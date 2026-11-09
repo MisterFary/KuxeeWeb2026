@@ -1,0 +1,124 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Evaluar Maestro - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .evaluar-container { max-width: 600px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .evaluar-header { text-align: center; margin-bottom: 30px; }
+    .evaluar-header h1 { color: #0f172a; font-size: 1.8rem; margin-bottom: 10px; }
+    .evaluar-header p { color: #64748b; font-size: 1rem; }
+    
+    .stars-container { display: flex; justify-content: center; gap: 10px; flex-direction: row-reverse; margin-bottom: 30px; }
+    .stars-container input { display: none; }
+    .stars-container label { font-size: 3rem; color: #e2e8f0; cursor: pointer; transition: color 0.2s; }
+    .stars-container label:hover,
+    .stars-container label:hover ~ label,
+    .stars-container input:checked ~ label { color: #facc15; }
+
+    .form-group { margin-bottom: 25px; }
+    .form-label { display: block; font-weight: bold; color: #334155; margin-bottom: 8px; }
+    .form-control { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+    .form-control:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    
+    /* ESTILOS NUEVOS PARA EL BOTÓN DE SUBIR FOTOS */
+    .upload-area { text-align: center; padding: 30px 20px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; transition: all 0.3s; }
+    .upload-area:hover { border-color: #4f46e5; background: #e0e7ff; }
+    .btn-upload { background: white; color: #4f46e5; border: 1px solid #4f46e5; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; transition: 0.2s; }
+    .btn-upload:hover { background: #4f46e5; color: white; }
+    .file-list { margin-top: 15px; font-size: 0.9rem; color: #475569; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .file-item { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 20px; border: 1px solid #e2e8f0; font-weight: 500; }
+
+    .btn-submit { background: #10b981; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:hover { background: #059669; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="evaluar-container">
+    <div class="evaluar-header">
+        <h1>Califica a {{ trato.maestro.first_name|title|default:trato.maestro.username|title }}</h1>
+        <p>Trabajo: <strong>{{ trato.servicio.titulo }}</strong></p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #475569;">¿Qué te pareció el servicio?</div>
+        <!-- Sistema visual de estrellas -->
+        <div class="stars-container">
+            <input type="radio" id="star5" name="calificacion" value="5" required>
+            <label for="star5" title="5 estrellas"><i class="fas fa-star"></i></label>
+            <input type="radio" id="star4" name="calificacion" value="4">
+            <label for="star4" title="4 estrellas"><i class="fas fa-star"></i></label>
+            <input type="radio" id="star3" name="calificacion" value="3">
+            <label for="star3" title="3 estrellas"><i class="fas fa-star"></i></label>
+            <input type="radio" id="star2" name="calificacion" value="2">
+            <label for="star2" title="2 estrellas"><i class="fas fa-star"></i></label>
+            <input type="radio" id="star1" name="calificacion" value="1">
+            <label for="star1" title="1 estrella"><i class="fas fa-star"></i></label>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Comentario (Opcional)</label>
+            <textarea name="comentario" class="form-control" rows="4" placeholder="Describe cómo fue tu experiencia trabajando con este maestro..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Sube fotos del trabajo terminado (Opcional, hasta 3)</label>
+            
+            <!-- NUEVA INTERFAZ DE UN SOLO BOTÓN -->
+            <div class="upload-area">
+                <label for="file-upload" class="btn-upload"><i class="fas fa-camera"></i> Seleccionar imágenes</label>
+                <!-- Este input permite elegir múltiples fotos a la vez, pero está oculto -->
+                <input type="file" id="file-upload" multiple accept="image/*" style="display: none;">
+                
+                <!-- Aquí aparecerán los nombres de las fotos seleccionadas -->
+                <div id="file-list" class="file-list"></div>
+            </div>
+
+            <!-- Inputs originales ocultos (El Javascript pondrá las fotos aquí para Django) -->
+            <input type="file" name="imagen_1" id="img1" style="display:none;">
+            <input type="file" name="imagen_2" id="img2" style="display:none;">
+            <input type="file" name="imagen_3" id="img3" style="display:none;">
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Publicar Reseña</button>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="{% url 'mis_trabajos' %}" style="color: #64748b; text-decoration: none;">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('file-upload').addEventListener('change', function(e) {
+        const files = e.target.files;
+        const listDiv = document.getElementById('file-list');
+        listDiv.innerHTML = ''; // Limpiar lista visual
+        
+        // Limpiar inputs ocultos por si el usuario cambia de opinión
+        document.getElementById('img1').value = '';
+        document.getElementById('img2').value = '';
+        document.getElementById('img3').value = '';
+
+        // Validar que no sean más de 3 fotos
+        if (files.length > 3) {
+            alert('Solo puedes subir un máximo de 3 imágenes.');
+            this.value = ''; // Resetear el botón
+            return;
+        }
+
+        // Repartir las fotos elegidas en los 3 inputs ocultos que lee Django
+        for(let i = 0; i < files.length; i++) {
+            let dt = new DataTransfer();
+            dt.items.add(files[i]);
+            document.getElementById('img' + (i+1)).files = dt.files;
+            
+            // Añadir el nombre del archivo con un ticket verde a la vista
+            listDiv.innerHTML += '<div class="file-item"><i class="fas fa-check-circle" style="color: #10b981;"></i> ' + files[i].name + '</div>';
+        }
+    });
+</script>
+{% endblock %}

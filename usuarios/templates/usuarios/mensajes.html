@@ -1,0 +1,464 @@
+{% extends 'usuarios/base.html' %}
+{% block title %}Mis Conversaciones - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Diseño General del Chat */
+    .chat-layout { max-width: 1200px; margin: 25px auto; display: flex; height: calc(100vh - 120px); min-height: 600px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden; }
+    
+    /* Barra Lateral de Contactos */
+    .chat-sidebar { width: 350px; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; background: white; }
+    .chat-sidebar-header { background: #4f46e5; color: white; padding: 20px; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+    .chat-search { padding: 15px; border-bottom: 1px solid #e2e8f0; background: white; }
+    .search-input-wrapper { position: relative; }
+    .search-input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .chat-search input { width: 100%; padding: 10px 15px 10px 40px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; }
+    .chat-list { flex: 1; overflow-y: auto; }
+    .chat-item { display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.2s; align-items: center; }
+    .chat-item:hover { background: #f8fafc; }
+    .chat-item.active { background: #f1f5f9; border-left: 4px solid #4f46e5; padding-left: 11px; }
+    .chat-item-avatar { width: 50px; height: 50px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 1.5rem; flex-shrink: 0; overflow: hidden;}
+    .chat-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .chat-item-info { flex: 1; overflow: hidden; }
+    .chat-item-name { font-weight: bold; color: #0f172a; font-size: 1rem; margin-bottom: 2px; }
+    .chat-item-msg { color: #64748b; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
+    
+    /* Área Principal del Chat */
+    .chat-main { flex: 1; display: flex; flex-direction: column; background: #f8fafc; position: relative;}
+    .chat-main-header { padding: 15px 25px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .chat-header-profile { display: flex; align-items: center; gap: 15px; }
+    .chat-header-info { display: flex; flex-direction: column; }
+    .chat-header-name { font-weight: bold; color: #0f172a; font-size: 1.1rem; }
+    .chat-header-service { color: #64748b; font-size: 0.85rem; }
+    .chat-header-actions { display: flex; align-items: center; gap: 12px; }
+    
+    /* Botones y Círculos Superiores */
+    .btn-trato { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
+    .btn-trato:hover { background: #059669; }
+    .btn-pagado { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; cursor: default; opacity: 0.95; }
+    .action-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
+    .circle-bell { color: #f59e0b; background: #fef3c7; }
+    .circle-help { color: white; background: #4f46e5; }
+    
+    /* Área de Mensajes y Globos */
+    .chat-messages-area { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+    .mensaje-globo { max-width: 70%; padding: 12px 16px; border-radius: 15px; position: relative; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
+    .msg-enviado { background: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .msg-recibido { background: white; color: #1e293b; border: 1px solid #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .msg-hora { font-size: 0.7rem; display: block; text-align: right; margin-top: 5px; opacity: 0.8; }
+    
+    /* Animación Escribiendo... */
+    .typing-indicator {
+        background: #f1f5f9; border: 1px solid #e2e8f0; align-self: flex-start; padding: 14px 18px; border-radius: 15px;
+        border-bottom-left-radius: 2px; display: inline-flex; gap: 6px; align-items: center; margin-top: 5px; min-height: 20px;
+    }
+    .typing-dot {
+        width: 7px; height: 7px; background-color: #64748b; border-radius: 50%; display: block;
+        animation: typingBounce 1.2s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typingBounce {
+        0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+        40% { transform: translateY(-5px); opacity: 1; }
+    }
+    
+    /* Caja Inferior de Texto */
+    .chat-bottom-wrapper { background: white; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; margin: 0; }
+    .chat-warning { background: #fef9c3; color: #a16207; padding: 8px 15px; text-align: center; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; border-bottom: 1px solid #fde047; }
+    .chat-input-row { padding: 15px 25px; display: flex; align-items: center; gap: 15px; }
+    .attach-btn { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.2s; flex-shrink: 0;}
+    .input-box { flex: 1; background: white; border: 1px solid #cbd5e1; border-radius: 25px; padding: 12px 20px; display: flex; align-items: center; }
+    .input-box input { width: 100%; border: none; outline: none; font-size: 0.95rem; font-family: inherit; }
+    .send-btn { width: 45px; height: 45px; border-radius: 50%; background: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-size: 1.2rem; transition: background 0.2s; flex-shrink: 0; box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);}
+    .empty-chat-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: #f8fafc; }
+
+    /* ESTILOS DEL SISTEMA DE TRATOS AUTOMÁTICO */
+    .mensaje-sistema { max-width: 80%; padding: 10px 20px; border-radius: 25px; font-size: 0.9rem; text-align: center; align-self: center; margin: 10px 0; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .msj-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+    .msj-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .msj-success { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+    
+    .trato-banner-top { background: #fef9c3; border-bottom: 1px solid #fde047; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .trato-banner-texto { color: #854d0e; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .trato-banner-acciones { display: flex; gap: 10px; align-items: center; }
+    .btn-pagar { background: #4f46e5; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .btn-pagar:hover { background: #4338ca; }
+    .btn-cancelar { background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .btn-cancelar:hover { background: #475569; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="chat-layout">
+    
+    <!-- BARRA LATERAL IZQUIERDA -->
+    <div class="chat-sidebar">
+        <div class="chat-sidebar-header">
+            <i class="fas fa-comments"></i> Mis conversaciones
+        </div>
+        <div class="chat-search">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar en mis chats...">
+            </div>
+        </div>
+        <div class="chat-list">
+            {% for conv in conversaciones %}
+                <a href="{% url 'mensajes' %}?contacto={{ conv.contacto.username }}{% if conv.ultimo_mensaje.servicio %}&servicio={{ conv.ultimo_mensaje.servicio.id }}{% endif %}" style="text-decoration: none; color: inherit;">
+                    <div class="chat-item {% if contacto_activo.username == conv.contacto.username %}active{% endif %}">
+                        <div class="chat-item-avatar">
+                            {% if conv.contacto.foto_perfil %}
+                                <img src="{{ conv.contacto.foto_perfil.url }}">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">
+                                {% if conv.contacto.first_name %}{{ conv.contacto.first_name }} {{ conv.contacto.last_name }}{% else %}{{ conv.contacto.username }}{% endif %}
+                            </div>
+                            <div class="chat-item-msg">
+                                {% if conv.ultimo_mensaje.remitente == user %}Tú: {% endif %}{{ conv.ultimo_mensaje.contenido|truncatechars:30 }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <div style="padding: 30px 20px; text-align: center; color: #94a3b8; font-size: 0.95rem;">Aún no tienes conversaciones abiertas.</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- ÁREA PRINCIPAL DEL CHAT -->
+    <div class="chat-main">
+        {% if contacto_activo %}
+            
+            <!-- CABECERA DEL CHAT -->
+            <div class="chat-main-header">
+                <div class="chat-header-profile">
+                    <div class="chat-item-avatar" style="width: 45px; height: 45px;">
+                        {% if contacto_activo.foto_perfil %}
+                            <img src="{{ contacto_activo.foto_perfil.url }}">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="chat-header-info">
+                        <div class="chat-header-name">
+                            {% if contacto_activo.first_name %}{{ contacto_activo.first_name }} {{ contacto_activo.last_name }}{% else %}{{ contacto_activo.username }}{% endif %}
+                        </div>
+                        <div class="chat-header-service">
+                            {% if servicio_activo %}Sobre: {{ servicio_activo.titulo }}{% else %}Conversación iniciada{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-header-actions">
+                    <!-- BOTÓN DINÁMICO: Si ya está pagado muestra 'Pagado', de lo contrario muestra 'Hacer trato' -->
+                    {% if trato_pagado %}
+                        <button type="button" class="btn-pagado" disabled>
+                            <i class="fas fa-check-circle"></i> Pagado
+                        </button>
+                    {% elif servicio_activo and not trato_pendiente and user != servicio_activo.maestro.usuario %}
+                        <button type="button" class="btn-trato" onclick="verificarRutYHacerTrato()">
+                            <i class="far fa-handshake"></i> Hacer trato
+                        </button>
+                    {% endif %}
+
+                    <!-- BOTÓN ELIMINAR CHAT (NUEVO) -->
+                    {% if servicio_activo %}
+                    <form id="form-eliminar-chat" method="POST" action="{% url 'eliminar_chat' contacto_activo.username servicio_activo.id %}" style="display: inline-block;">
+                        {% csrf_token %}
+                        <button type="button" onclick="confirmarEliminarChat()" title="Eliminar chat" style="background: #ef4444; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(239,68,68,0.3); vertical-align: middle;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <div class="action-circle circle-bell"><i class="fas fa-bell"></i></div>
+                    <div class="action-circle circle-help"><i class="fas fa-question"></i></div>
+                </div>
+            </div>
+            
+            <!-- BARRA SUPERIOR DE TRATO PENDIENTE -->
+            {% if trato_pendiente %}
+            <div class="trato-banner-top">
+                <div class="trato-banner-texto">
+                    <i class="fas fa-hourglass-half"></i> Trato propuesto: Trato sobre: {{ servicio_activo.titulo }} · Comisión Kuxee: {% if request.user.perfil_cliente.plan_actual == 'premium' %}$5.990{% else %}$6.990{% endif %}
+                </div>
+                <div class="trato-banner-acciones">
+                    {% if user == trato_pendiente.cliente %}
+                        <button class="btn-pagar" onclick="procesarTrato('ir_a_pagar')">
+                            <i class="fas fa-credit-card"></i> Pagar ({% if request.user.perfil_cliente.plan_actual == 'premium' %}$5.990{% else %}$6.990{% endif %})
+                        </button>
+                    {% else %}
+                        <span style="font-size: 0.85rem; font-weight: bold; color: #b45309; display: flex; align-items: center;">
+                            <i class="fas fa-spinner fa-spin" style="margin-right: 5px;"></i> Esperando pago del cliente...
+                        </span>
+                    {% endif %}
+                    <button class="btn-cancelar" onclick="procesarTrato('cancelar')">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- ÁREA DE MENSAJES -->
+            <div class="chat-messages-area" id="caja-mensajes">
+                {% for msg in mensajes %}
+                    {% if msg.es_sistema %}
+                        <!-- GLOBOS AUTOMÁTICOS DEL SISTEMA -->
+                        <div class="mensaje-sistema {% if msg.tipo_sistema == 'danger' %}msj-danger{% elif msg.tipo_sistema == 'success' %}msj-success{% else %}msj-warning{% endif %}">
+                            {% if msg.tipo_sistema == 'warning' %}<i class="fas fa-handshake"></i>{% endif %}
+                            {% if msg.tipo_sistema == 'danger' %}<i class="fas fa-times"></i>{% endif %}
+                            {% if msg.tipo_sistema == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+                            {{ msg.contenido }}
+                        </div>
+                    {% else %}
+                        <!-- GLOBOS DE TEXTO NORMALES -->
+                        <div class="mensaje-globo {% if msg.remitente == user %}msg-enviado{% else %}msg-recibido{% endif %}">
+                            {{ msg.contenido }}
+                            <span class="msg-hora">{{ msg.fecha_envio|date:"H:i" }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- ANIMACIÓN ESCRIBIENDO -->
+                {% if otro_escribiendo %}
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- BARRA INFERIOR PARA ESCRIBIR MENSAJE -->
+            <form id="form-mensaje" class="chat-bottom-wrapper" method="POST" action="">
+                {% csrf_token %}
+                
+                <!-- BANNER DINÁMICO DE ADVERTENCIA DE SEGURIDAD -->
+                {% if not trato_pagado %}
+                <div class="chat-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Por seguridad y para que Kuxee proteja el trato, está prohibido compartir teléfonos, correos o direcciones antes de pagar la comisión.
+                </div>
+                {% else %}
+                <div class="chat-warning" style="background: #d1fae5; color: #047857; border-bottom: 1px solid #6ee7b7;">
+                    <i class="fas fa-info-circle"></i> Trato pagado. Ya pueden compartir datos de contacto de forma segura.
+                </div>
+                {% endif %}
+
+                <div class="chat-input-row">
+                    <button type="button" class="attach-btn"><i class="fas fa-paperclip"></i></button>
+                    <div class="input-box">
+                        <input type="text" name="contenido" id="chat-input" placeholder="Escribe un mensaje..." required autocomplete="off" autofocus>
+                    </div>
+                    <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </form>
+            
+        {% else %}
+            <!-- ESTADO VACÍO SI NO HA SELECCIONADO CONTACTO -->
+            <div class="empty-chat-state">
+                <i class="fas fa-comments" style="font-size: 5rem; color: #cbd5e1; margin-bottom: 20px;"></i>
+                <h3 style="color: #475569; margin: 0 0 10px 0; font-size: 1.5rem;">Tus Mensajes</h3>
+                <p style="color: #94a3b8;">Selecciona a un maestro para iniciar una conversación.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const TIENE_RUT = "{{ user.rut|default:'' }}" !== "";
+    const CONTACTO_USERNAME = "{{ contacto_activo.username|default:'' }}";
+    const SERVICIO_ID = "{{ servicio_activo.id|default:'' }}";
+    
+    // Configuración del precio dinámico de la comisión basado en el plan
+    const PRECIO_COMISION = "{% if request.user.perfil_cliente.plan_actual == 'premium' %}5.990{% else %}6.990{% endif %}";
+    
+    function validarRutChileno(rutCompleto) {
+        if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rutCompleto)) return false;
+        let tmp = rutCompleto.split('-');
+        let digv = tmp[1].toLowerCase();
+        let rut = tmp[0];
+        let M = 0, S = 1;
+        for (; rut; rut = Math.floor(rut / 10)) { S = (S + rut % 10 * (9 - M++ % 6)) % 11; }
+        return (S ? S - 1 : 'k') == digv;
+    }
+
+    function verificarRutYHacerTrato() {
+        if (!TIENE_RUT) {
+            Swal.fire({
+                title: 'Necesitamos tu RUT',
+                html: `
+                    <p style="font-size:0.95rem; text-align:left; color:#475569; margin-bottom:10px;">Necesitamos tu RUT (chileno válido) antes de pagar. Lo pedimos solo una vez en Ajustes.</p>
+                    <p style="font-size:0.95rem; text-align:left; color:#475569; margin-bottom:20px;">Lo pedimos solo una vez para emitir la boleta. Ejemplo: 12345678-5</p>
+                    <input type="text" id="swal-input-rut" class="swal2-input" placeholder="Ej: 12345678-5" style="width: 80%;">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar y continuar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'swal2-custom-popup' },
+                preConfirm: () => {
+                    const rut = document.getElementById('swal-input-rut').value;
+                    if (!validarRutChileno(rut)) {
+                        Swal.showValidationMessage('Por favor, ingresa un RUT válido con guion');
+                        return false;
+                    }
+                    return rut;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('rut', result.value);
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                    
+                    fetch("{% url 'guardar_rut' %}", { method: 'POST', body: formData })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'ok') { mostrarConfirmacionTrato(); }
+                        });
+                }
+            });
+        } else {
+            mostrarConfirmacionTrato();
+        }
+    }
+
+    function mostrarConfirmacionTrato() {
+        Swal.fire({
+            icon: 'info',
+            title: '¿Hacer trato?',
+            html: `
+                <p style="text-align:left; color:#475569;">Pagarás SOLO la comisión de Kuxee ($${PRECIO_COMISION} CLP) con tarjeta — este monto va a Kuxee por el uso de la plataforma.</p>
+                <p style="text-align:left; color:#475569; margin-top:15px;">Una vez aprobada, se desbloquean los datos de contacto del maestro y entre ustedes acuerdan libremente el precio del trabajo. Ese dinero del trabajo es 100% para el maestro.</p>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Ir a pagar $' + PRECIO_COMISION,
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#4f46e5',
+            customClass: { popup: 'swal2-custom-popup' }
+        }).then((result) => {
+            if (result.isConfirmed) { 
+                procesarTrato('iniciar_y_pagar'); 
+            }
+        });
+    }
+
+    function procesarTrato(accion) {
+        const formData = new FormData();
+        formData.append('accion', accion);
+        formData.append('contacto', CONTACTO_USERNAME);
+        formData.append('servicio_id', SERVICIO_ID);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch("{% url 'gestionar_trato' %}", { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => { 
+                if (data.status === 'ok') { 
+                    window.location.reload(); 
+                }
+                else if (data.status === 'redirect') { 
+                    window.location.href = data.url; 
+                }
+                else if (data.status === 'error') {
+                    Swal.fire('Error', data.msg || 'Hubo un problema procesando la solicitud', 'error');
+                }
+            });
+    }
+
+    function confirmarEliminarChat() {
+        Swal.fire({
+            title: '¿Eliminar conversación?',
+            text: 'Esta acción borrará todos los mensajes permanentemente para ambos usuarios.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('form-eliminar-chat').submit();
+            }
+        });
+    }
+
+    var cajaMensajes = document.getElementById("caja-mensajes");
+    var formMensaje = document.getElementById("form-mensaje");
+    var inputTexto = document.getElementById("chat-input");
+
+    if (cajaMensajes) cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
+
+    function actualizarMensajes() {
+        if (!cajaMensajes) return;
+        var urlFresca = new URL(window.location.href, window.location.origin);
+        urlFresca.searchParams.set('_t', new Date().getTime());
+        
+        fetch(urlFresca.toString(), { cache: 'no-store' })
+            .then(response => response.text())
+            .then(html => {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var nuevaCaja = doc.getElementById('caja-mensajes');
+                if (nuevaCaja && cajaMensajes.innerHTML.trim() !== nuevaCaja.innerHTML.trim()) {
+                    cajaMensajes.innerHTML = nuevaCaja.innerHTML;
+                    cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
+                }
+            });
+    }
+    
+    if (cajaMensajes) { setInterval(actualizarMensajes, 2000); }
+
+    let escribiendoTimeout = false;
+    if (inputTexto && formMensaje) {
+        inputTexto.addEventListener('input', function() {
+            if (!escribiendoTimeout && inputTexto.value.trim().length > 0) {
+                escribiendoTimeout = true;
+                let formData = new FormData();
+                formData.append('accion', 'escribiendo');
+                formData.append('csrfmiddlewaretoken', formMensaje.querySelector('[name=csrfmiddlewaretoken]').value);
+                fetch(window.location.href, { method: 'POST', body: formData });
+                setTimeout(() => { escribiendoTimeout = false; }, 2500); 
+            }
+        });
+    }
+
+    // ENVÍO DE MENSAJES CON INTERCEPTOR DE SEGURIDAD (REGEX)
+    if (formMensaje) {
+        formMensaje.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            var formData = new FormData(formMensaje);
+            var mensajeOriginal = inputTexto.value; // Guardamos el texto por si hay error
+            inputTexto.value = ''; // Limpiamos la caja visualmente rápido
+            
+            fetch(window.location.href, { 
+                method: 'POST', 
+                body: formData, 
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    // Si el servidor detectó datos prohibidos antes de pagar
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Acción no permitida',
+                        text: data.msg,
+                        confirmButtonColor: '#4f46e5'
+                    });
+                    inputTexto.value = mensajeOriginal; // Devolvemos el texto a la caja
+                } else {
+                    // Mensaje válido guardado correctamente
+                    actualizarMensajes(); 
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar el mensaje:', error);
+                actualizarMensajes();
+            });
+        });
+    }
+</script>
+{% endblock %}

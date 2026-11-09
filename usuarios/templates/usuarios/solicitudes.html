@@ -1,0 +1,225 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block title %}Solicitudes publicadas - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .solicitudes-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    /* Encabezado Centrado */
+    .header-center { text-align: center; margin-bottom: 40px; }
+    .page-title { color: #0f172a; margin-bottom: 10px; font-size: 2.5rem; font-weight: 800; }
+    .page-subtitle { color: #64748b; font-size: 1.1rem; margin: 0; }
+
+    /* Barra de Filtros (Estilo Servicios) */
+    .filter-bar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; display: flex; gap: 20px; align-items: flex-end; margin-bottom: 40px; }
+    .filter-group { flex: 1; }
+    .filter-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; color: #1e293b; }
+    .filter-group label span { font-weight: normal; color: #94a3b8; font-size: 0.8rem; margin-left: 5px; }
+    
+    .filter-group input.search-input { width: 100%; height: 45px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; }
+    .select2-container--default .select2-selection--single { height: 45px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; padding: 8px !important; outline: none; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { top: 9px !important; }
+
+    .btn-filtrar { background: #3b82f6; color: white; border: none; padding: 0 30px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; height: 45px; font-size: 1rem; transition: background 0.3s; text-decoration: none; }
+    .btn-filtrar:hover { background: #2563eb; color: white; }
+
+    /* Cuadrícula de Tarjetas */
+    .grid-solicitudes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+    /* Diseño de la Tarjeta Vertical Cliqueable */
+    .card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; color: inherit; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    
+    .card-img { width: 100%; height: 140px; background: #f1f5f9; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .card-img i { font-size: 3rem; color: #cbd5e1; }
+
+    .card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin: 0 0 10px 0; line-height: 1.3; }
+    .card-desc { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
+    
+    .card-footer { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #3b82f6; }
+    .card-footer span { display: flex; align-items: center; gap: 8px; }
+
+    /* Estado Vacío */
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #64748b; }
+    .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 15px; }
+    .empty-state h3 { color: #475569; font-size: 1.3rem; margin: 0; }
+
+    /* Botón Flotante Redondo */
+    .btn-flotante {
+        position: fixed; bottom: 40px; right: 40px; background: #3b82f6; color: white;
+        width: 65px; height: 65px; border-radius: 50%; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        font-weight: bold; font-size: 2rem; display: flex; justify-content: center; align-items: center;
+        text-decoration: none; z-index: 999; transition: all 0.3s; border: none; cursor: pointer;
+    }
+    .btn-flotante:hover { background: #2563eb; transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
+
+    /* Estilos del Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; justify-content: center; align-items: center; }
+    .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: #64748b; cursor: pointer; border: none; background: none; }
+    .modal-title { color: #3b82f6; font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; font-weight: bold; }
+    .form-control, .form-select { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+    .btn-submit-modal { width: 100%; background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+    .btn-submit-modal:hover { background: #2563eb; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="solicitudes-container">
+    
+    <!-- Encabezado Centrado -->
+    <div class="header-center">
+        <h1 class="page-title">Solicitudes publicadas</h1>
+        <p class="page-subtitle">Explora lo que los clientes de Kuxee necesitan y ofréceles tu ayuda</p>
+    </div>
+
+    <!-- Barra de Filtros -->
+    <form class="filter-bar" method="GET">
+        <div class="filter-group">
+            <label style="opacity: 0;">Buscar</label>
+            <input type="text" name="q" class="search-input" placeholder="Buscar..." value="{{ request.GET.q }}">
+        </div>
+        <div class="filter-group">
+            <label>Oficios <span>(selecciona uno)</span></label>
+            <select name="oficio" id="filtro_oficio">
+                <option value="">Todos los oficios</option>
+                {% for categoria, oficios_list in oficios %}
+                    <optgroup label="{{ categoria }}">
+                        {% for valor, etiqueta in oficios_list %}
+                            <option value="{{ valor }}" {% if request.GET.oficio == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Comunas <span>(selecciona una)</span></label>
+            <select name="comuna" id="filtro_comuna">
+                <option value="">Todas las comunas</option>
+                {% for region, comunas_list in regiones %}
+                    <optgroup label="{{ region }}">
+                        {% for valor, etiqueta in comunas_list %}
+                            <option value="{{ valor }}" {% if request.GET.comuna == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-filtrar"><i class="fas fa-filter"></i> Filtrar</button>
+    </form>
+
+    <!-- Área de resultados: Cuadrícula de Tarjetas Cliqueables -->
+    <div class="grid-solicitudes">
+        {% for solicitud in solicitudes %}
+            <a href="{% url 'detalle_solicitud' solicitud.id %}" class="card">
+                <!-- Imagen Superior -->
+                <div class="card-img">
+                    {% if solicitud.archivos.first %}
+                        <img src="{{ solicitud.archivos.first.archivo.url }}" alt="{{ solicitud.titulo }}">
+                    {% else %}
+                        <i class="fas fa-clipboard-list"></i>
+                    {% endif %}
+                </div>
+                
+                <!-- Contenido de la Tarjeta -->
+                <div class="card-body">
+                    <h3 class="card-title">{{ solicitud.titulo }}</h3>
+                    <p class="card-desc">{{ solicitud.descripcion|truncatechars:60 }}</p>
+                    
+                    <div class="card-footer">
+                        <span><i class="fas fa-map-marker-alt"></i> {{ solicitud.cliente.comuna }}</span>
+                        <span><i class="fas fa-user"></i> {{ solicitud.cliente.usuario.first_name }}</span>
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No hay solicitudes publicadas aún.</h3>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Botón Flotante para Clientes Premium -->
+{% if user.is_authenticated and user.es_cliente and user.perfil_cliente.plan_actual == 'premium' %}
+    <button class="btn-flotante" onclick="abrirModal()">
+        <i class="fas fa-plus"></i>
+    </button>
+{% endif %}
+
+<!-- Modal de Publicación -->
+<div class="modal-overlay" id="modalSolicitud">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
+        <h2 class="modal-title"><i class="fas fa-plus"></i> Publicar nueva solicitud</h2>
+        
+        <form method="POST" action="{% url 'publicar_solicitud' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label style="font-weight: bold; color: #334155;">Nombre de la solicitud *</label>
+            <input type="text" name="titulo" class="form-control" placeholder="Ej: Instalación eléctrica (máx 60 caracteres)" maxlength="60" required>
+
+            <label style="font-weight: bold; color: #334155;">Descripción *</label>
+            <textarea name="descripcion" class="form-control" rows="4" placeholder="Describe qué incluye, materiales, tiempo estimado... (máx 2000 caracteres)" maxlength="2000" required></textarea>
+
+            <label style="font-weight: bold; color: #334155;">Categoría requerida *</label>
+            <select name="oficio" class="form-select" required>
+                <option value="" disabled selected>Selecciona un oficio</option>
+                {% for categoria, oficios_list in oficios %}
+                    <optgroup label="{{ categoria }}">
+                        {% for valor, etiqueta in oficios_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+
+            <label style="font-weight: bold; color: #334155;">Imágenes o videos de referencia (Max 10)</label>
+            <input type="file" name="archivos" class="form-control" multiple accept="image/*,video/*">
+
+            <button type="submit" class="btn-submit-modal">Publicar solicitud</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#filtro_oficio').select2({
+            placeholder: "Todos los oficios",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        $('#filtro_comuna').select2({
+            placeholder: "Todas las comunas",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
+    // Funciones del Modal
+    function abrirModal() {
+        document.getElementById('modalSolicitud').style.display = 'flex';
+    }
+    
+    function cerrarModal() {
+        document.getElementById('modalSolicitud').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic afuera
+    window.onclick = function(event) {
+        var modal = document.getElementById('modalSolicitud');
+        if (event.target == modal) {
+            cerrarModal();
+        }
+    }
+</script>
+{% endblock %}

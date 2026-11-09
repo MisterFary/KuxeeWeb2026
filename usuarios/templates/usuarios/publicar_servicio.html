@@ -1,0 +1,143 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Publicar nuevo servicio - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .page-title { color: var(--kuxee-dark); margin-bottom: 10px; font-size: 2rem; }
+    .page-subtitle { color: #64748b; margin-bottom: 30px; font-size: 1rem; }
+    
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #475569; }
+    .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+    .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    textarea.form-control { resize: vertical; min-height: 120px; }
+    
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
+    .btn-submit:hover { background: #2563eb; }
+
+    .file-upload-box { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 8px; color: #64748b; cursor: pointer; background: #f8fafc; transition: all 0.2s; }
+    .file-upload-box:hover { border-color: var(--kuxee-blue); background: #f1f5f9; color: var(--kuxee-blue); }
+    .file-upload-box i { font-size: 3rem; margin-bottom: 15px; }
+    .file-upload-box.dragover { border-color: var(--kuxee-blue); background: #eff6ff; color: var(--kuxee-blue); }
+
+    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+    .preview-item { position: relative; width: 100%; padding-top: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .preview-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    .alert-error { background: #fee2e2; color: #b91c1c; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="form-container">
+    <h1 class="page-title">Publicar nuevo servicio</h1>
+    <p class="page-subtitle">Completa los detalles de tu trabajo para que los clientes puedan encontrarte.</p>
+
+    {% if error %}
+        <div class="alert-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Título del servicio</label>
+            <input type="text" name="titulo" class="form-control" placeholder="Ej: Instalación eléctrica domiciliaria" maxlength="150" required>
+        </div>
+
+        <div class="form-group">
+            <label>Categoría (Oficio)</label>
+            <select name="oficio" class="form-control" id="select_oficio" required>
+                <option value="">Selecciona una categoría</option>
+                {% for categoria, oficios_list in oficios %}
+                    <optgroup label="{{ categoria }}">
+                        {% for valor, etiqueta in oficios_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Descripción detallada</label>
+            <textarea name="descripcion" class="form-control" placeholder="Describe qué incluye tu servicio, tus años de experiencia, herramientas que utilizas, etc." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Precio base estimado (Opcional)</label>
+            <input type="number" name="precio" class="form-control" placeholder="Ej: 25000" min="0" step="1">
+        </div>
+
+        <div class="form-group">
+            <label>Fotos de trabajos anteriores</label>
+            <div class="file-upload-box" id="drop-area" onclick="document.getElementById('file-input').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Haz clic para subir imágenes o arrástralas aquí</p>
+                <small>Formatos soportados: JPG, PNG. Máximo 5MB por foto.</small>
+            </div>
+            <input type="file" name="imagenes" id="file-input" style="display: none;" multiple accept="image/png, image/jpeg">
+            <div class="preview-grid" id="preview-grid"></div>
+        </div>
+
+        <button type="submit" class="btn-submit">Publicar Servicio</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#select_oficio').select2({
+            width: '100%',
+            placeholder: "Selecciona una categoría"
+        });
+    });
+
+    // Vista previa simple de las imágenes seleccionadas
+    const fileInput = document.getElementById('file-input');
+    const dropArea = document.getElementById('drop-area');
+    const previewGrid = document.getElementById('preview-grid');
+
+    function mostrarPreview(files) {
+        previewGrid.innerHTML = '';
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
+                previewGrid.appendChild(item);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    fileInput.addEventListener('change', function() {
+        mostrarPreview(this.files);
+    });
+
+    // Soporte básico de arrastrar y soltar
+    ['dragenter', 'dragover'].forEach(evento => {
+        dropArea.addEventListener(evento, function(e) {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evento => {
+        dropArea.addEventListener(evento, function(e) {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+        });
+    });
+
+    dropArea.addEventListener('drop', function(e) {
+        fileInput.files = e.dataTransfer.files;
+        mostrarPreview(fileInput.files);
+    });
+</script>
+{% endblock %}

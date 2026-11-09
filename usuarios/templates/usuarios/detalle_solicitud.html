@@ -1,0 +1,133 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block title %}{{ solicitud.titulo }} - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detalle-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    .breadcrumb { margin-bottom: 20px; font-size: 0.9rem; color: #64748b; }
+    .breadcrumb a { color: #3b82f6; text-decoration: none; }
+    
+    .detalle-layout { display: flex; gap: 40px; flex-wrap: wrap; }
+    
+    /* Galería de imágenes (Izquierda) */
+    .galeria-section { flex: 1; min-width: 300px; max-width: 600px; }
+    .img-principal { width: 100%; height: 400px; background: #000; border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+    .img-principal img { width: 100%; height: 100%; object-fit: contain; }
+    .img-principal i { font-size: 5rem; color: #334155; }
+    
+    .miniaturas { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+    .miniatura { width: 80px; height: 60px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; object-fit: cover; }
+    .miniatura.activa { border-color: #3b82f6; }
+
+    /* Info del Servicio (Derecha) */
+    .info-section { flex: 1; min-width: 300px; }
+    .tag-oficio { color: #64748b; font-size: 0.9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+    .titulo-solicitud { color: #0f172a; font-size: 2.2rem; font-weight: 900; margin: 0 0 20px 0; text-transform: uppercase; }
+    
+    .perfil-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; background: #f8fafc; margin-bottom: 30px; }
+    .avatar-cliente { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid #cbd5e1; font-size: 1.5rem; color: #64748b; }
+    .datos-cliente h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; }
+    .datos-cliente p { margin: 0; color: #64748b; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+
+    .seccion-descripcion h3 { font-size: 1.2rem; color: #0f172a; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    .seccion-descripcion p { color: #475569; line-height: 1.6; font-size: 1rem; }
+
+    .acciones-btn { display: flex; gap: 15px; margin-top: 40px; }
+    .btn-contactar { background: #4f46e5; color: white; padding: 12px 30px; border-radius: 6px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 10px; border: none; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
+    .btn-contactar:hover { background: #4338ca; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="detalle-container">
+    <div class="breadcrumb">
+        <a href="{% url 'solicitudes' %}">Solicitudes</a> > <span class="format-texto">{{ solicitud.oficio_requerido }}</span> > {{ solicitud.titulo }}
+    </div>
+
+    <div class="detalle-layout">
+        <!-- Izquierda: Imágenes -->
+        <div class="galeria-section">
+            <div class="img-principal">
+                {% if solicitud.archivos.first %}
+                    <img id="imgMostrada" src="{{ solicitud.archivos.first.archivo.url }}" alt="Imagen de solicitud">
+                {% else %}
+                    <i class="fas fa-clipboard-list"></i>
+                {% endif %}
+            </div>
+            
+            {% if solicitud.archivos.count > 1 %}
+            <div class="miniaturas">
+                {% for archivo in solicitud.archivos.all %}
+                    <img src="{{ archivo.archivo.url }}" class="miniatura {% if forloop.first %}activa{% endif %}" onclick="cambiarImagen(this, '{{ archivo.archivo.url }}')">
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Derecha: Información -->
+        <div class="info-section">
+            <div class="tag-oficio"><i class="fas fa-tag"></i> <span class="format-texto">{{ solicitud.oficio_requerido }}</span></div>
+            <h1 class="titulo-solicitud">{{ solicitud.titulo }}</h1>
+
+            <div class="perfil-card">
+                <div class="avatar-cliente">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="datos-cliente">
+                    <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px;">Solicitado por</p>
+                    <h4>{{ solicitud.cliente.usuario.first_name }} {{ solicitud.cliente.usuario.last_name }}</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ solicitud.cliente.comuna }}</p>
+                </div>
+            </div>
+
+            <div class="seccion-descripcion">
+                <h3>Descripción</h3>
+                <p>{{ solicitud.descripcion|linebreaks }}</p>
+            </div>
+
+            <div class="acciones-btn">
+                {% if user.is_authenticated %}
+                    {% if user.es_maestro %}
+                        <a href="{% url 'mensajes' %}?contacto={{ solicitud.cliente.usuario.username }}" class="btn-contactar">
+                            <i class="fas fa-comments"></i> Contactar cliente
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-contactar" style="background: #64748b;">
+                        Inicia sesión para contactar
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Función para la galería de imágenes
+    function cambiarImagen(elemento, url) {
+        document.getElementById('imgMostrada').src = url;
+        let miniaturas = document.getElementsByClassName('miniatura');
+        for (let i = 0; i < miniaturas.length; i++) {
+            miniaturas[i].classList.remove('activa');
+        }
+        elemento.classList.add('activa');
+    }
+
+    // Función para formatear el texto (quitar guiones bajos y capitalizar primera letra)
+    document.addEventListener("DOMContentLoaded", function() {
+        let textosFormatear = document.querySelectorAll('.format-texto');
+        textosFormatear.forEach(elemento => {
+            let texto = elemento.textContent.trim();
+            texto = texto.replace(/_/g, ' ');
+            if(texto.length > 0) {
+                elemento.textContent = texto.charAt(0).toUpperCase() + texto.slice(1);
+            }
+        });
+    });
+</script>
+{% endblock %}

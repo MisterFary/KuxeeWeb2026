@@ -1,0 +1,179 @@
+{% extends 'usuarios/base.html' %}
+{% block title %}Pago Seguro - Kuxee{% endblock %}
+
+{% block contenido %}
+<div style="min-height: 80vh; background: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    
+    <div style="background: white; max-width: 450px; width: 100%; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0;">
+        <div style="background: #1e293b; padding: 25px; text-align: center; color: white;">
+            <i class="fas fa-shield-alt" style="font-size: 2rem; color: #10b981; margin-bottom: 10px;"></i>
+            <h2 style="margin: 0; font-size: 1.4rem;">Pago de Comisión</h2>
+            <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 0.9rem;">Plataforma de Pago Segura Kuxee</p>
+        </div>
+        
+        <div style="padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 20px;">
+                <div>
+                    <strong style="color: #0f172a; display: block; font-size: 1.1rem;">Servicio a reservar</strong>
+                    <span style="color: #64748b; font-size: 0.9rem;">{{ trato.servicio.titulo }}</span>
+                </div>
+                <div style="text-align: right;">
+                    <!-- PRECIO DINÁMICO: Si es Premium $5.990, si no $6.990 -->
+                    <strong style="color: #4f46e5; display: block; font-size: 1.5rem;">
+                        {% if request.user.perfil_cliente.plan_actual == 'premium' %}
+                            $5.990
+                        {% else %}
+                            $6.990
+                        {% endif %}
+                    </strong>
+                    <span style="color: #64748b; font-size: 0.8rem;">CLP Total</span>
+                </div>
+            </div>
+
+            <!-- Formulario de Tarjeta -->
+            <form id="form-pasarela" onsubmit="event.preventDefault(); completarPago();">
+                <!-- Número de Tarjeta -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 0.9rem;">Número de Tarjeta</label>
+                    <div style="position: relative;">
+                        <i class="far fa-credit-card" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                        <input type="text" id="input-tarjeta" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric" autocomplete="cc-number" style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; box-sizing: border-box; font-family: monospace; font-size: 1rem;">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                    <!-- Vencimiento -->
+                    <div style="flex: 1;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 0.9rem;">Vencimiento</label>
+                        <input type="text" id="input-vencimiento" placeholder="MM/YY" maxlength="5" inputmode="numeric" autocomplete="cc-exp" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; box-sizing: border-box; font-family: monospace; font-size: 1rem; text-align: center;">
+                    </div>
+                    <!-- CVV (Oculto con puntos) -->
+                    <div style="flex: 1;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 0.9rem;">CVV</label>
+                        <input type="password" id="input-cvv" placeholder="•••" maxlength="3" inputmode="numeric" autocomplete="cc-csc" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; box-sizing: border-box; font-family: monospace; font-size: 1rem; text-align: center; -webkit-text-security: disc;">
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                    <i class="fas fa-lock"></i> Confirmar y Pagar
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" onclick="volverAlChat()" style="background: none; border: none; color: #64748b; font-size: 0.95rem; font-weight: 500; cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i> Cancelar y volver
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Formatear Número de Tarjeta (Máximo 16 dígitos agrupados de a 4)
+    const tarjetaInput = document.getElementById('input-tarjeta');
+    tarjetaInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Eliminar todo lo que no sea número
+        if (value.length > 16) value = value.slice(0, 16);
+        let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+        e.target.value = formatted;
+    });
+
+    // 2. Formatear Vencimiento (Formato MM/YY con barra automática)
+    const vencimientoInput = document.getElementById('input-vencimiento');
+    vencimientoInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        
+        if (value.length >= 2) {
+            let month = parseInt(value.slice(0, 2), 10);
+            if (month > 12) value = '12' + value.slice(2);
+            if (month === 0 && value.length >= 2) value = '01' + value.slice(2);
+            e.target.value = value.slice(0, 2) + '/' + value.slice(2);
+        } else {
+            e.target.value = value;
+        }
+    });
+
+    // 3. Formatear CVV (Máximo 3 dígitos numéricos)
+    const cvvInput = document.getElementById('input-cvv');
+    cvvInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 3) value = value.slice(0, 3);
+        e.target.value = value;
+    });
+
+    function volverAlChat() {
+        const formData = new FormData();
+        formData.append('accion', 'volver_pasarela');
+        formData.append('contacto', '{{ trato.maestro.username }}');
+        formData.append('servicio_id', '{{ trato.servicio.id }}');
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch("{% url 'gestionar_trato' %}", { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                window.location.href = "{% url 'mensajes' %}?contacto={{ trato.maestro.username }}&servicio={{ trato.servicio.id }}";
+            });
+    }
+
+    function completarPago() {
+        const numTarjeta = tarjetaInput.value.replace(/\s/g, '');
+        const vencimiento = vencimientoInput.value;
+        const cvv = cvvInput.value;
+
+        // Validaciones previas al envío
+        if (numTarjeta.length !== 16) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tarjeta incompleta',
+                text: 'Por favor, ingresa los 16 dígitos de tu tarjeta de crédito o débito.',
+                confirmButtonColor: '#4f46e5'
+            });
+            return;
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(vencimiento)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fecha de vencimiento inválida',
+                text: 'Ingresa una fecha válida en formato MM/YY (ejemplo: 08/28).',
+                confirmButtonColor: '#4f46e5'
+            });
+            return;
+        }
+
+        if (cvv.length !== 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'CVV incompleto',
+                text: 'Ingresa el código CVV de 3 dígitos ubicado al reverso de tu tarjeta.',
+                confirmButtonColor: '#4f46e5'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Procesando pago...',
+            html: 'Conectando con la pasarela segura Kuxee',
+            timer: 2000,
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        }).then(() => {
+            const formData = new FormData();
+            formData.append('accion', 'pagar');
+            formData.append('contacto', '{{ trato.maestro.username }}');
+            formData.append('servicio_id', '{{ trato.servicio.id }}');
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            
+            fetch("{% url 'gestionar_trato' %}", { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        window.location.href = "{% url 'mensajes' %}?contacto={{ trato.maestro.username }}&servicio={{ trato.servicio.id }}";
+                    }
+                });
+        });
+    }
+</script>
+{% endblock %}

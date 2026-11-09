@@ -1,0 +1,377 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Mi Perfil - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 200px; width: 100%; }
+    .profile-container { max-width: 1100px; margin: -100px auto 40px auto; padding: 0 20px; }
+    .profile-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; gap: 30px; align-items: center; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+
+    .profile-avatar-large { width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; padding: 0; background: transparent; flex-shrink: 0; }
+    .btn-edit-avatar { position: absolute; bottom: 5px; right: 5px; background: var(--kuxee-blue); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; transition: background 0.2s; }
+    .btn-edit-avatar:hover { background: #2563eb; }
+
+    .profile-info h1 { margin: 0 0 10px 0; color: var(--kuxee-dark); font-size: 2rem; display: flex; align-items: center; }
+    .badge-rol { background: #eff6ff; color: var(--kuxee-blue); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
+    .profile-details { display: flex; gap: 20px; color: #475569; font-size: 0.95rem; margin-bottom: 10px; flex-wrap: wrap; }
+    .profile-details i { color: var(--kuxee-blue); width: 20px; }
+    
+    .profile-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .btn-action { background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; color: #475569; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; font-size: 0.9rem; }
+    .btn-action:hover { background: #f1f5f9; border-color: #94a3b8; color: var(--kuxee-blue); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: white; border-radius: 12px; padding: 25px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .stat-card.primary { background: var(--kuxee-blue); color: white; border: none; }
+    .stat-value { font-size: 2.5rem; font-weight: 900; color: var(--kuxee-dark); margin-bottom: 5px; }
+    .stat-card.primary .stat-value { color: white; }
+    .stat-label { color: #64748b; font-size: 0.9rem; }
+    .stat-card.primary .stat-label { color: #bfdbfe; }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-header h2 { margin: 0; color: var(--kuxee-blue); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .plan-badge { background: #f1f5f9; color: #64748b; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #e2e8f0; }
+
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+    .service-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; position: relative; text-decoration: none; color: inherit; transition: transform 0.2s;}
+    .service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    
+    .service-image-container { width: 100%; height: 180px; position: relative; background: #f8fafc; }
+    .service-image-container img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .service-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; }
+    .btn-control { background: white; color: #475569; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
+    .btn-control:hover { background: #f8fafc; }
+    .btn-control.delete:hover { color: #ef4444; border-color: #fca5a5; }
+
+    .service-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .service-title { font-weight: bold; color: var(--kuxee-dark); font-size: 1.1rem; margin: 0 0 10px 0; }
+    .service-tag { color: var(--kuxee-blue); font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+    .service-price { margin-top: auto; display: inline-block; background: #fffbeb; color: #d97706; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; align-self: flex-start;}
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="profile-header-banner"></div>
+
+<div class="profile-container">
+    <!-- 1. Tarjeta de Perfil Principal -->
+    <div class="profile-card">
+        <div class="profile-avatar-large">
+            <div style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #e2e8f0;">
+                {% if user.foto_perfil %}
+                    <img src="{{ user.foto_perfil.url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    <i class="fas fa-user" style="font-size: 60px; color: #94a3b8;"></i>
+                {% endif %}
+            </div>
+            
+            <form id="form-avatar" method="POST" action="{% url 'actualizar_avatar' %}" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" name="avatar" id="input-avatar" accept="image/png, image/jpeg" onchange="document.getElementById('form-avatar').submit();">
+            </form>
+
+            <div class="btn-edit-avatar" onclick="document.getElementById('input-avatar').click();" title="Cambiar foto de perfil">
+                <i class="fas fa-camera"></i>
+            </div>
+        </div>
+        
+        <div class="profile-info">
+            <h1>
+                {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                {% if user.es_maestro and user.perfil_maestro.plan_actual == 'plus' %}
+                    <i class="fas fa-check-circle" style="color: #10b981; margin-left: 8px; font-size: 1.2rem;" title="Maestro Verificado (Plan Plus)"></i>
+                {% elif user.es_cliente and user.perfil_cliente.plan_actual == 'premium' %}
+                    <i class="fas fa-check-circle" style="color: #4f46e5; margin-left: 8px; font-size: 1.2rem;" title="Cliente Kuxee (Premium)"></i>
+                {% endif %}
+            </h1>
+            
+            {% if user.is_superuser %}
+                <div class="badge-rol" style="background-color: #0f172a; color: white; border: 1px solid #334155;">
+                    <i class="fas fa-shield-alt"></i> Administrador
+                </div>
+                <div class="profile-details">
+                    <div><i class="fas fa-map-marker-alt"></i> Kuxee Admin</div>
+                </div>
+            {% elif user.es_maestro %}
+                <div class="badge-rol">
+                    {% if user.perfil_maestro.plan_actual == 'plus' %}
+                        <i class="fas fa-star" style="color: #4f46e5; margin-right: 4px;"></i> Maestro Plus
+                    {% else %}
+                        Maestro Gratis
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <div><i class="fas fa-tools"></i> <span class="format-texto">{{ user.perfil_maestro.oficio_principal }}</span></div>
+                    <div><i class="fas fa-map-marker-alt"></i> Disponible en {{ user.perfil_maestro.comuna|default:"Chile" }}</div>
+                </div>
+            {% else %}
+                <div class="badge-rol">
+                    {% if user.perfil_cliente.plan_actual == 'premium' %}
+                        <i class="fas fa-crown" style="color: #4f46e5; margin-right: 4px;"></i> Cliente Premium
+                    {% else %}
+                        Cliente Gratis
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <div><i class="fas fa-map-marker-alt"></i> {{ user.perfil_cliente.comuna|default:"Chile" }}</div>
+                </div>
+            {% endif %}
+            
+            <div class="profile-details" style="color: #94a3b8; font-size: 0.85rem;">
+                <div><i class="far fa-calendar-alt" style="color: #94a3b8;"></i> Miembro desde {{ user.date_joined|date:"Y-m-d" }}</div>
+            </div>
+
+            <div class="profile-actions">
+                {% if user.es_maestro %}
+                    <a href="{% url 'ver_resenas' %}" class="btn-action"><i class="fas fa-star"></i> Ver reseñas</a>
+                {% endif %}
+                
+                <a href="{% url 'editar_perfil' %}" class="btn-action"><i class="fas fa-cog"></i> Editar perfil</a>
+                
+                {% if user.es_maestro %}
+                    <button type="button" class="btn-action" onclick="document.getElementById('modalMisLikes').style.display='flex'">
+                        <i class="fas fa-heart"></i> Mis likes
+                    </button>
+                    
+                    <a href="{% url 'mis_comentarios' %}" class="btn-action"><i class="fas fa-comment"></i> Mis comentarios</a>
+                {% endif %}
+                
+                {% if user.is_superuser %}
+                <a href="{% url 'panel_admin' %}" class="btn-action" style="background-color: #3b82f6; color: white; border-color: #2563eb;">
+                    <i class="fas fa-chart-pie" style="color: white;"></i> Ir al Panel Admin
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Tarjetas de Estadísticas (Solo para maestros) -->
+    {% if user.es_maestro %}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ servicios.count }}</div>
+            <div class="stat-label">Servicios publicados</div>
+        </div>
+        <!-- PROMEDIO ACTUALIZADO AQUÍ -->
+        <div class="stat-card">
+            <div class="stat-value">
+                {% if promedio_calificacion > 0 %}
+                    {{ promedio_calificacion|floatformat:1 }} <i class="fas fa-star" style="font-size: 1.5rem; color: #facc15;"></i>
+                {% else %}
+                    —
+                {% endif %}
+            </div>
+            <div class="stat-label">Calificación promedio</div>
+        </div>
+        <div class="stat-card primary">
+            <div class="stat-value">{{ tratos_realizados|default:"0" }}</div>
+            <div class="stat-label">Tratos realizados</div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2><i class="fas fa-tools"></i> Mis servicios publicados</h2>
+        <div class="plan-badge">
+            {{ servicios.count }} / {% if user.perfil_maestro.plan_actual == 'plus' %}6{% else %}3{% endif %} · 
+            {% if user.perfil_maestro.plan_actual == 'plus' %}Plan Maestro Plus{% else %}Plan Maestro Gratis{% endif %}
+        </div>
+    </div>
+
+    <div class="services-grid">
+        {% for servicio in servicios %}
+            <a href="#" class="service-card">
+                <div class="service-image-container">
+                    <div class="service-controls">
+                        <span onclick="event.preventDefault(); window.location.href='{% url 'editar_servicio' servicio.id %}'" class="btn-control" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        
+                        <form id="delete-form-serv-{{ servicio.id }}" method="POST" action="{% url 'eliminar_servicio' servicio.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="button" class="btn-control delete" title="Eliminar" style="border: none; cursor: pointer;" onclick="event.preventDefault(); confirmarEliminar('serv-{{ servicio.id }}', 'este servicio')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    {% if servicio.imagen_portada %}
+                        <img src="{{ servicio.imagen_portada.url }}" alt="{{ servicio.titulo }}">
+                    {% else %}
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1;">
+                            <i class="fas fa-image" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">{{ servicio.titulo }}</h3>
+                    <div class="service-tag"><i class="fas fa-tag"></i> <span class="format-texto">{{ servicio.oficio }}</span></div>
+                    
+                    <div style="margin-top: auto;">
+                        {% if servicio.precio_base %}
+                            <div class="service-price">Desde ${{ servicio.precio_base }}</div>
+                        {% else %}
+                            <div class="service-price">Precio a Conversar</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div style="grid-column: 1 / -1; background: white; padding: 40px; text-align: center; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                <h3 style="color: #475569;">Aún no has publicado ningún servicio</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Usa el botón flotante (+) para crear tu primer anuncio.</p>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 3. Sección de Solicitudes Publicadas (Solo para Clientes) -->
+    {% if user.es_cliente %}
+    <div class="section-header">
+        <h2><i class="fas fa-clipboard-list"></i> Mis solicitudes publicadas</h2>
+        <div class="plan-badge">
+            {{ solicitudes.count }} Solicitudes · 
+            {% if user.perfil_cliente.plan_actual == 'premium' %}Plan Cliente Premium{% else %}Plan Cliente Gratis{% endif %}
+        </div>
+    </div>
+
+    <div class="services-grid">
+        {% for solicitud in solicitudes %}
+            <a href="{% url 'detalle_solicitud' solicitud.id %}" class="service-card">
+                <div class="service-image-container">
+                    <div class="service-controls">
+                        <span onclick="event.preventDefault(); window.location.href='{% url 'editar_solicitud' solicitud.id %}'" class="btn-control" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        
+                        <form id="delete-form-sol-{{ solicitud.id }}" method="POST" action="{% url 'eliminar_solicitud' solicitud.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="button" class="btn-control delete" title="Eliminar" style="border: none; cursor: pointer;" onclick="event.preventDefault(); confirmarEliminar('sol-{{ solicitud.id }}', 'esta solicitud')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    {% if solicitud.archivos.first %}
+                        <img src="{{ solicitud.archivos.first.archivo.url }}" alt="{{ solicitud.titulo }}">
+                    {% else %}
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1;">
+                            <i class="fas fa-clipboard" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">{{ solicitud.titulo }}</h3>
+                    <div class="service-tag"><i class="fas fa-tag"></i> <span class="format-texto">{{ solicitud.oficio_requerido }}</span></div>
+                    
+                    <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 15px; flex-grow: 1;">{{ solicitud.descripcion|truncatechars:70 }}</p>
+                    <div class="service-price" style="background: #f1f5f9; color: #64748b;"><i class="far fa-calendar-alt"></i> {{ solicitud.fecha_creacion|date:"d M Y" }}</div>
+                </div>
+            </a>
+        {% empty %}
+            <div style="grid-column: 1 / -1; background: white; padding: 40px; text-align: center; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                <h3 style="color: #475569;">Aún no has publicado ninguna solicitud</h3>
+                {% if user.perfil_cliente.plan_actual == 'premium' %}
+                    <p style="color: #64748b; margin-bottom: 20px;">Usa el botón flotante (+) para crear tu primera solicitud.</p>
+                {% else %}
+                    <p style="color: #64748b; margin-bottom: 20px;">Debes ser Cliente Premium para publicar solicitudes.</p>
+                    <a href="{% url 'planes' %}" class="btn-action" style="display: inline-block;">Ver Planes</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- MODAL FLOTANTE: MIS LIKES -->
+    {% if user.es_maestro %}
+    <div id="modalMisLikes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; width: 95%; max-width: 450px; border-radius: 12px; padding: 25px; position: relative; max-height: 80vh; overflow-y: auto;">
+            <button type="button" onclick="document.getElementById('modalMisLikes').style.display='none'" style="position: absolute; top: 15px; right: 20px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+            
+            <h3 style="color: var(--kuxee-blue); margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                <i class="fas fa-heart" style="color: #ef4444;"></i> Likes en tus servicios
+            </h3>
+            
+            <div id="contenedor-lista-likes">
+                {% for servicio in servicios %}
+                    {% if servicio.likes.count > 0 %}
+                        <div class="item-like-servicio" style="margin-bottom: 20px;">
+                            <strong style="color: #0f172a; font-size: 1.05rem;">{{ servicio.titulo }}</strong> 
+                            <span style="background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 5px;">{{ servicio.likes.count }}</span>
+                            
+                            <ul style="list-style: none; padding: 0; margin: 10px 0 0 0;">
+                                {% for usuario_like in servicio.likes.all %}
+                                <li style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 6px; margin-bottom: 5px;">
+                                    <span style="font-weight: bold; color: #334155;">
+                                        <i class="fas fa-user-circle" style="color: #94a3b8; margin-right: 5px;"></i> 
+                                        {% if usuario_like.first_name %}{{ usuario_like.first_name }} {{ usuario_like.last_name }}{% else %}{{ usuario_like.username }}{% endif %}
+                                    </span>
+                                    <span style="font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; {% if usuario_like.es_maestro %}background: #e0e7ff; color: #4f46e5;{% else %}background: #dcfce7; color: #166534;{% endif %}">
+                                        {% if usuario_like.es_maestro %}Maestro{% else %}Cliente{% endif %}
+                                    </span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Mensaje en caso de no tener likes -->
+            <p id="msg-no-likes" style="color: #64748b; text-align: center; padding: 20px 0; display: none;">
+                Aún nadie le ha dado like a tus servicios.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Mostrar mensaje si no hay likes
+    document.addEventListener("DOMContentLoaded", function() {
+        const listaLikes = document.querySelectorAll('.item-like-servicio');
+        const msgNoLikes = document.getElementById('msg-no-likes');
+        
+        if (listaLikes.length === 0 && msgNoLikes) {
+            msgNoLikes.style.display = 'block';
+        }
+    });
+
+    // Función unificada para SweetAlert2 (sirve para servicios y solicitudes)
+    function confirmarEliminar(idCompleto, textoItem) {
+        Swal.fire({
+            title: '¿Eliminar?',
+            text: '¿Estás seguro de que deseas eliminar ' + textoItem + ' de forma permanente?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#e2e8f0',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true, 
+            customClass: { popup: 'swal2-custom-popup', cancelButton: 'btn-cancelar-swal' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + idCompleto).submit();
+            }
+        });
+    }
+
+    // Formatear textos (Oficios)
+    document.addEventListener("DOMContentLoaded", function() {
+        let textosFormatear = document.querySelectorAll('.format-texto');
+        textosFormatear.forEach(elemento => {
+            let texto = elemento.textContent.trim();
+            texto = texto.replace(/_/g, ' ');
+            if(texto.length > 0) {
+                elemento.textContent = texto.charAt(0).toUpperCase() + texto.slice(1);
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% for comentario in lista_comentarios %}
+    <div class="comentario-wrapper {% if comentario.parent %}is-reply{% else %}is-main{% endif %}" id="comentario-{{ comentario.id }}">
+        
+        <div class="comentario-header">
+            <div class="comentario-avatar">
+                {% if comentario.autor.foto_perfil %}
+                    <img src="{{ comentario.autor.foto_perfil.url }}" alt="Avatar">
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
+            <div class="comentario-meta">
+                <div class="comentario-autor" {% if comentario.autor.username == servicio.maestro.usuario.username %}style="color: var(--kuxee-blue);"{% endif %}>
+                    {% if comentario.autor.first_name %}{{ comentario.autor.first_name }} {{ comentario.autor.last_name }}{% else %}{{ comentario.autor.username }}{% endif %}
+                    
+                    {% if comentario.autor.username == servicio.maestro.usuario.username %} 
+                        <span class="badge-maestro"><i class="fas fa-check-circle"></i> Maestro</span>
+                    {% endif %}
+                </div>
+                <div class="comentario-fecha">{{ comentario.fecha_creacion|date:"d M Y, H:i" }}</div>
+            </div>
+        </div>
+        
+        <!-- Texto limpio, sin el apodo ni menciones -->
+        <div class="comentario-texto">{{ comentario.texto }}</div>
+        
+        {% if user.is_authenticated and user.username != comentario.autor.username %}
+            <button type="button" class="btn-abrir-respuesta" onclick="toggleFormularioRespuesta('{{ comentario.id }}')">
+                <i class="fas fa-reply"></i> Responder
+            </button>
+            
+            <form id="form-respuesta-{{ comentario.id }}" class="reply-form" style="display: none;" method="POST" action="{% url 'agregar_comentario' servicio.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ comentario.id }}">
+                <textarea name="texto" placeholder="Escribe tu respuesta..." maxlength="1000" required></textarea>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel-sm" onclick="toggleFormularioRespuesta('{{ comentario.id }}')">Cancelar</button>
+                    <button type="submit" class="btn-submit-sm">Enviar respuesta</button>
+                </div>
+            </form>
+        {% endif %}
+        
+        {% if comentario.respuestas.all %}
+            <div class="respuestas-hilo">
+                {% include 'usuarios/comentario_nodo.html' with lista_comentarios=comentario.respuestas.all servicio=servicio user=user csrf_token=csrf_token only %}
+            </div>
+        {% endif %}
+        
+    </div>
+{% endfor %}

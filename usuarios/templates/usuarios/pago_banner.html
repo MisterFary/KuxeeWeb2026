@@ -1,0 +1,238 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Pago Seguro - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 20px;
+        background-color: #f8fafc;
+    }
+    .payment-card {
+        background: white;
+        width: 100%;
+        max-width: 550px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .payment-header {
+        background: #1e293b;
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+        position: relative;
+    }
+    .btn-volver {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.2s;
+    }
+    .btn-volver:hover {
+        color: white;
+    }
+    .payment-header h2 {
+        color: #3b82f6;
+        margin: 10px 0 5px 0;
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+    .payment-header p {
+        color: #cbd5e1;
+        margin: 0 0 15px 0;
+        font-size: 0.95rem;
+    }
+    .payment-amount {
+        color: #fbbf24;
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0;
+    }
+    .payment-body {
+        padding: 30px;
+    }
+    .payment-body h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #1e293b;
+        font-size: 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .payment-icons {
+        display: flex;
+        gap: 10px;
+        font-size: 1.5rem;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .form-control:focus {
+        border-color: #3b82f6;
+    }
+    .input-icon-wrapper {
+        position: relative;
+    }
+    .input-icon-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    .input-icon-wrapper .form-control {
+        padding-left: 40px;
+    }
+    .grid-2-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    .btn-pagar {
+        background: #3b82f6;
+        color: white;
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.2s;
+        margin-top: 10px;
+    }
+    .btn-pagar:hover {
+        background: #2563eb;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="payment-container">
+    <div class="payment-card">
+        <!-- CABECERA DEL PAGO -->
+        <div class="payment-header">
+            <a href="{% url 'inicio' %}" class="btn-volver">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <h2>Pago Seguro Kuxee</h2>
+            <p>Publicidad por <strong>{{ banner.dias_contratados }} días</strong> en el <strong>{{ banner.posicion }}º lugar</strong>.</p>
+            <div class="payment-amount">${{ banner.monto_pagado }}</div>
+        </div>
+
+        <!-- FORMULARIO DE TARJETA -->
+        <div class="payment-body">
+            <h3>Detalles de la Tarjeta 
+                <div class="payment-icons">
+                    <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
+                    <i class="fab fa-cc-mastercard" style="color: #eb001b;"></i>
+                </div>
+            </h3>
+
+            <!-- FORMULARIO QUE ENVÍA EL ID OCULTO A LA VISTA -->
+            <form method="POST" action="{% url 'procesar_pago_banner' %}">
+                {% csrf_token %}
+                
+                <!-- ESTE INPUT OCULTO ES EL QUE CONECTA EL PAGO CON EL BANNER CORRECTO -->
+                <input type="hidden" name="pagar_banner_id" value="{{ banner.id }}">
+
+                <div class="form-group">
+                    <label>Número de Tarjeta</label>
+                    <div class="input-icon-wrapper">
+                        <i class="far fa-credit-card"></i>
+                        <input type="text" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                    </div>
+                </div>
+
+                <div class="grid-2-col">
+                    <div class="form-group">
+                        <label>Fecha de Expiración</label>
+                        <input type="text" class="form-control" placeholder="MM/AA" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CVC / CVV</label>
+                        <div class="input-icon-wrapper">
+                            <input type="password" class="form-control" placeholder="***" maxlength="3" required style="padding-left: 15px;">
+                            <i class="fas fa-info-circle" style="left: auto; right: 15px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre del Titular</label>
+                    <input type="text" class="form-control" placeholder="EJ: JUAN PÉREZ" required>
+                </div>
+
+                <button type="submit" class="btn-pagar">
+                    <i class="fas fa-lock"></i> Pagar ${{ banner.monto_pagado }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Formateo automático del número de tarjeta (agrega espacios cada 4 dígitos)
+    const cardInput = document.querySelector('input[placeholder="0000 0000 0000 0000"]');
+    if (cardInput) {
+        cardInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formattedValue = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            e.target.value = formattedValue;
+        });
+    }
+
+    // Formateo automático de la fecha de expiración (agrega el /)
+    const expInput = document.querySelector('input[placeholder="MM/AA"]');
+    if (expInput) {
+        expInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+    }
+</script>
+{% endblock %}

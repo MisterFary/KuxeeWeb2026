@@ -1,0 +1,193 @@
+{% extends 'usuarios/base.html' %}
+{% block title %}Pago de Suscripción - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container { 
+        max-width: 500px; 
+        margin: 40px auto; 
+        background: white; 
+        padding: 40px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .form-control { 
+        width: 100%; 
+        padding: 14px; 
+        margin-top: 8px; 
+        margin-bottom: 20px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 8px; 
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    .form-control:focus {
+        border-color: #4f46e5;
+        outline: none;
+    }
+    .row { display: flex; gap: 15px; }
+    .col { flex: 1; }
+    .btn-pagar { 
+        width: 100%; 
+        background: #10b981; 
+        color: white; 
+        padding: 16px; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1.1rem; 
+        font-weight: bold; 
+        cursor: pointer; 
+        transition: background 0.3s;
+    }
+    .btn-pagar:disabled { 
+        background: #94a3b8; 
+        cursor: not-allowed; 
+    }
+    .btn-cancelar { 
+        width: 100%; 
+        background: #f1f5f9; 
+        color: #475569; 
+        padding: 14px; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        font-weight: bold; 
+        cursor: pointer; 
+        margin-top: 15px; 
+    }
+    .secure-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #10b981;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="payment-container">
+    <h2 style="text-align: center; color: #1e293b; margin-bottom: 5px;">Kuxee Pagos</h2>
+    
+    {% if user.es_cliente %}
+        <p style="text-align: center; color: #64748b; margin-bottom: 20px;">Suscripción Cliente Kuxee</p>
+    {% else %}
+        <p style="text-align: center; color: #64748b; margin-bottom: 20px;">Suscripción Maestro Plus</p>
+    {% endif %}
+
+    <div class="secure-badge">
+        <i class="fas fa-lock"></i> Pago 100% Seguro
+    </div>
+
+    <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 30px; text-align: center; border: 1px solid #e2e8f0;">
+        {% if user.es_cliente %}
+            <h3 style="color: #4f46e5; margin: 0; font-size: 2rem;">$6.990 CLP</h3>
+        {% else %}
+            <h3 style="color: #4f46e5; margin: 0; font-size: 2rem;">$9.990 CLP</h3>
+        {% endif %}
+        <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.95rem;">Cobro mensual recurrente</p>
+    </div>
+
+    <form id="pago-form">
+        {% csrf_token %}
+        <label style="font-weight: bold; color: #334155;">Nombre en la tarjeta</label>
+        <input type="text" class="form-control" placeholder="Ej: Juan Pérez" required>
+
+        <label style="font-weight: bold; color: #334155;">Número de tarjeta</label>
+        <input type="text" id="tarjeta" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" required>
+
+        <div class="row">
+            <div class="col">
+                <label style="font-weight: bold; color: #334155;">Vencimiento</label>
+                <input type="text" id="vencimiento" class="form-control" placeholder="MM/AA" maxlength="5" required>
+            </div>
+            <div class="col">
+                <label style="font-weight: bold; color: #334155;">CVV</label>
+                <input type="password" id="cvv" class="form-control" placeholder="123" maxlength="4" required>
+            </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn-pagar">
+            {% if user.es_cliente %}
+                Pagar $6.990 y Activar
+            {% else %}
+                Pagar $9.990 y Activar
+            {% endif %}
+        </button>
+        <a href="{% url 'planes' %}" style="display: block; text-decoration: none;">
+            <button type="button" class="btn-cancelar">Cancelar</button>
+        </a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    {% if user.es_cliente %}
+        const textoBoton = 'Pagar $6.990 y Activar';
+        const mensajeExito = '¡Felicidades! Ahora eres Cliente Premium. Tus beneficios ya están activos.';
+    {% else %}
+        const textoBoton = 'Pagar $9.990 y Activar';
+        const mensajeExito = '¡Felicidades! Ahora eres Maestro Plus. Tus beneficios ya están activos.';
+    {% endif %}
+
+    // Máscara para la tarjeta (agrega espacios automáticamente)
+    document.getElementById('tarjeta').addEventListener('input', function (e) {
+        this.value = this.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+    });
+
+    // Máscara para el vencimiento (agrega el / automáticamente)
+    document.getElementById('vencimiento').addEventListener('input', function (e) {
+        let val = this.value.replace(/\D/g, '');
+        if (val.length >= 3) {
+            this.value = val.slice(0,2) + '/' + val.slice(2,4);
+        } else {
+            this.value = val;
+        }
+    });
+
+    // Máscara para CVV (solo números)
+    document.getElementById('cvv').addEventListener('input', function (e) {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    // Envío del formulario simulando conexión al banco
+    document.getElementById('pago-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando pago con el banco...';
+
+        // Retraso de 2 segundos para simular la pasarela real (como hicimos en los tratos)
+        setTimeout(() => {
+            const formData = new FormData(this);
+            fetch("{% url 'procesar_pago_suscripcion' %}", {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Pago Aprobado!',
+                        text: mensajeExito,
+                        confirmButtonColor: '#4f46e5',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.href = "{% url 'mi_perfil' %}";
+                    });
+                } else {
+                    Swal.fire('Error', 'Hubo un problema procesando tu tarjeta.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = textoBoton;
+                }
+            });
+        }, 2000); 
+    });
+</script>
+{% endblock %}

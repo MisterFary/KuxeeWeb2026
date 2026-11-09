@@ -1,0 +1,88 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Editar mi perfil - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 700px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .page-title { color: var(--kuxee-dark); margin-bottom: 10px; font-size: 2rem; }
+    .page-subtitle { color: #64748b; margin-bottom: 30px; font-size: 1rem; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #475569; }
+    .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+    .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+    
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
+    .btn-submit:hover { background: #2563eb; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="form-container">
+    <h1 class="page-title"><i class="fas fa-user-edit"></i> Editar mi perfil</h1>
+    <p class="page-subtitle">Actualiza tu información personal y de contacto.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono de contacto</label>
+            <input type="text" name="telefono" class="form-control" value="{% if user.es_maestro %}{{ user.perfil_maestro.telefono }}{% else %}{{ user.perfil_cliente.telefono }}{% endif %}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Comuna</label>
+            <select name="comuna" class="form-control" id="select_comuna">
+                {% if user.es_maestro %}
+                    <option value="{{ user.perfil_maestro.comuna }}" selected>{{ user.perfil_maestro.comuna|default:"Selecciona una comuna" }}</option>
+                {% else %}
+                    <option value="{{ user.perfil_cliente.comuna }}" selected>{{ user.perfil_cliente.comuna|default:"Selecciona una comuna" }}</option>
+                {% endif %}
+                
+                {% for region, comunas_list in regiones %}
+                    <optgroup label="{{ region }}">
+                        {% for valor, etiqueta in comunas_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if user.es_maestro %}
+        <div class="form-group">
+            <label>Descripción sobre ti (Biografía)</label>
+            <textarea name="descripcion" class="form-control" placeholder="Cuéntale a tus clientes sobre tu experiencia y forma de trabajar...">{{ user.perfil_maestro.descripcion }}</textarea>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 15px; margin-top: 30px;">
+            <a href="{% url 'mi_perfil' %}" style="padding: 15px 30px; border-radius: 8px; background: #e2e8f0; color: #475569; text-decoration: none; font-weight: bold; text-align: center; width: 30%;">Cancelar</a>
+            <button type="submit" class="btn-submit" style="width: 70%;">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#select_comuna').select2({
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

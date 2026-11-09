@@ -1,0 +1,86 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Editar servicio - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .page-title { color: var(--kuxee-dark); margin-bottom: 10px; font-size: 2rem; }
+    .page-subtitle { color: #64748b; margin-bottom: 30px; font-size: 1rem; }
+    
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #475569; }
+    .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+    .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    textarea.form-control { resize: vertical; min-height: 120px; }
+    
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
+    .btn-submit:hover { background: #2563eb; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="form-container">
+    <h1 class="page-title">Editar servicio</h1>
+    <p class="page-subtitle">Modifica los detalles de tu anuncio.</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Título del servicio</label>
+            <input type="text" name="titulo" class="form-control" value="{{ servicio.titulo }}" maxlength="150" required>
+        </div>
+
+        <div class="form-group">
+            <label>Categoría (Oficio actual: <strong>{{ servicio.oficio }}</strong>)</label>
+            <select name="oficio" class="form-control" id="select_oficio" required>
+                <option value="{{ servicio.oficio }}" selected>{{ servicio.oficio }} (Mantener actual)</option>
+                {% for categoria, oficios_list in oficios %}
+                    <optgroup label="{{ categoria }}">
+                        {% for valor, etiqueta in oficios_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Descripción detallada</label>
+            <textarea name="descripcion" class="form-control" required>{{ servicio.descripcion }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Precio base estimado (Opcional)</label>
+            <input type="number" name="precio" class="form-control" value="{{ servicio.precio_base|default_if_none:'' }}" min="0" step="1">
+        </div>
+
+        <div class="form-group">
+            <label>Cambiar foto de portada (Opcional)</label>
+            {% if servicio.imagen_portada %}
+                <div style="margin-bottom: 10px; font-size: 0.9rem; color: #64748b;">
+                    <img src="{{ servicio.imagen_portada.url }}" style="height: 60px; border-radius: 6px; vertical-align: middle; margin-right: 10px;"> 
+                    Ya tienes una imagen. Sube una nueva solo si deseas reemplazarla.
+                </div>
+            {% endif %}
+            <input type="file" name="imagenes" class="form-control" accept="image/png, image/jpeg">
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <a href="{% url 'mi_perfil' %}" style="padding: 15px 30px; border-radius: 8px; background: #e2e8f0; color: #475569; text-decoration: none; font-weight: bold; text-align: center; width: 30%;">Cancelar</a>
+            <button type="submit" class="btn-submit" style="width: 70%;">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#select_oficio').select2({
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

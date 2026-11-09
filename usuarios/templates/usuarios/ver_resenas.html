@@ -1,0 +1,121 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Reseñas de {{ maestro_user.first_name|title|default:maestro_user.username|title }} - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resenas-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .header-resenas { text-align: center; margin-bottom: 40px; }
+    .header-resenas h1 { color: #0f172a; font-size: 2.2rem; margin-bottom: 10px; }
+    
+    .promedio-caja { background: white; border-radius: 12px; padding: 30px; text-align: center; border: 1px solid #e2e8f0; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .promedio-numero { font-size: 4rem; font-weight: 900; color: #facc15; display: flex; align-items: center; justify-content: center; gap: 10px; line-height: 1; }
+    .promedio-texto { color: #64748b; font-size: 1.1rem; margin-top: 10px; font-weight: bold; }
+
+    .lista-resenas { display: flex; flex-direction: column; gap: 20px; }
+    .resena-card { background: white; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .resena-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+    .cliente-info { display: flex; align-items: center; gap: 10px; }
+    .cliente-avatar { width: 45px; height: 45px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #94a3b8; font-size: 1.2rem; }
+    .cliente-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .cliente-nombre { font-weight: bold; color: #0f172a; font-size: 1.1rem; }
+    .resena-fecha { color: #94a3b8; font-size: 0.85rem; }
+    
+    .estrellas { color: #e2e8f0; font-size: 1.2rem; margin-bottom: 15px; }
+    .estrellas .activa { color: #facc15; }
+    
+    .resena-comentario { color: #334155; line-height: 1.6; font-size: 1rem; margin-bottom: 20px; white-space: pre-line; }
+    
+    .resena-imagenes { display: flex; gap: 15px; flex-wrap: wrap; }
+    .img-miniatura { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s; }
+    .img-miniatura:hover { transform: scale(1.05); }
+    
+    .empty-state { text-align: center; padding: 50px 20px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="resenas-container">
+    <div class="header-resenas">
+        <h1>Reseñas de {{ maestro_user.first_name|title|default:maestro_user.username|title }}</h1>
+        
+        {% if request.user == maestro_user %}
+            <a href="{% url 'mi_perfil' %}" style="color: var(--kuxee-blue); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Volver a mi perfil</a>
+        {% else %}
+            <a href="{% url 'perfil_publico' maestro_user.username %}" style="color: var(--kuxee-blue); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Volver al perfil</a>
+        {% endif %}
+    </div>
+
+    <div class="promedio-caja">
+        <div class="promedio-numero">
+            {% if promedio > 0 %}{{ promedio|floatformat:1 }}{% else %}0.0{% endif %} 
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="promedio-texto">Basado en {{ resenas.count }} calificación{% if resenas.count != 1 %}es{% endif %}</div>
+    </div>
+
+    <div class="lista-resenas">
+        {% for resena in resenas %}
+            <div class="resena-card">
+                <div class="resena-header">
+                    <div class="cliente-info">
+                        <div class="cliente-avatar">
+                            {% if resena.cliente.foto_perfil %}
+                                <img src="{{ resena.cliente.foto_perfil.url }}" alt="Avatar">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="cliente-nombre">{{ resena.cliente.first_name|title|default:resena.cliente.username|title }}</div>
+                            <div class="resena-fecha">{{ resena.fecha_creacion|date:"d de F, Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="estrellas">
+                    <i class="fas fa-star {% if resena.calificacion >= 1 %}activa{% endif %}"></i>
+                    <i class="fas fa-star {% if resena.calificacion >= 2 %}activa{% endif %}"></i>
+                    <i class="fas fa-star {% if resena.calificacion >= 3 %}activa{% endif %}"></i>
+                    <i class="fas fa-star {% if resena.calificacion >= 4 %}activa{% endif %}"></i>
+                    <i class="fas fa-star {% if resena.calificacion >= 5 %}activa{% endif %}"></i>
+                </div>
+                
+                {% if resena.comentario %}
+                    <div class="resena-comentario">{{ resena.comentario }}</div>
+                {% endif %}
+                
+                <div class="resena-imagenes">
+                    {% if resena.imagen_1 %}
+                        <a href="{{ resena.imagen_1.url }}" target="_blank">
+                            <img src="{{ resena.imagen_1.url }}" class="img-miniatura">
+                        </a>
+                    {% endif %}
+                    
+                    {% if resena.imagen_2 %}
+                        <a href="{{ resena.imagen_2.url }}" target="_blank">
+                            <img src="{{ resena.imagen_2.url }}" class="img-miniatura">
+                        </a>
+                    {% endif %}
+                    
+                    {% if resena.imagen_3 %}
+                        <a href="{{ resena.imagen_3.url }}" target="_blank">
+                            <img src="{{ resena.imagen_3.url }}" class="img-miniatura">
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-top: 15px; font-size: 0.85rem; color: #94a3b8; border-top: 1px dashed #e2e8f0; padding-top: 10px;">
+                    <i class="fas fa-tools"></i> Trabajo evaluado: {{ resena.trato.servicio.titulo }}
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-star-half-alt" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                <h3>Este maestro aún no tiene reseñas</h3>
+                <p>Las evaluaciones aparecerán aquí cuando los clientes finalicen sus tratos.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

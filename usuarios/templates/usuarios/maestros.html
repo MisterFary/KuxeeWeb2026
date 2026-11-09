@@ -1,0 +1,133 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Maestros disponibles - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .maestros-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .page-title { text-align: center; color: var(--kuxee-dark); margin-bottom: 40px; font-size: 2rem; }
+
+    /* Barra de Filtros */
+    .filter-bar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; gap: 20px; align-items: flex-end; margin-bottom: 40px; }
+    .filter-group { flex: 1; }
+    .filter-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; color: #475569; }
+    
+    .select2-container--default .select2-selection--single { height: 42px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; padding: 6px !important; outline: none; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { top: 7px !important; }
+
+    .btn-filtrar { background: var(--kuxee-blue); color: white; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 42px; }
+    .btn-filtrar:hover { background: #2563eb; }
+
+    /* Grilla de Maestros */
+    .maestros-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .maestro-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+    .maestro-header { background: linear-gradient(135deg, #3b82f6, #0ea5e9); height: 100px; position: relative; }
+    .maestro-avatar { width: 90px; height: 90px; background: #e2e8f0; border-radius: 50%; border: 4px solid white; position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; font-size: 45px; color: #94a3b8; overflow: hidden; }
+    .maestro-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .maestro-info { padding: 55px 20px 20px 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .maestro-name { font-weight: bold; color: var(--kuxee-dark); margin-bottom: 5px; font-size: 1.1rem; }
+    .maestro-skills { font-size: 0.85rem; color: #64748b; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .maestro-reviews { font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+    .maestro-location { font-size: 0.8rem; color: var(--kuxee-blue); margin-bottom: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .btn-ver-perfil { background: #1877f2; color: white; display: block; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 8px; transition: background 0.2s; margin-top: auto; }
+    .btn-ver-perfil:hover { background: #145dbf; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="maestros-container">
+    <h1 class="page-title">Maestros disponibles</h1>
+
+    <!-- Formulario visual de filtros -->
+    <form class="filter-bar" method="GET">
+        <div class="filter-group">
+            <label>Oficio</label>
+            <select name="oficio" id="filtro_oficio">
+                <option value="">Todos los oficios</option>
+                {% for categoria, oficios_list in oficios %}
+                    <optgroup label="{{ categoria }}">
+                        {% for valor, etiqueta in oficios_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Comuna</label>
+            <select name="comuna" id="filtro_comuna">
+                <option value="">Todas las comunas</option>
+                {% for region, comunas_list in regiones %}
+                    <optgroup label="{{ region }}">
+                        {% for valor, etiqueta in comunas_list %}
+                            <option value="{{ valor }}">{{ etiqueta }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-filtrar"><i class="fas fa-filter"></i> Filtrar</button>
+    </form>
+
+    <!-- Lista de maestros registrados -->
+    <div class="maestros-grid">
+        {% for perfil in maestros %}
+        <div class="maestro-card">
+            <div class="maestro-header">
+                <div class="maestro-avatar">
+                    {% if perfil.usuario.foto_perfil %}
+                        <img src="{{ perfil.usuario.foto_perfil.url }}" alt="Avatar">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="maestro-info">
+                <div class="maestro-name">
+                    {% if perfil.usuario.first_name %}
+                        {{ perfil.usuario.first_name }} {{ perfil.usuario.last_name }}
+                    {% else %}
+                        {{ perfil.usuario.username }}
+                    {% endif %}
+                </div>
+                <div class="maestro-skills" title="{{ perfil.oficio_principal }}"><i class="fas fa-tools"></i> {{ perfil.oficio_principal|title }}</div>
+                <div class="maestro-reviews">Sin reseñas aún</div>
+                
+                <!-- AQUÍ CAMBIAMOS comuna POR comuna_label -->
+                <div class="maestro-location" title="{{ perfil.comuna_label }}"><i class="fas fa-map-marker-alt"></i> {{ perfil.comuna_label }}</div>
+                
+                <!-- Validación dinámica para el botón Ver perfil -->
+                {% if user.is_authenticated and user.username == perfil.usuario.username %}
+                    <a href="{% url 'mi_perfil' %}" class="btn-ver-perfil" style="background: #10b981;">Ver mi perfil</a>
+                {% else %}
+                    <a href="{% url 'perfil_publico' perfil.usuario.username %}" class="btn-ver-perfil">Ver perfil</a>
+                {% endif %}
+                
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+            No hay maestros registrados en la plataforma o que coincidan con tu búsqueda.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#filtro_oficio').select2({
+            placeholder: "Todos los oficios",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        $('#filtro_comuna').select2({
+            placeholder: "Todas las comunas",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

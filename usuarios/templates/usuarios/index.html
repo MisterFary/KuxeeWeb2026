@@ -1,0 +1,503 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Kuxee - Inicio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
+    .hero-grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .hero-banner { background: #111; color: white; border-radius: 12px; padding: 0; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; min-height: 350px; }
+    .hero-banner h1 { font-size: 2.5rem; margin: 0 0 15px 0; color: #fbbf24; }
+    .hero-banner p { max-width: 400px; line-height: 1.5; color: #cbd5e1; }
+    
+    /* CSS para el texto sobre el banner */
+    .carousel-caption {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+        padding: 40px 25px 20px 25px;
+        color: white;
+        pointer-events: none;
+    }
+    .carousel-caption h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.8rem;
+        color: #fbbf24;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        font-weight: 900;
+    }
+    .carousel-caption p {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #f8fafc;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        max-width: 80%;
+    }
+
+    .side-banner { background: white; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; }
+    .side-banner-title { color: var(--kuxee-blue); font-size: 1.8rem; font-weight: 900; margin: 20px 0; }
+    .btn-dark-blue { background: #1e3a8a; color: white; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; display: block; }
+    
+    /* Contenedor del título con línea completa */
+    .section-title-container { border-bottom: 2px solid var(--kuxee-blue); margin: 40px 0 20px 0; padding-bottom: 10px; }
+    .section-title-container h2 { font-size: 1.5rem; color: var(--kuxee-dark); margin: 0; display: inline-block; }
+    
+    /* Grilla de Servicios */
+    .servicios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .servicio-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .servicio-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .servicio-img { width: 100%; height: 140px; object-fit: cover; border-bottom: 1px solid #e2e8f0; }
+    .servicio-content { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
+    
+    .servicio-title { font-weight: bold; color: var(--kuxee-dark); font-size: 0.95rem; margin: 0 0 5px 0; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; text-transform: capitalize; }
+    .servicio-desc { font-size: 0.75rem; color: #64748b; margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; }
+    
+    .servicio-price-pill { border: 1px solid #fcd34d; border-radius: 15px; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; color: var(--kuxee-dark); display: inline-block; text-align: center; margin-bottom: 12px; margin-right: auto; }
+    
+    .servicio-footer-row { font-size: 0.75rem; color: var(--kuxee-blue); display: flex; align-items: center; gap: 6px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .servicio-footer-row i { width: 12px; text-align: center; }
+
+    /* Diseño Tarjetas de Maestros */
+    .maestros-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .maestro-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+    .maestro-header { background: linear-gradient(135deg, #3b82f6, #0ea5e9); height: 100px; position: relative; }
+    .maestro-avatar { width: 90px; height: 90px; background: #e2e8f0; border-radius: 50%; border: 4px solid white; position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; font-size: 45px; color: #94a3b8; overflow: hidden; }
+    .maestro-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .maestro-info { padding: 55px 20px 20px 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .maestro-name { font-weight: bold; color: var(--kuxee-dark); margin-bottom: 5px; font-size: 1.1rem; }
+    .maestro-skills { font-size: 0.85rem; color: #64748b; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .maestro-reviews { font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+    .maestro-location { font-size: 0.8rem; color: var(--kuxee-blue); margin-bottom: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .btn-ver-perfil { background: #1877f2; color: white; display: block; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 8px; transition: background 0.2s; margin-top: auto; }
+    .btn-ver-perfil:hover { background: #145dbf; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="main-container">
+    
+    <!-- BANNER DE ACCESO DIRECTO PARA ADMINISTRADORES -->
+    {% if user.is_superuser %}
+    <div style="background-color: #0f172a; border-radius: 12px; padding: 15px 25px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="background: rgba(251, 191, 36, 0.2); padding: 10px; border-radius: 50%;">
+                <i class="fas fa-shield-alt" style="color: #fbbf24; font-size: 1.5rem;"></i>
+            </div>
+            <div>
+                <h3 style="color: white; margin: 0; font-size: 1.1rem;">Modo Administrador Activo</h3>
+                <p style="color: #94a3b8; margin: 2px 0 0 0; font-size: 0.85rem;">Tienes acceso total a la plataforma.</p>
+            </div>
+        </div>
+        <a href="{% url 'panel_admin' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: background 0.2s;">
+            <i class="fas fa-chart-pie"></i> Ir al Panel Admin
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Hero y Banners / Carrusel -->
+    <div class="hero-grid">
+        <div class="hero-banner">
+            {% if banners %}
+                <div class="carousel-container" style="position: relative; width: 100%; height: 100%; min-height: 350px; overflow: hidden;">
+                    {% for b in banners %}
+                        <div class="carousel-slide" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.5s ease-in-out; z-index: {% if forloop.first %}1{% else %}0{% endif %};">
+                            
+                            {% if b.imagen_final_banner %}
+                                <img src="{{ b.imagen_final_banner.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Banner Publicitario">
+                            {% endif %}
+
+                            <!-- TEXTO SOBRE EL BANNER (Si el admin lo configuró) -->
+                            {% if b.titulo_banner or b.texto_banner %}
+                            <div class="carousel-caption">
+                                {% if b.titulo_banner %}<h3>{{ b.titulo_banner }}</h3>{% endif %}
+                                {% if b.texto_banner %}<p>{{ b.texto_banner }}</p>{% endif %}
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+                    
+                    {% if banners|length > 1 %}
+                        <button onclick="moverCarrusel(-1)" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; width: 40px; height: 40px; cursor: pointer; border-radius: 50%; z-index: 10; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">&#10094;</button>
+                        <button onclick="moverCarrusel(1)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; width: 40px; height: 40px; cursor: pointer; border-radius: 50%; z-index: 10; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">&#10095;</button>
+                        
+                        <div style="position: absolute; bottom: 15px; right: 20px; display: flex; gap: 8px; z-index: 10;">
+                            {% for b in banners %}
+                                <span class="dot" style="height: 10px; width: 10px; background-color: {% if forloop.first %}#fbbf24{% else %}rgba(255,255,255,0.5){% endif %}; border-radius: 50%; display: inline-block; cursor: pointer;" onclick="irASlide({{ forloop.counter0 }})"></span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div style="padding: 40px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box;">
+                    <h1>Donde el talento<br>encuentra oportunidades</h1>
+                    <p>Kuxee conecta maestros y clientes para que juntos logren grandes cosas, de forma fácil y segura.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="{% url 'registro' %}" style="background: #fbbf24; color: black; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">ÚNETE A KUXEE</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="side-banner">
+            <div style="background: var(--kuxee-blue); color: white; padding: 5px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin: 0 auto;">IMAGEN FIJA EN KUXEE</div>
+            <h2 class="side-banner-title">TU MARCA,<br>TU SERVICIO,<br>SIEMPRE A LA VISTA</h2>
+            <a href="#" class="btn-dark-blue">
+                <i class="fas fa-chart-line"></i> MÁS VISIBILIDAD,<br>MÁS OPORTUNIDADES
+            </a>
+        </div>
+    </div>
+
+    <!-- BOTÓN EXCLUSIVO PARA MAESTROS PARA APARECER EN EL BANNER -->
+    {% if user.is_authenticated and user.es_maestro %}
+    <div style="margin-bottom: 30px;">
+        <button onclick="document.getElementById('modalBanner').style.display='flex'" style="background: #ef4444; color: white; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: background 0.2s;">
+            <i class="fas fa-bullhorn"></i> Aparecer en este banner
+        </button>
+    </div>
+
+    <!-- Modal Estilo Kuxee para Comprar Banner (WIZARD) -->
+    <div id="modalBanner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; width: 95%; max-width: 600px; border-radius: 12px; padding: 30px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <button onclick="document.getElementById('modalBanner').style.display='none'" style="position: absolute; top: 20px; right: 20px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+            
+            <h2 style="color: #3b82f6; margin-top: 0; text-align: center; font-weight: 800;">Comprar banner en el carrusel</h2>
+            <p style="text-align: center; color: #64748b; margin-bottom: 25px; font-size: 0.95rem;">Tu imagen aparecerá en el carrusel principal por los días que elijas.</p>
+            
+            <form method="POST" action="{% url 'procesar_pago_banner' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- ========================= -->
+                <!-- PASO 1: SELECCIÓN DE DÍAS -->
+                <!-- ========================= -->
+                <div id="paso1_dias">
+                    <h4 style="color: #1e293b; margin-bottom: 10px; font-size: 1rem;">1. Elige cuántos días</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 1, 5990)">
+                            <input type="radio" name="dias" value="1" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">1 día</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$5.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 2, 7990)">
+                            <input type="radio" name="dias" value="2" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">2 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$7.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 3, 8990)">
+                            <input type="radio" name="dias" value="3" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">3 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$8.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 4, 10990)">
+                            <input type="radio" name="dias" value="4" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">4 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$10.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 5, 11990)">
+                            <input type="radio" name="dias" value="5" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">5 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$11.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s;" onclick="seleccionarDia(this, 6, 12990)">
+                            <input type="radio" name="dias" value="6" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">6 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$12.990</div>
+                        </label>
+                        <label class="opcion-dia" style="border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: border-color 0.2s; grid-column: span 2;" onclick="seleccionarDia(this, 7, 13990)">
+                            <input type="radio" name="dias" value="7" required style="display: none;">
+                            <div style="font-weight: bold; color: #1e293b; font-size: 1.1rem;">7 días</div><div style="color: #4f46e5; font-weight: bold; margin-top: 5px;">$13.990</div>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" onclick="document.getElementById('modalBanner').style.display='none'" style="padding: 12px 20px; background: #f1f5f9; color: #475569; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
+                        <button type="button" id="btnSiguiente" disabled onclick="mostrarPaso(2)" style="padding: 12px 30px; background: #94a3b8; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s;">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- PASO 2: SELECCIÓN DE POSICIÓN, FOTO Y DETALLES -->
+                <!-- ============================================== -->
+                <div id="paso2_detalles" style="display: none;">
+                    <h4 style="color: #1e293b; margin-bottom: 10px; font-size: 1rem;">2. Elige el orden (lugar en el banner)</h4>
+                    
+                    <!-- LÓGICA DE LUGARES DISPONIBLES EN TIEMPO REAL -->
+                    <div style="border: 1px solid #cbd5e1; border-radius: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 25px; padding: 5px;">
+                        {% for lugar in disponibilidad_banners %}
+                        <label class="opcion-pos" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: {% if lugar.disponible %}pointer{% else %}not-allowed; opacity: 0.5; background-color: #f8fafc;{% endif %}; transition: background 0.2s;" {% if lugar.disponible %}onclick="seleccionarPosicion(this, {{ lugar.posicion }}, {{ lugar.precio }})"{% endif %}>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <input type="radio" name="posicion" value="{{ lugar.posicion }}" {% if not lugar.disponible %}disabled{% endif %} required style="display: none;">
+                                <div>
+                                    <div style="font-weight: bold; color: {% if lugar.disponible %}#1e293b{% else %}#94a3b8{% endif %};">{{ lugar.posicion }}º lugar {{ lugar.emoji }}</div>
+                                    <div style="font-size: 0.8rem; color: {% if lugar.disponible %}#64748b{% else %}#ef4444; font-weight: bold;{% endif %};">{{ lugar.mensaje }}</div>
+                                </div>
+                            </div>
+                            <div style="color: {% if lugar.disponible %}#4f46e5{% else %}#94a3b8{% endif %}; font-weight: bold;">+${{ lugar.precio }}</div>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <h4 style="color: #1e293b; margin-bottom: 10px; font-size: 1rem;">3. ¿Qué foto usamos para tu banner?</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                        <label style="border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 8px; display: flex; gap: 10px; cursor: pointer; align-items: center;">
+                            <input type="radio" name="tipo_foto" value="perfil" checked onchange="toggleCargaFoto(false)"> 
+                            <div><strong>Usar mi foto de perfil</strong><br><span style="font-size: 0.85rem; color: #64748b;">Usamos la foto de tu perfil actual.</span></div>
+                        </label>
+                        <label style="border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 8px; display: flex; gap: 10px; cursor: pointer; flex-direction: column;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="radio" name="tipo_foto" value="nueva" onchange="toggleCargaFoto(true)"> 
+                                <strong>Subir una foto mía</strong>
+                            </div>
+                            <div id="divCargaFoto" style="display: none; padding-left: 25px;">
+                                <input type="file" name="foto_nueva" accept="image/*" style="font-size: 0.9rem;">
+                            </div>
+                        </label>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h5 style="margin: 0 0 10px 0; color: #1e293b;">📝 ¿Cómo quieres que sea tu banner? <span style="font-weight: normal; color: #64748b;">(opcional)</span></h5>
+                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">Cuéntanos cualquier detalle para diseñarlo a tu gusto:</p>
+                        <ul style="font-size: 0.85rem; color: #64748b; margin-top: 0; padding-left: 20px; margin-bottom: 10px;">
+                            <li>✨ ¿Algo importante que destacar?</li>
+                            <li>🎨 ¿Algún color en especial?</li>
+                            <li>💬 ¿Mensaje principal del banner?</li>
+                        </ul>
+                        <textarea name="detalles" rows="3" placeholder="Ej: Quiero que destaque mi servicio de gasfitería, color azul predominante, frase 'Atención 24/7'..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; box-sizing: border-box; font-size: 0.9rem;" maxlength="500"></textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" onclick="mostrarPaso(1)" style="padding: 12px 20px; background: #f1f5f9; color: #475569; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Volver</button>
+                        <button type="submit" style="padding: 12px 30px; background: #94a3b8; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s;" id="btnPagar" disabled>Selecciona lugar</button>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="total_a_pagar" id="totalAPagar" value="0">
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Servicios Publicados -->
+    <div class="section-title-container">
+        <h2>Servicios con más tratos realizados</h2>
+    </div>
+    
+    <div class="servicios-grid">
+        {% for servicio in servicios %}
+        <div class="servicio-card" onclick="window.location.href='{% url 'detalle_servicio' servicio.id %}';">
+            
+            {% if servicio.imagen_portada %}
+                <img src="{{ servicio.imagen_portada.url }}" alt="{{ servicio.titulo }}" class="servicio-img">
+            {% else %}
+                <div class="servicio-img" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                    <i class="fas fa-tools" style="font-size: 2.5rem;"></i>
+                </div>
+            {% endif %}
+            
+            <div class="servicio-content">
+                <h4 class="servicio-title" title="{{ servicio.titulo }}">{{ servicio.titulo }}</h4>
+                <p class="servicio-desc" title="{{ servicio.descripcion }}">{{ servicio.descripcion }}</p>
+                
+                <div class="servicio-price-pill">
+                    {% if servicio.precio_base %}
+                        Desde ${{ servicio.precio_base }}
+                    {% else %}
+                        Precio a Conversar
+                    {% endif %}
+                </div>
+                
+                <div class="servicio-footer-row" title="{{ servicio.maestro.comuna|default:'Chile' }}">
+                    <i class="fas fa-map-marker-alt"></i> <span class="format-text">{{ servicio.maestro.comuna|default:"Chile" }}</span>
+                </div>
+                
+                <div class="servicio-footer-row" title="{% if servicio.maestro.usuario.first_name %}{{ servicio.maestro.usuario.first_name|title }} {{ servicio.maestro.usuario.last_name|title }}{% else %}{{ servicio.maestro.usuario.username|title }}{% endif %}">
+                    <i class="fas fa-user"></i> 
+                    {% if servicio.maestro.usuario.first_name %}
+                        {{ servicio.maestro.usuario.first_name|title }} {{ servicio.maestro.usuario.last_name|title }}
+                    {% else %}
+                        {{ servicio.maestro.usuario.username|title }}
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 40px; border: 1px dashed #cbd5e1; border-radius: 8px;">
+            Los servicios de nuestros maestros aparecerán aquí pronto.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- BOTÓN PARA VER TODOS LOS SERVICIOS -->
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 50px;">
+        <a href="{% url 'servicios' %}" style="background: var(--kuxee-blue); color: white; padding: 14px 35px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: opacity 0.2s;">
+            <i class="fas fa-search" style="margin-right: 8px;"></i> Ver todos los servicios
+        </a>
+    </div>
+
+    <!-- Maestros -->
+    <div class="section-title-container">
+        <h2>Maestros con mejores reseñas y más tratos realizados</h2>
+    </div>
+    
+    <div class="maestros-grid">
+        {% for perfil in maestros %}
+        <div class="maestro-card">
+            <div class="maestro-header">
+                <div class="maestro-avatar">
+                    {% if perfil.usuario.foto_perfil %}
+                        <img src="{{ perfil.usuario.foto_perfil.url }}" alt="Avatar">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="maestro-info">
+                <div class="maestro-name">
+                    {% if perfil.usuario.first_name %}
+                        {{ perfil.usuario.first_name|title }} {{ perfil.usuario.last_name|title }}
+                    {% else %}
+                        {{ perfil.usuario.username|title }}
+                    {% endif %}
+                </div>
+                
+                <div class="maestro-skills" title="{{ perfil.oficio_principal }}">
+                    <i class="fas fa-tools"></i> <span class="format-text">{{ perfil.oficio_principal }}</span>
+                </div>
+                
+                <div class="maestro-reviews">Sin reseñas aún</div>
+                
+                <div class="maestro-location" title="{{ perfil.comuna|default:'Chile' }}">
+                    <i class="fas fa-map-marker-alt"></i> <span class="format-text">{{ perfil.comuna|default:"Chile" }}</span>
+                </div>
+                
+                {% if user.is_authenticated and user.username == perfil.usuario.username %}
+                    <a href="{% url 'mi_perfil' %}" class="btn-ver-perfil" style="background: #10b981;">Ver mi perfil</a>
+                {% else %}
+                    <a href="{% url 'perfil_publico' perfil.usuario.username %}" class="btn-ver-perfil">Ver perfil</a>
+                {% endif %}
+                
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: white; border-radius: 12px; border: 1px dashed #cbd5e1;">
+            <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 10px; color: #94a3b8;"></i>
+            <h3>Aún no hay maestros registrados</h3>
+            <p>¡Anímate a ser el primero en ofrecer tus servicios!</p>
+            <a href="{% url 'registro' %}" style="display: inline-block; margin-top: 15px; background: var(--kuxee-blue); color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">Registrarme ahora</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Lógica del Modal del Banner - Wizard (Paso a Paso)
+    let valorDias = 0;
+    let valorPosicion = 0;
+
+    function mostrarPaso(paso) {
+        if (paso === 1) {
+            document.getElementById('paso1_dias').style.display = 'block';
+            document.getElementById('paso2_detalles').style.display = 'none';
+        } else if (paso === 2) {
+            document.getElementById('paso1_dias').style.display = 'none';
+            document.getElementById('paso2_detalles').style.display = 'block';
+        }
+    }
+
+    function calcularTotal() {
+        let total = valorDias + valorPosicion;
+        document.getElementById('totalAPagar').value = total;
+        const btn = document.getElementById('btnPagar');
+        
+        if (valorDias > 0 && valorPosicion > 0) {
+            btn.style.background = '#3b82f6';
+            btn.disabled = false;
+            btn.innerText = 'Ir a Pagar $' + total.toLocaleString('es-CL');
+        }
+    }
+
+    function seleccionarDia(elementoLabel, dias, precio) {
+        document.querySelectorAll('.opcion-dia').forEach(label => {
+            label.style.borderColor = '#cbd5e1';
+            label.style.background = 'white';
+        });
+        elementoLabel.style.borderColor = '#3b82f6';
+        elementoLabel.style.background = '#eff6ff';
+        elementoLabel.querySelector('input').checked = true;
+        
+        valorDias = precio;
+        
+        // Habilitar botón de siguiente
+        const btnSig = document.getElementById('btnSiguiente');
+        btnSig.disabled = false;
+        btnSig.style.background = '#3b82f6';
+        
+        calcularTotal();
+    }
+
+    function seleccionarPosicion(elementoLabel, pos, precio) {
+        document.querySelectorAll('.opcion-pos').forEach(label => {
+            if(label.style.cursor !== 'not-allowed') {
+                label.style.background = 'white';
+            }
+        });
+        elementoLabel.style.background = '#eff6ff';
+        elementoLabel.querySelector('input').checked = true;
+        valorPosicion = precio;
+        calcularTotal();
+    }
+
+    function toggleCargaFoto(mostrar) {
+        document.getElementById('divCargaFoto').style.display = mostrar ? 'block' : 'none';
+    }
+
+    // Carrusel Automático de Banners
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".carousel-slide");
+    const dots = document.querySelectorAll(".dot");
+    let carruselTimer;
+
+    function mostrarSlide(n) {
+        if (!slides.length) return;
+        slides.forEach(s => { s.style.opacity = "0"; s.style.zIndex = "0"; });
+        dots.forEach(d => d.style.backgroundColor = "rgba(255,255,255,0.5)");
+        slideIndex = n;
+        if (slideIndex >= slides.length) slideIndex = 0;
+        if (slideIndex < 0) slideIndex = slides.length - 1;
+        slides[slideIndex].style.opacity = "1";
+        slides[slideIndex].style.zIndex = "1";
+        if(dots.length) dots[slideIndex].style.backgroundColor = "#fbbf24";
+    }
+
+    function moverCarrusel(n) {
+        clearInterval(carruselTimer);
+        mostrarSlide(slideIndex + n);
+        iniciarCarrusel();
+    }
+
+    function irASlide(n) {
+        clearInterval(carruselTimer);
+        mostrarSlide(n);
+        iniciarCarrusel();
+    }
+
+    function iniciarCarrusel() {
+        if (slides.length > 1) {
+            carruselTimer = setInterval(() => { mostrarSlide(slideIndex + 1); }, 6000); // 6 segundos para leer mejor
+        }
+    }
+
+    // Lógica de Formateo de Textos
+    document.addEventListener("DOMContentLoaded", function() {
+        if(slides.length > 0) iniciarCarrusel();
+
+        const formatElements = document.querySelectorAll('.format-text');
+        
+        formatElements.forEach(el => {
+            if (el.textContent) {
+                let text = el.textContent.replace(/_/g, ' ');
+                text = text.split(' ').map(word => {
+                    if(word.length === 0) return '';
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+                el.textContent = text;
+            }
+        });
+    });
+</script>
+{% endblock %}

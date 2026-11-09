@@ -1,0 +1,114 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Pago de Banner - Kuxee{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 650px; margin: 50px auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;">
+    
+    <!-- Header / Resumen del Pedido -->
+    <div style="background: #1e293b; color: white; padding: 30px; text-align: center; position: relative;">
+        <!-- Botón Volver Oculto/Discreto -->
+        <a href="{% url 'inicio' %}" style="position: absolute; top: 15px; left: 15px; color: #94a3b8; text-decoration: none; font-size: 0.9rem;">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        
+        <h2 style="margin: 0 0 10px 0; color: #3b82f6; font-weight: 800;">Pago Seguro Kuxee</h2>
+        <p style="margin: 0; font-size: 1.05rem; color: #cbd5e1;">Publicidad por <strong>{{ banner.dias_contratados }} días</strong> en el <strong>{{ banner.posicion }}º lugar</strong>.</p>
+        
+        <div style="font-size: 2.5rem; font-weight: bold; margin-top: 15px; color: #fbbf24;">
+            ${{ total|floatformat:"0" }}
+        </div>
+    </div>
+
+    <!-- Formulario de Tarjeta Simulado -->
+    <div style="padding: 40px;">
+        <form method="POST" id="paymentForm">
+            {% csrf_token %}
+            
+            <h3 style="color: #334155; margin-top: 0; margin-bottom: 25px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+                Detalles de la Tarjeta
+                <div style="display: flex; gap: 10px; font-size: 1.8rem;">
+                    <i class="fab fa-cc-visa" style="color: #1434CB;"></i>
+                    <i class="fab fa-cc-mastercard" style="color: #EB001B;"></i>
+                </div>
+            </h3>
+
+            <!-- Número de tarjeta -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; color: #64748b; margin-bottom: 8px; font-size: 0.9rem;">Número de Tarjeta</label>
+                <div style="position: relative;">
+                    <i class="far fa-credit-card" style="position: absolute; left: 15px; top: 15px; color: #94a3b8; font-size: 1.1rem;"></i>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required style="width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1.05rem; box-sizing: border-box; font-family: monospace, sans-serif; transition: border-color 0.2s;">
+                </div>
+            </div>
+
+            <!-- Expiración y CVC -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; color: #64748b; margin-bottom: 8px; font-size: 0.9rem;">Fecha de Expiración</label>
+                    <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1.05rem; box-sizing: border-box; font-family: monospace, sans-serif; text-align: center;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; color: #64748b; margin-bottom: 8px; font-size: 0.9rem;">CVC / CVV</label>
+                    <div style="position: relative;">
+                        <!-- SE CAMBIÓ type="text" POR type="password" AQUÍ -->
+                        <input type="password" id="cardCvc" placeholder="***" maxlength="4" required style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1.05rem; box-sizing: border-box; font-family: monospace, sans-serif; text-align: center; letter-spacing: 2px;">
+                        <i class="fas fa-info-circle" style="position: absolute; right: 15px; top: 15px; color: #cbd5e1; font-size: 1rem;" title="Los 3 dígitos al reverso de tu tarjeta"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nombre -->
+            <div style="margin-bottom: 35px;">
+                <label style="display: block; font-weight: bold; color: #64748b; margin-bottom: 8px; font-size: 0.9rem;">Nombre del Titular</label>
+                <input type="text" placeholder="EJ: JUAN PÉREZ" required style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; text-transform: uppercase;">
+            </div>
+
+            <!-- Botón de Pago -->
+            <button type="submit" id="btnProcesar" style="width: 100%; background: #2563eb; color: white; padding: 16px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: background 0.3s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <i class="fas fa-lock"></i> Pagar ${{ total|floatformat:"0" }}
+            </button>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;"><i class="fas fa-shield-alt"></i> Tus datos están protegidos y encriptados.</p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script para dar formato visual de tarjeta real mientras el usuario escribe
+    
+    // Formatear número de tarjeta (agrega espacio cada 4 números)
+    document.getElementById('cardNumber').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/[^\d]/g, '');
+        e.target.value = value.replace(/(.{4})/g, '$1 ').trim();
+    });
+
+    // Formatear fecha (agrega / después del mes)
+    document.getElementById('cardExpiry').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/[^\d]/g, '');
+        if (value.length >= 2) {
+            e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        } else {
+            e.target.value = value;
+        }
+    });
+
+    // CVC solo números
+    document.getElementById('cardCvc').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^\d]/g, '');
+    });
+    
+    // Animación de carga al presionar pagar
+    document.getElementById('paymentForm').addEventListener('submit', function() {
+        const btn = document.getElementById('btnProcesar');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando pago...';
+        btn.style.background = '#94a3b8';
+        btn.style.boxShadow = 'none';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Acceso Denegado - Kuxee{% endblock %}
+
+{% block contenido %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 20px;">
+    
+    <div style="width: 100px; height: 100px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+        <i class="fas fa-lock" style="font-size: 3rem; color: #ef4444;"></i>
+    </div>
+    
+    <h1 style="color: #0f172a; font-size: 2.5rem; margin-bottom: 15px;">Acceso Denegado</h1>
+    
+    <p style="color: #64748b; font-size: 1.1rem; max-width: 500px; margin-bottom: 30px; line-height: 1.6;">
+        Lo sentimos, no tienes permisos para ver esta página. Debes iniciar sesión con tu cuenta para acceder a la mensajería y a las herramientas privadas.
+    </p>
+    
+    <div style="display: flex; gap: 15px;">
+        <a href="{% url 'login' %}" style="background: var(--kuxee-blue); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+            Iniciar Sesión
+        </a>
+        <a href="{% url 'inicio' %}" style="background: #f1f5f9; color: #475569; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+            Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends 'usuarios/base.html' %}
+{% block title %}Planes Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .planes-container { max-width: 900px; margin: 40px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    /* Switch Cliente / Maestro */
+    .toggle-wrapper { display: flex; justify-content: center; margin-bottom: 50px; }
+    .toggle-box { background: #f1f5f9; border-radius: 30px; display: flex; padding: 5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .toggle-btn { padding: 10px 30px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .toggle-btn.active { background: #4f46e5; color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+    .toggle-btn.inactive { background: transparent; color: #64748b; }
+
+    /* Contenedor de Tarjetas */
+    .cards-wrapper { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+    
+    /* Diseño Base de Tarjeta */
+    .plan-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px 30px; width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
+    .plan-card:hover { transform: translateY(-5px); }
+
+    /* Tarjeta Destacada (Plus/Premium) */
+    .plan-card.pro { border: 2px solid #4f46e5; box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1); }
+    .badge-recomendado { position: absolute; top: -14px; right: 20px; background: #4f46e5; color: white; font-size: 0.8rem; font-weight: bold; padding: 6px 16px; border-radius: 20px; }
+
+    /* Textos de la Tarjeta */
+    .plan-subtitle { color: #4f46e5; font-weight: bold; font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
+    .plan-price { color: #4f46e5; font-size: 3.2rem; font-weight: 800; text-align: center; margin-bottom: 20px; display: flex; justify-content: center; align-items: baseline; }
+    .plan-price.free { font-size: 2.8rem; }
+    .plan-price span { font-size: 1rem; font-weight: normal; color: #64748b; margin-left: 5px; }
+    .plan-desc { color: #475569; font-size: 0.9rem; text-align: center; line-height: 1.5; margin-bottom: 30px; min-height: 70px; }
+
+    /* Lista de Beneficios */
+    .plan-features { list-style: none; padding: 0; margin: 0 0 30px 0; flex-grow: 1; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; font-size: 0.9rem; color: #334155; line-height: 1.4; }
+    .plan-features li i.fa-check { color: #10b981; margin-top: 3px; font-size: 1rem; }
+    .icon-emoji { margin-right: 4px; font-style: normal; }
+
+    /* Botones de Acción */
+    .btn-plan { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: background 0.2s; }
+    .btn-blue { background: #3b82f6; color: white; }
+    .btn-blue:hover { background: #2563eb; color: white; }
+    .btn-current { background: #f1f5f9; color: #64748b; cursor: default; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="planes-container">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #0f172a;">Planes Kuxee</h1>
+        <p style="color: #64748b;">Elige el plan que mejor se adapta a ti. Puedes cambiar de plan cuando quieras.</p>
+    </div>
+
+    <!-- Switch de Tipo de Cuenta -->
+    <div class="toggle-wrapper">
+        <div class="toggle-box">
+            <button id="btn-cliente" class="toggle-btn inactive" onclick="mostrarPlanes('cliente')">
+                <i class="fas fa-user"></i> Cliente
+            </button>
+            <button id="btn-maestro" class="toggle-btn active" onclick="mostrarPlanes('maestro')">
+                <i class="fas fa-tools"></i> Maestro
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE PLANES MAESTRO -->
+    <div class="cards-wrapper" id="planes-maestro">
+        <!-- PLAN GRATIS MAESTRO -->
+        <div class="plan-card">
+            <div class="plan-subtitle">Maestro</div>
+            <div class="plan-price free">Gratis</div>
+            <div class="plan-desc">
+                Hasta 3 servicios publicados, 7 imágenes por servicio. Sin costo mensual.
+            </div>
+            
+            <ul class="plan-features">
+                <li><i class="fas fa-check"></i> Hasta 3 servicios publicados</li>
+                <li><i class="fas fa-check"></i> Hasta 7 imágenes por servicio</li>
+                <li><i class="fas fa-check"></i> Hasta 3 oficios donde ofreces tu servicio</li>
+                <li><i class="fas fa-check"></i> <span class="icon-emoji">🎓</span> Subir 1 certificado profesional</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                {% if user.es_maestro %}
+                    {% if user.perfil_maestro.plan_actual == 'gratis' %}
+                        <button class="btn-plan btn-current" disabled>Tu plan actual</button>
+                    {% else %}
+                        <button class="btn-plan btn-blue" onclick="alert('Pronto conectaremos esto para cambiar de plan.')">Cambiar a Gratis</button>
+                    {% endif %}
+                {% else %}
+                    <button class="btn-plan btn-current" disabled>Solo para Maestros</button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'registro' %}" class="btn-plan btn-blue">Crear cuenta para activar</a>
+            {% endif %}
+        </div>
+
+        <!-- PLAN MAESTRO PLUS -->
+        <div class="plan-card pro">
+            <div class="badge-recomendado">Recomendado</div>
+            <div class="plan-subtitle">Maestro Plus</div>
+            <div class="plan-price">$9.990 <span>/mes</span></div>
+            <div class="plan-desc">
+                Maestro verificado ✓ - hasta 6 servicios, 14 imágenes por servicio, mejor posicionamiento en búsquedas y hasta 3 certificados profesionales visibles en tu perfil.
+            </div>
+            
+            <ul class="plan-features">
+                <li><i class="fas fa-check"></i> Hasta 6 servicios publicados</li>
+                <li><i class="fas fa-check"></i> Hasta 14 imágenes por servicio</li>
+                <li><i class="fas fa-check"></i> Hasta 6 oficios donde ofreces tu servicio</li>
+                <li><i class="fas fa-check"></i> Publicar solicitudes con hasta 5 archivos (videos e imágenes)</li>
+                <li><i class="fas fa-check"></i> <span style="font-weight: bold; color: #0f172a;">Maestro verificado</span></li>
+                <li><i class="fas fa-check"></i> <span class="icon-emoji">🚀</span> Mejor posicionamiento en búsquedas</li>
+                <li><i class="fas fa-check"></i> <span class="icon-emoji">🎓</span> Subir hasta 3 certificados profesionales</li>
+                <li><i class="fas fa-check"></i> <span class="icon-emoji">⭐</span> Comprar una sección exclusiva en el inicio (tu franja con tus servicios, activa 1 semana por compra)</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                {% if user.es_maestro %}
+                    {% if user.perfil_maestro.plan_actual == 'plus' %}
+                        <button class="btn-plan btn-current" disabled>Tu plan actual</button>
+                    {% else %}
+                        <a href="{% url 'pasarela_suscripcion' %}" class="btn-plan btn-blue">Suscribirse a Plus</a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn-plan btn-current" disabled>Solo para Maestros</button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'registro' %}" class="btn-plan btn-blue">Crear cuenta para activar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE PLANES CLIENTE (Oculto por defecto) -->
+    <div class="cards-wrapper" id="planes-cliente" style="display: none;">
+        <!-- PLAN GRATIS CLIENTE -->
+        <div class="plan-card">
+            <div class="plan-subtitle">Cliente</div>
+            <div class="plan-price free">Gratis</div>
+            <div class="plan-desc">
+                Navega y contrata servicios. Comisión de trato $9.990.
+            </div>
+            
+            <ul class="plan-features">
+                <li><i class="fas fa-check"></i> Busca y contacta maestros</li>
+                <li><i class="fas fa-check"></i> Califica los servicios finalizados</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                {% if user.es_cliente %}
+                    {% if user.perfil_cliente.plan_actual == 'gratis' %}
+                        <button class="btn-plan btn-current" disabled>Tu plan actual</button>
+                    {% else %}
+                        <button class="btn-plan btn-blue" onclick="alert('Pronto conectaremos esto para cambiar de plan.')">Cambiar a Gratis</button>
+                    {% endif %}
+                {% else %}
+                    <button class="btn-plan btn-current" disabled>Solo para Clientes</button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'registro' %}" class="btn-plan btn-blue">Crear cuenta para activar</a>
+            {% endif %}
+        </div>
+
+        <!-- PLAN CLIENTE PREMIUM -->
+        <div class="plan-card pro">
+            <div class="badge-recomendado">Recomendado</div>
+            <div class="plan-subtitle">Cliente Kuxee</div>
+            <div class="plan-price">$6.990 <span>/mes</span></div>
+            <div class="plan-desc">
+                Publica tus solicitudes para que los maestros te contacten. Comisión de trato preferencial $5.990.
+            </div>
+            
+            <ul class="plan-features">
+                <li><i class="fas fa-check"></i> Publicar solicitudes con hasta 10 archivos (videos e imágenes)</li>
+                <li><i class="fas fa-check"></i> Ahorra en comisiones en todos tus tratos</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                {% if user.es_cliente %}
+                    {% if user.perfil_cliente.plan_actual == 'premium' %}
+                        <button class="btn-plan btn-current" disabled>Tu plan actual</button>
+                    {% else %}
+                        <a href="{% url 'pasarela_suscripcion' %}" class="btn-plan btn-blue">Suscribirse a Premium</a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn-plan btn-current" disabled>Solo para Clientes</button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'registro' %}" class="btn-plan btn-blue">Crear cuenta para activar</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function mostrarPlanes(tipo) {
+        const btnMaestro = document.getElementById('btn-maestro');
+        const btnCliente = document.getElementById('btn-cliente');
+        const planesMaestro = document.getElementById('planes-maestro');
+        const planesCliente = document.getElementById('planes-cliente');
+
+        if (tipo === 'cliente') {
+            btnCliente.classList.add('active');
+            btnCliente.classList.remove('inactive');
+            btnMaestro.classList.add('inactive');
+            btnMaestro.classList.remove('active');
+            
+            planesMaestro.style.display = 'none';
+            planesCliente.style.display = 'flex';
+        } else {
+            btnMaestro.classList.add('active');
+            btnMaestro.classList.remove('inactive');
+            btnCliente.classList.add('inactive');
+            btnCliente.classList.remove('active');
+            
+            planesCliente.style.display = 'none';
+            planesMaestro.style.display = 'flex';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}{{ servicio.titulo|title }} - Kuxee{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detalle-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+    .detalle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+    
+    .media-col { display: flex; flex-direction: column; gap: 15px; }
+    .main-image-box { width: 100%; height: 420px; border-radius: 12px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; }
+    .main-image-box img { width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .thumbnails-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+    .thumb-item { width: 65px; height: 65px; border-radius: 8px; border: 2px solid #cbd5e1; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+    .thumb-item.active { border-color: var(--kuxee-blue); }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .info-col { display: flex; flex-direction: column; }
+    .servicio-categorias { color: #64748b; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .servicio-titulo { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0 0 15px 0; text-transform: uppercase; line-height: 1.3; }
+    .precio-badge { border: 1px solid #fcd34d; border-radius: 20px; padding: 6px 16px; font-weight: bold; color: #1e293b; display: inline-block; margin-bottom: 20px; width: fit-content; font-size: 0.95rem; }
+    
+    .maestro-card-link { text-decoration: none; display: block; margin-bottom: 25px; }
+    .maestro-card-box { background: #f8fafc; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 15px; border: 1px solid #e2e8f0; transition: border-color 0.2s; }
+    .maestro-card-box:hover { border-color: #cbd5e1; }
+    .maestro-avatar-mini { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 1.5rem; flex-shrink: 0; }
+    .maestro-avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
+    .maestro-textos span { font-size: 0.8rem; color: #64748b; display: block; }
+    .maestro-textos strong { font-size: 1rem; color: #0f172a; display: block; }
+    .maestro-textos small { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+    .desc-header { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 12px; }
+    .desc-cuerpo { color: #334155; line-height: 1.7; font-size: 0.95rem; white-space: pre-line; margin-bottom: 25px; }
+    .acciones-row { display: flex; gap: 12px; align-items: center; margin-top: auto; }
+    .btn-contactar { background: #4338ca; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; text-decoration: none; transition: background 0.2s; }
+    .btn-contactar:hover { background: #3730a3; }
+    .btn-like { border: 1px solid #ef4444; color: #ef4444; border-radius: 8px; padding: 10px 18px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; transition: background 0.2s; }
+    
+    .seccion-bloque { margin-top: 50px; border-top: 1px solid #f1f5f9; padding-top: 30px; }
+    .seccion-subtitulo { color: #4f46e5; font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; }
+    .aviso-login { color: #64748b; font-size: 0.95rem; }
+    .aviso-login a { color: #2563eb; text-decoration: underline; font-weight: 500; }
+    
+    /* FORMULARIO PRINCIPAL DE COMENTARIOS */
+    .comentario-form-main { margin-bottom: 30px; }
+    .comentario-form-main textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; resize: vertical; min-height: 80px; margin-bottom: 10px; outline: none; box-sizing: border-box; }
+    .comentario-form-main textarea:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    .btn-publicar-main { background: #5b21b6; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .btn-publicar-main:hover { background: #4c1d95; }
+    
+    .comentarios-lista { display: flex; flex-direction: column; gap: 20px; }
+    
+    /* DISEÑO TIPO CAJA + HILO COMPACTO */
+    .comentario-wrapper { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    .comentario-wrapper.is-reply { padding: 10px 0 0 0; border: none; background: transparent; box-shadow: none; border-radius: 0; }
+    
+    .comentario-header { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+    .comentario-avatar { width: 38px; height: 38px; border-radius: 50%; background: #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #cbd5e1; flex-shrink: 0; }
+    .comentario-wrapper.is-reply > .comentario-header .comentario-avatar { width: 28px; height: 28px; font-size: 0.8rem; }
+    .comentario-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .comentario-meta { line-height: 1.2; }
+    .comentario-autor { font-weight: bold; color: #0f172a; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+    .badge-maestro { background: #eff6ff; color: var(--kuxee-blue); font-size: 0.65rem; padding: 2px 6px; border-radius: 12px; font-weight: bold; border: 1px solid #bfdbfe; display: flex; align-items: center; gap: 4px; }
+    .comentario-fecha { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    
+    .comentario-texto { color: #334155; font-size: 0.95rem; line-height: 1.4; margin-bottom: 2px; padding-left: 48px; white-space: pre-line; word-break: break-word; }
+    .comentario-wrapper.is-reply > .comentario-texto { padding-left: 38px; }
+    
+    .btn-abrir-respuesta { background: none; border: none; color: #64748b; font-weight: bold; font-size: 0.8rem; cursor: pointer; padding: 0; margin-left: 48px; margin-bottom: 0px; transition: color 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+    .comentario-wrapper.is-reply > .btn-abrir-respuesta { margin-left: 38px; }
+    .btn-abrir-respuesta:hover { color: var(--kuxee-blue); text-decoration: underline; }
+    
+    /* FORMULARIO DE RESPUESTAS INTERNAS */
+    .reply-form { margin-left: 48px; margin-bottom: 10px; margin-top: 5px; }
+    .comentario-wrapper.is-reply > .reply-form { margin-left: 38px; }
+    .reply-form textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; font-family: inherit; resize: vertical; min-height: 60px; margin-bottom: 6px; outline: none; box-sizing: border-box; font-size: 0.9rem;}
+    .reply-form textarea:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .form-actions { display: flex; gap: 8px; }
+    .btn-submit-sm { background: var(--kuxee-blue); color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;}
+    .btn-submit-sm:hover { background: #2563eb; }
+    .btn-cancel-sm { background: #f1f5f9; color: #475569; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;}
+    .btn-cancel-sm:hover { background: #e2e8f0; }
+    
+    /* CONTROL DE ANIDACIÓN Y LÍNEAS ALINEADAS PERFECTAMENTE AL CENTRO DEL AVATAR */
+    .respuestas-hilo { margin-left: 18px; padding-left: 15px; border-left: 2px solid #e2e8f0; margin-top: 4px; }
+    .comentario-wrapper.is-reply > .respuestas-hilo { margin-left: 13px; padding-left: 15px; border-left: 2px solid #cbd5e1; }
+    /* A partir del nivel 3 se anula el margen izquierdo para que baje recto */
+    .respuestas-hilo .respuestas-hilo { margin-left: 0; border-left: 2px dashed #cbd5e1; padding-left: 15px; }
+    .respuestas-hilo .respuestas-hilo .respuestas-hilo { margin-left: 0; padding-left: 15px; border-left: 2px dashed #94a3b8; }
+
+    /* Otros servicios */
+    .empty-otros { text-align: center; color: #64748b; padding: 30px 0; font-size: 0.95rem; }
+    .otros-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+    .otro-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; text-decoration: none; display: flex; flex-direction: column; }
+    .otro-img { height: 130px; width: 100%; object-fit: cover; }
+    .otro-info { padding: 10px 12px; }
+    .otro-titulo { font-weight: bold; color: #1e293b; font-size: 0.9rem; margin-bottom: 6px; }
+    .otro-precio { color: #d97706; font-weight: bold; font-size: 0.85rem; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="detalle-container">
+    <div class="detalle-grid">
+        
+        <div class="media-col">
+            <div class="main-image-box">
+                {% if servicio.imagen_portada %}
+                    <img id="main-display-img" src="{{ servicio.imagen_portada.url }}" alt="{{ servicio.titulo }}">
+                {% else %}
+                    <i class="fas fa-tools" style="font-size: 4rem; color: #cbd5e1;"></i>
+                {% endif %}
+            </div>
+            
+            {% if servicio.imagen_portada %}
+            <div class="thumbnails-row">
+                <div class="thumb-item active" onclick="cambiarImagenPrincipal('{{ servicio.imagen_portada.url }}', this)">
+                    <img src="{{ servicio.imagen_portada.url }}" alt="Miniatura">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="info-col">
+            <div class="servicio-categorias">
+                <!-- Se agregó la clase format-text para limpiar los oficios -->
+                <i class="fas fa-tag"></i> <span class="format-text">{{ servicio.oficios_labels|default:servicio.oficio }}</span>
+            </div>
+            
+            <h1 class="servicio-titulo">{{ servicio.titulo }}</h1>
+            
+            <div class="precio-badge">
+                {% if servicio.precio_base %}
+                    Desde ${{ servicio.precio_base }}
+                {% else %}
+                    Precio a Conversar
+                {% endif %}
+            </div>
+            
+            {% if user.is_authenticated and user.username == servicio.maestro.usuario.username %}
+                <a href="{% url 'mi_perfil' %}" class="maestro-card-link">
+            {% else %}
+                <a href="{% url 'perfil_publico' servicio.maestro.usuario.username %}" class="maestro-card-link">
+            {% endif %}
+                <div class="maestro-card-box">
+                    <div class="maestro-avatar-mini">
+                        {% if servicio.maestro.usuario.foto_perfil %}
+                            <img src="{{ servicio.maestro.usuario.foto_perfil.url }}" alt="Avatar">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="maestro-textos">
+                        <span>Ofrecido por</span>
+                        <strong>
+                            <!-- CORRECCIÓN: Filtro |title para forzar mayúsculas iniciales -->
+                            {% if servicio.maestro.usuario.first_name %}
+                                {{ servicio.maestro.usuario.first_name|title }} {{ servicio.maestro.usuario.last_name|title }}
+                            {% else %}
+                                {{ servicio.maestro.usuario.username|title }}
+                            {% endif %}
+                        </strong>
+                        <!-- CORRECCIÓN: Se muestra la ubicación usando 'comuna' o 'comuna_label' y con format-text -->
+                        <small>
+                            <i class="fas fa-map-marker-alt"></i> 
+                            <span class="format-text">
+                                {% if servicio.maestro.comuna_label %}
+                                    {{ servicio.maestro.comuna_label }}
+                                {% elif servicio.maestro.comuna %}
+                                    {{ servicio.maestro.comuna }}
+                                {% else %}
+                                    Chile
+                                {% endif %}
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </a>
+            
+            <div class="desc-header">Descripción</div>
+            <div class="desc-cuerpo">{{ servicio.descripcion }}</div>
+            
+            <div class="acciones-row">
+                {% if not user.is_authenticated or user.username != servicio.maestro.usuario.username %}
+                    <!-- Botón actualizado para ir al chat interno -->
+                    <a href="{% url 'mensajes' %}?contacto={{ servicio.maestro.usuario.username }}&servicio={{ servicio.id }}" class="btn-contactar" style="background: #4f46e5;">
+                        <i class="fas fa-comments"></i> Contactar maestro
+                    </a>
+                {% endif %}
+
+                <!-- BOTÓN DE LIKE DINÁMICO -->
+                {% if user.is_authenticated %}
+                    <button type="button" id="btn-like-{{ servicio.id }}" class="btn-like" onclick="darLike({{ servicio.id }})" style="{% if request.user in servicio.likes.all %}background: #fee2e2;{% else %}background: white;{% endif %}">
+                        <i class="{% if request.user in servicio.likes.all %}fas{% else %}far{% endif %} fa-heart"></i> 
+                        <span id="contador-likes-{{ servicio.id }}">{{ servicio.likes.count }}</span>
+                    </button>
+                {% else %}
+                    <button type="button" class="btn-like" onclick="window.location.href='{% url 'login' %}'" style="background: white;">
+                        <i class="far fa-heart"></i> <span>{{ servicio.likes.count }}</span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="seccion-bloque">
+        <h2 class="seccion-subtitulo">Comentarios y preguntas</h2>
+        
+        {% if user.is_authenticated %}
+            <!-- El maestro NO ve el formulario principal en su propio servicio -->
+            {% if user.username != servicio.maestro.usuario.username %}
+                <form class="comentario-form-main" method="POST" action="{% url 'agregar_comentario' servicio.id %}">
+                    {% csrf_token %}
+                    <textarea name="texto" placeholder="Escribe una pregunta o comentario... (máx 1000 caracteres)" maxlength="1000" required></textarea>
+                    <button type="submit" class="btn-publicar-main">Publicar comentario</button>
+                </form>
+            {% else %}
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">
+                    <i class="fas fa-info-circle"></i> Este es tu servicio. Puedes responder a los clientes directamente debajo de sus preguntas.
+                </p>
+            {% endif %}
+        {% else %}
+            <p class="aviso-login" style="margin-bottom: 30px;">
+                <a href="{% url 'login' %}">Inicia sesión</a> para dejar un comentario.
+            </p>
+        {% endif %}
+        
+        <div class="comentarios-lista">
+            {% if comentarios %}
+                {% include 'usuarios/comentario_nodo.html' with lista_comentarios=comentarios %}
+            {% else %}
+                <div style="color: #64748b; font-size: 0.95rem;">Aún no hay comentarios. ¡Sé el primero en preguntar!</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="seccion-bloque">
+        <h2 class="seccion-subtitulo" style="color: var(--kuxee-blue);">
+            <!-- CORRECCIÓN: Filtro |title en el título de otros servicios -->
+            Otros servicios de 
+            {% if servicio.maestro.usuario.first_name %}
+                {{ servicio.maestro.usuario.first_name|title }} {{ servicio.maestro.usuario.last_name|title }}
+            {% else %}
+                {{ servicio.maestro.usuario.username|title }}
+            {% endif %}
+        </h2>
+        
+        {% if otros_servicios %}
+            <div class="otros-grid">
+                {% for otro in otros_servicios %}
+                    <a href="{% url 'detalle_servicio' otro.id %}" class="otro-card">
+                        {% if otro.imagen_portada %}
+                            <img src="{{ otro.imagen_portada.url }}" alt="{{ otro.titulo }}" class="otro-img">
+                        {% else %}
+                            <div class="otro-img" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#94a3b8;">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                        {% endif %}
+                        <div class="otro-info">
+                            <div class="otro-titulo">{{ otro.titulo|truncatechars:40|title }}</div>
+                            <div class="otro-precio">
+                                {% if otro.precio_base %}
+                                    Desde ${{ otro.precio_base }}
+                                {% else %}
+                                    Precio a Conversar
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-otros">Este maestro no tiene otros servicios publicados.</div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function cambiarImagenPrincipal(src, elemento) {
+        document.getElementById('main-display-img').src = src;
+        document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
+        elemento.classList.add('active');
+    }
+
+    function toggleFormularioRespuesta(comentarioId) {
+        const formulario = document.getElementById('form-respuesta-' + comentarioId);
+        if (formulario.style.display === 'none' || formulario.style.display === '') {
+            formulario.style.display = 'block';
+            formulario.querySelector('textarea').focus();
+        } else {
+            formulario.style.display = 'none';
+        }
+    }
+
+    // SCRIPT PARA DAR LIKE POR AJAX
+    function darLike(servicioId) {
+        fetch(`/servicio/${servicioId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) return; // Si hay error, no hacemos nada
+            
+            // Actualizamos el número en el contador
+            document.getElementById(`contador-likes-${servicioId}`).innerText = data.total_likes;
+            
+            // Cambiamos el color de fondo y el icono del corazón (sólido o regular)
+            const btn = document.getElementById(`btn-like-${servicioId}`);
+            const icon = btn.querySelector('i');
+            
+            if (data.liked) {
+                btn.style.background = '#fee2e2'; // Fondo rosado
+                icon.classList.remove('far'); // Quitamos corazón vacío
+                icon.classList.add('fas');    // Ponemos corazón lleno
+            } else {
+                btn.style.background = 'white'; // Fondo blanco
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        });
+    }
+</script>
+
+<!-- SCRIPT PARA LIMPIAR GUIONES BAJOS Y CAPITALIZAR COMUNAS Y OFICIOS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const formatElements = document.querySelectorAll('.format-text');
+        
+        formatElements.forEach(el => {
+            if (el.textContent) {
+                // Reemplaza guiones bajos por espacios
+                let text = el.textContent.replace(/_/g, ' ');
+                
+                // Capitaliza la primera letra de cada palabra
+                text = text.split(' ').map(word => {
+                    if(word.length === 0) return '';
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+                
+                el.textContent = text;
+            }
+        });
+    });
+</script>
+{% endblock %}
