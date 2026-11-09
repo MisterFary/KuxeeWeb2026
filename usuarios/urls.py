@@ -82,4 +82,9 @@ urlpatterns = [
     path('trato/<int:trato_id>/evaluar/', views.evaluar_trato, name='evaluar_trato'),
     path('resenas/', views.ver_resenas, name='ver_resenas'),    
     path('resenas/<str:username>/', views.ver_resenas, name='ver_resenas_publico'),
+    
+    # ==========================================
+    # RUTA CORREGIDA: Eliminar chat
+    # ==========================================
+    path('eliminar-chat/<str:contacto_username>/<int:servicio_id>/', views.eliminar_chat, name='eliminar_chat'),
 ]
