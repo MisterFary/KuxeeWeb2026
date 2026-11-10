@@ -142,3 +142,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = 'acceso_denegado'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://tu-dominio-de-railway.up.railway.app',
+]
