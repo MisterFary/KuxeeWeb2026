@@ -4,15 +4,16 @@
 
 {% block extra_css %}
 <style>
-    .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 200px; width: 100%; }
-    .profile-container { max-width: 1100px; margin: -100px auto 40px auto; padding: 0 20px; }
+    .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 180px; width: 100%; }
+    .profile-container { max-width: 1100px; margin: -80px auto 40px auto; padding: 0 20px; }
     .profile-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; gap: 30px; align-items: center; border: 1px solid #e2e8f0; margin-bottom: 30px; }
 
     .profile-avatar-large { width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; padding: 0; background: transparent; flex-shrink: 0; }
     .btn-edit-avatar { position: absolute; bottom: 5px; right: 5px; background: var(--kuxee-blue); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; transition: background 0.2s; }
     .btn-edit-avatar:hover { background: #2563eb; }
 
-    .profile-info h1 { margin: 0 0 10px 0; color: var(--kuxee-dark); font-size: 2rem; display: flex; align-items: center; }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-info h1 { margin: 0 0 10px 0; color: var(--kuxee-dark); font-size: 2rem; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
     .badge-rol { background: #eff6ff; color: var(--kuxee-blue); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
     .profile-details { display: flex; gap: 20px; color: #475569; font-size: 0.95rem; margin-bottom: 10px; flex-wrap: wrap; }
     .profile-details i { color: var(--kuxee-blue); width: 20px; }
@@ -29,11 +30,11 @@
     .stat-label { color: #64748b; font-size: 0.9rem; }
     .stat-card.primary .stat-label { color: #bfdbfe; }
 
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .section-header h2 { margin: 0; color: var(--kuxee-blue); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
     .plan-badge { background: #f1f5f9; color: #64748b; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #e2e8f0; }
 
-    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
     .service-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; position: relative; text-decoration: none; color: inherit; transition: transform 0.2s;}
     .service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
     
@@ -49,6 +50,28 @@
     .service-title { font-weight: bold; color: var(--kuxee-dark); font-size: 1.1rem; margin: 0 0 10px 0; }
     .service-tag { color: var(--kuxee-blue); font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
     .service-price { margin-top: auto; display: inline-block; background: #fffbeb; color: #d97706; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; align-self: flex-start;}
+
+    /* =========================================
+       DISEÑO RESPONSIVO PARA CELULARES
+       ========================================= */
+    @media (max-width: 768px) {
+        .profile-container { padding: 0 15px; margin-top: -60px; }
+        .profile-card { flex-direction: column; text-align: center; padding: 20px; gap: 20px; }
+        
+        .profile-avatar-large { width: 120px; height: 120px; margin: 0 auto; }
+        .profile-info h1 { justify-content: center; font-size: 1.6rem; }
+        
+        .profile-details { justify-content: center; font-size: 0.9rem; }
+        .profile-actions { justify-content: center; }
+        .btn-action { width: 100%; justify-content: center; }
+        
+        .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+        .stat-card { padding: 18px; }
+        .stat-value { font-size: 2rem; }
+        
+        .section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .services-grid { grid-template-columns: 1fr; }
+    }
 </style>
 {% endblock %}
 
@@ -79,11 +102,11 @@
         
         <div class="profile-info">
             <h1>
-                {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                <span>{% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}</span>
                 {% if user.es_maestro and user.perfil_maestro.plan_actual == 'plus' %}
-                    <i class="fas fa-check-circle" style="color: #10b981; margin-left: 8px; font-size: 1.2rem;" title="Maestro Verificado (Plan Plus)"></i>
+                    <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;" title="Maestro Verificado (Plan Plus)"></i>
                 {% elif user.es_cliente and user.perfil_cliente.plan_actual == 'premium' %}
-                    <i class="fas fa-check-circle" style="color: #4f46e5; margin-left: 8px; font-size: 1.2rem;" title="Cliente Kuxee (Premium)"></i>
+                    <i class="fas fa-check-circle" style="color: #4f46e5; font-size: 1.2rem;" title="Cliente Kuxee (Premium)"></i>
                 {% endif %}
             </h1>
             
@@ -154,7 +177,6 @@
             <div class="stat-value">{{ servicios.count }}</div>
             <div class="stat-label">Servicios publicados</div>
         </div>
-        <!-- PROMEDIO ACTUALIZADO AQUÍ -->
         <div class="stat-card">
             <div class="stat-value">
                 {% if promedio_calificacion > 0 %}
@@ -285,8 +307,8 @@
 
     <!-- MODAL FLOTANTE: MIS LIKES -->
     {% if user.es_maestro %}
-    <div id="modalMisLikes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
-        <div style="background: white; width: 95%; max-width: 450px; border-radius: 12px; padding: 25px; position: relative; max-height: 80vh; overflow-y: auto;">
+    <div id="modalMisLikes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 15px;">
+        <div style="background: white; width: 100%; max-width: 450px; border-radius: 12px; padding: 25px; position: relative; max-height: 80vh; overflow-y: auto;">
             <button type="button" onclick="document.getElementById('modalMisLikes').style.display='none'" style="position: absolute; top: 15px; right: 20px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
             
             <h3 style="color: var(--kuxee-blue); margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">

@@ -15,7 +15,7 @@
     .select2-container--default .select2-selection--single { height: 42px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; padding: 6px !important; outline: none; }
     .select2-container--default .select2-selection--single .select2-selection__arrow { top: 7px !important; }
 
-    .btn-filtrar { background: var(--kuxee-blue); color: white; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 42px; }
+    .btn-filtrar { background: var(--kuxee-blue); color: white; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; height: 42px; transition: background 0.2s; box-sizing: border-box; }
     .btn-filtrar:hover { background: #2563eb; }
 
     /* Grilla de Maestros */
@@ -31,6 +31,28 @@
     .maestro-location { font-size: 0.8rem; color: var(--kuxee-blue); margin-bottom: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .btn-ver-perfil { background: #1877f2; color: white; display: block; padding: 12px; text-decoration: none; font-weight: bold; border-radius: 8px; transition: background 0.2s; margin-top: auto; }
     .btn-ver-perfil:hover { background: #145dbf; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO (CELULARES)
+       ========================================= */
+    @media (max-width: 768px) {
+        .maestros-container { padding: 0 15px; margin: 20px auto; }
+        .page-title { font-size: 1.5rem; margin-bottom: 25px; }
+        
+        /* Apilar filtros verticalmente */
+        .filter-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; margin-bottom: 25px; }
+        .btn-filtrar { width: 100%; margin-top: 5px; }
+        
+        /* Ajustar grilla a columnas más pequeñas si es necesario */
+        .maestros-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        
+        /* Ajustes a la tarjeta para que quepa bien a 2 columnas en celular */
+        .maestro-header { height: 80px; }
+        .maestro-avatar { width: 70px; height: 70px; bottom: -35px; border-width: 3px; font-size: 35px; }
+        .maestro-info { padding: 45px 15px 15px 15px; }
+        .maestro-name { font-size: 1rem; }
+        .btn-ver-perfil { padding: 10px; font-size: 0.9rem; }
+    }
 </style>
 {% endblock %}
 

@@ -7,7 +7,7 @@
     .chat-layout { max-width: 1200px; margin: 25px auto; display: flex; height: calc(100vh - 120px); min-height: 600px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden; }
     
     /* Barra Lateral de Contactos */
-    .chat-sidebar { width: 350px; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; background: white; }
+    .chat-sidebar { width: 350px; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; background: white; flex-shrink: 0; }
     .chat-sidebar-header { background: #4f46e5; color: white; padding: 20px; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
     .chat-search { padding: 15px; border-bottom: 1px solid #e2e8f0; background: white; }
     .search-input-wrapper { position: relative; }
@@ -24,7 +24,7 @@
     .chat-item-msg { color: #64748b; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
     
     /* Área Principal del Chat */
-    .chat-main { flex: 1; display: flex; flex-direction: column; background: #f8fafc; position: relative;}
+    .chat-main { flex: 1; display: flex; flex-direction: column; background: #f8fafc; position: relative; overflow: hidden; }
     .chat-main-header { padding: 15px 25px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
     .chat-header-profile { display: flex; align-items: center; gap: 15px; }
     .chat-header-info { display: flex; flex-direction: column; }
@@ -32,6 +32,9 @@
     .chat-header-service { color: #64748b; font-size: 0.85rem; }
     .chat-header-actions { display: flex; align-items: center; gap: 12px; }
     
+    /* Botón Volver para Celular (Oculto en PC) */
+    .btn-volver-chats { display: none; background: #f1f5f9; border: none; width: 38px; height: 38px; border-radius: 50%; align-items: center; justify-content: center; color: #475569; font-size: 1.1rem; cursor: pointer; margin-right: 5px; flex-shrink: 0; }
+
     /* Botones y Círculos Superiores */
     .btn-trato { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
     .btn-trato:hover { background: #059669; }
@@ -71,7 +74,7 @@
     .input-box { flex: 1; background: white; border: 1px solid #cbd5e1; border-radius: 25px; padding: 12px 20px; display: flex; align-items: center; }
     .input-box input { width: 100%; border: none; outline: none; font-size: 0.95rem; font-family: inherit; }
     .send-btn { width: 45px; height: 45px; border-radius: 50%; background: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-size: 1.2rem; transition: background 0.2s; flex-shrink: 0; box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);}
-    .empty-chat-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: #f8fafc; }
+    .empty-chat-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: #f8fafc; padding: 20px; }
 
     /* ESTILOS DEL SISTEMA DE TRATOS AUTOMÁTICO */
     .mensaje-sistema { max-width: 80%; padding: 10px 20px; border-radius: 25px; font-size: 0.9rem; text-align: center; align-self: center; margin: 10px 0; font-weight: 500; display: flex; align-items: center; gap: 8px; }
@@ -86,6 +89,34 @@
     .btn-pagar:hover { background: #4338ca; }
     .btn-cancelar { background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
     .btn-cancelar:hover { background: #475569; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO PARA CELULARES
+       ========================================= */
+    @media (max-width: 768px) {
+        .chat-layout { margin: 10px; height: calc(100vh - 90px); min-height: 500px; border-radius: 8px; position: relative; overflow: hidden; }
+        
+        {% if contacto_activo %}
+        /* Si hay chat activo, ocultamos la barra lateral y mostramos el chat principal a pantalla completa */
+        .chat-sidebar { display: none; }
+        .chat-main { display: flex; width: 100%; }
+        .btn-volver-chats { display: flex; }
+        {% else %}
+        /* Si NO hay chat activo, mostramos la lista de chats a pantalla completa y ocultamos el panel principal vacío */
+        .chat-sidebar { width: 100%; border-right: none; }
+        .chat-main { display: none; }
+        {% endif %}
+
+        .chat-main-header { padding: 10px 15px; }
+        .chat-header-name { font-size: 1rem; }
+        .chat-header-service { font-size: 0.75rem; }
+        .chat-messages-area { padding: 15px; }
+        .chat-input-row { padding: 10px 15px; gap: 10px; }
+        .trato-banner-top { flex-direction: column; align-items: flex-start; padding: 10px 15px; gap: 8px; }
+        .trato-banner-acciones { width: 100%; justify-content: space-between; }
+        .btn-trato { padding: 8px 12px; font-size: 0.85rem; }
+        .btn-pagado { padding: 8px 12px; font-size: 0.85rem; }
+    }
 </style>
 {% endblock %}
 
@@ -137,7 +168,11 @@
             <!-- CABECERA DEL CHAT -->
             <div class="chat-main-header">
                 <div class="chat-header-profile">
-                    <div class="chat-item-avatar" style="width: 45px; height: 45px;">
+                    <!-- Botón para regresar a la lista de chats en celular -->
+                    <button class="btn-volver-chats" onclick="window.location.href='{% url 'mensajes' %}'" title="Volver a chats">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="chat-item-avatar" style="width: 42px; height: 42px;">
                         {% if contacto_activo.foto_perfil %}
                             <img src="{{ contacto_activo.foto_perfil.url }}">
                         {% else %}
@@ -166,7 +201,7 @@
                         </button>
                     {% endif %}
 
-                    <!-- BOTÓN ELIMINAR CHAT (NUEVO) -->
+                    <!-- BOTÓN ELIMINAR CHAT -->
                     {% if servicio_activo %}
                     <form id="form-eliminar-chat" method="POST" action="{% url 'eliminar_chat' contacto_activo.username servicio_activo.id %}" style="display: inline-block;">
                         {% csrf_token %}
@@ -274,7 +309,6 @@
     const CONTACTO_USERNAME = "{{ contacto_activo.username|default:'' }}";
     const SERVICIO_ID = "{{ servicio_activo.id|default:'' }}";
     
-    // Configuración del precio dinámico de la comisión basado en el plan
     const PRECIO_COMISION = "{% if request.user.perfil_cliente.plan_actual == 'premium' %}5.990{% else %}6.990{% endif %}";
     
     function validarRutChileno(rutCompleto) {
@@ -292,7 +326,7 @@
             Swal.fire({
                 title: 'Necesitamos tu RUT',
                 html: `
-                    <p style="font-size:0.95rem; text-align:left; color:#475569; margin-bottom:10px;">Necesitamos tu RUT (chileno válido) antes de pagar. Lo pedimos solo una vez en Ajustes.</p>
+                    <p style="font-size:0.95rem; text-align:left; color:#475569; margin-bottom:10px;">Necesitamos tu RUT (chileno válido) antes de pagar.</p>
                     <p style="font-size:0.95rem; text-align:left; color:#475569; margin-bottom:20px;">Lo pedimos solo una vez para emitir la boleta. Ejemplo: 12345678-5</p>
                     <input type="text" id="swal-input-rut" class="swal2-input" placeholder="Ej: 12345678-5" style="width: 80%;">
                 `,
@@ -333,7 +367,7 @@
             title: '¿Hacer trato?',
             html: `
                 <p style="text-align:left; color:#475569;">Pagarás SOLO la comisión de Kuxee ($${PRECIO_COMISION} CLP) con tarjeta — este monto va a Kuxee por el uso de la plataforma.</p>
-                <p style="text-align:left; color:#475569; margin-top:15px;">Una vez aprobada, se desbloquean los datos de contacto del maestro y entre ustedes acuerdan libremente el precio del trabajo. Ese dinero del trabajo es 100% para el maestro.</p>
+                <p style="text-align:left; color:#475569; margin-top:15px;">Una vez aprobada, se desbloquean los datos de contacto del maestro y entre ustedes acuerdan libremente el precio del trabajo.</p>
             `,
             showCancelButton: true,
             confirmButtonText: 'Ir a pagar $' + PRECIO_COMISION,
@@ -425,13 +459,12 @@
         });
     }
 
-    // ENVÍO DE MENSAJES CON INTERCEPTOR DE SEGURIDAD (REGEX)
     if (formMensaje) {
         formMensaje.addEventListener('submit', function(e) {
             e.preventDefault(); 
             var formData = new FormData(formMensaje);
-            var mensajeOriginal = inputTexto.value; // Guardamos el texto por si hay error
-            inputTexto.value = ''; // Limpiamos la caja visualmente rápido
+            var mensajeOriginal = inputTexto.value; 
+            inputTexto.value = ''; 
             
             fetch(window.location.href, { 
                 method: 'POST', 
@@ -441,16 +474,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'error') {
-                    // Si el servidor detectó datos prohibidos antes de pagar
                     Swal.fire({
                         icon: 'warning',
                         title: 'Acción no permitida',
                         text: data.msg,
                         confirmButtonColor: '#4f46e5'
                     });
-                    inputTexto.value = mensajeOriginal; // Devolvemos el texto a la caja
+                    inputTexto.value = mensajeOriginal; 
                 } else {
-                    // Mensaje válido guardado correctamente
                     actualizarMensajes(); 
                 }
             })
