@@ -14,8 +14,20 @@
     .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     textarea.form-control { resize: vertical; min-height: 120px; }
     
-    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
+    .btn-row { display: flex; gap: 15px; margin-top: 30px; }
+    .btn-cancel { padding: 15px 30px; border-radius: 8px; background: #e2e8f0; color: #475569; text-decoration: none; font-weight: bold; text-align: center; width: 30%; box-sizing: border-box; }
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 70%; transition: background 0.3s; box-sizing: border-box; }
     .btn-submit:hover { background: #2563eb; }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 600px) {
+        .form-container { margin: 20px 15px; padding: 25px 20px; }
+        .page-title { font-size: 1.6rem; }
+        .btn-row { flex-direction: column-reverse; gap: 10px; }
+        .btn-cancel { width: 100%; }
+        .btn-submit { width: 100%; }
+        .form-control { font-size: 1rem; } /* Evita zoom automático en iPhone */
+    }
 </style>
 {% endblock %}
 
@@ -67,9 +79,9 @@
             <input type="file" name="imagenes" class="form-control" accept="image/png, image/jpeg">
         </div>
 
-        <div style="display: flex; gap: 15px;">
-            <a href="{% url 'mi_perfil' %}" style="padding: 15px 30px; border-radius: 8px; background: #e2e8f0; color: #475569; text-decoration: none; font-weight: bold; text-align: center; width: 30%;">Cancelar</a>
-            <button type="submit" class="btn-submit" style="width: 70%;">Guardar Cambios</button>
+        <div class="btn-row">
+            <a href="{% url 'mi_perfil' %}" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-submit">Guardar Cambios</button>
         </div>
     </form>
 </div>

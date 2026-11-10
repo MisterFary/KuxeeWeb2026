@@ -4,25 +4,154 @@
 
 {% block extra_css %}
 <style>
-    .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 200px); padding: 40px 20px; }
-    .login-card { background: white; width: 100%; max-width: 450px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-    .login-title { text-align: center; color: var(--kuxee-blue); font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #475569; font-size: 0.95rem; }
-    .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
-    .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 14px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.3s; }
-    .btn-submit:hover { background: #2563eb; }
-    .register-link { text-align: center; margin-top: 20px; font-size: 0.95rem; color: #64748b; }
-    .register-link a { color: var(--kuxee-blue); text-decoration: none; font-weight: bold; }
-    .register-link a:hover { text-decoration: underline; }
+    .login-wrapper { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: calc(100vh - 180px); 
+        padding: 40px 20px; 
+        background-color: #f8fafc;
+    }
+    
+    .login-card { 
+        background: white; 
+        width: 100%; 
+        max-width: 440px; 
+        padding: 40px 35px; 
+        border-radius: 16px; 
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01); 
+        border: 1px solid #e2e8f0; 
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        width: 54px;
+        height: 54px;
+        background: #eff6ff;
+        color: var(--kuxee-blue, #3b82f6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin: 0 auto 15px auto;
+    }
+
+    .login-title { 
+        color: #0f172a; 
+        font-size: 1.8rem; 
+        font-weight: 800;
+        margin: 0 0 6px 0; 
+    }
+
+    .login-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .form-group { 
+        margin-bottom: 20px; 
+    }
+
+    .form-group label { 
+        display: block; 
+        font-weight: 600; 
+        margin-bottom: 8px; 
+        color: #334155; 
+        font-size: 0.95rem; 
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="email"],
+    .form-control { 
+        width: 100%; 
+        padding: 12px 14px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        outline: none; 
+        box-sizing: border-box; 
+        transition: all 0.2s ease; 
+        background-color: #f8fafc;
+        color: #1e293b;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group input[type="password"]:focus,
+    .form-group input[type="email"]:focus,
+    .form-control:focus { 
+        background-color: #ffffff;
+        border-color: var(--kuxee-blue, #3b82f6); 
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); 
+    }
+
+    .btn-submit { 
+        background: var(--kuxee-blue, #3b82f6); 
+        color: white; 
+        border: none; 
+        padding: 14px; 
+        font-size: 1.05rem; 
+        border-radius: 8px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        width: 100%; 
+        margin-top: 10px; 
+        transition: background 0.2s, transform 0.1s; 
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-submit:hover { 
+        background: #2563eb; 
+    }
+
+    .btn-submit:active {
+        transform: scale(0.99);
+    }
+
+    .register-link { 
+        text-align: center; 
+        margin-top: 25px; 
+        font-size: 0.95rem; 
+        color: #64748b; 
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .register-link a { 
+        color: var(--kuxee-blue, #3b82f6); 
+        text-decoration: none; 
+        font-weight: 700; 
+    }
+
+    .register-link a:hover { 
+        text-decoration: underline; 
+    }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 480px) {
+        .login-wrapper { padding: 20px 15px; background: transparent; }
+        .login-card { padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .login-title { font-size: 1.5rem; }
+    }
 </style>
 {% endblock %}
 
 {% block contenido %}
 <div class="login-wrapper">
     <div class="login-card">
-        <h2 class="login-title">Iniciar Sesión</h2>
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <h2 class="login-title">Iniciar Sesión</h2>
+            <p class="login-subtitle">Ingresa a tu cuenta de Kuxee</p>
+        </div>
 
         <form method="POST">
             {% csrf_token %}

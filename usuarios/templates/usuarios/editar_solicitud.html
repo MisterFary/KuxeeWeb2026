@@ -5,20 +5,29 @@
 {% block extra_css %}
 <style>
     .form-container { max-width: 700px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .form-title { color: #1e293b; margin-bottom: 10px; font-size: 1.8rem; }
+    .form-subtitle { color: #64748b; margin-bottom: 30px; }
     .form-control, .form-select { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-    .btn-publicar { width: 100%; background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    .btn-publicar { width: 100%; background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; box-sizing: border-box; }
     .btn-publicar:hover { background: #2563eb; }
-    .btn-cancelar { display: block; width: 100%; text-align: center; background: #f1f5f9; color: #475569; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; text-decoration: none; margin-top: 15px; transition: background 0.3s; }
+    .btn-cancelar { display: block; width: 100%; text-align: center; background: #f1f5f9; color: #475569; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; text-decoration: none; margin-top: 15px; transition: background 0.3s; box-sizing: border-box; }
     .btn-cancelar:hover { background: #e2e8f0; }
     .archivos-actuales { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .archivos-actuales img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 600px) {
+        .form-container { margin: 20px 15px; padding: 25px 20px; }
+        .form-title { font-size: 1.5rem; }
+        .form-control, .form-select { font-size: 1rem; } /* Evita zoom automático en iPhone */
+    }
 </style>
 {% endblock %}
 
 {% block contenido %}
 <div class="form-container">
-    <h2 style="color: #1e293b; margin-bottom: 10px;"><i class="fas fa-edit"></i> Editar solicitud</h2>
-    <p style="color: #64748b; margin-bottom: 30px;">Actualiza los detalles de lo que necesitas.</p>
+    <h2 class="form-title"><i class="fas fa-edit"></i> Editar solicitud</h2>
+    <p class="form-subtitle">Actualiza los detalles de lo que necesitas.</p>
 
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}

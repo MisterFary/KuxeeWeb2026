@@ -24,13 +24,25 @@
     /* ESTILOS NUEVOS PARA EL BOTÓN DE SUBIR FOTOS */
     .upload-area { text-align: center; padding: 30px 20px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; transition: all 0.3s; }
     .upload-area:hover { border-color: #4f46e5; background: #e0e7ff; }
-    .btn-upload { background: white; color: #4f46e5; border: 1px solid #4f46e5; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; transition: 0.2s; }
+    .btn-upload { background: white; color: #4f46e5; border: 1px solid #4f46e5; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; transition: 0.2s; box-sizing: border-box; }
     .btn-upload:hover { background: #4f46e5; color: white; }
     .file-list { margin-top: 15px; font-size: 0.9rem; color: #475569; display: flex; flex-direction: column; gap: 8px; align-items: center; }
     .file-item { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 20px; border: 1px solid #e2e8f0; font-weight: 500; }
 
-    .btn-submit { background: #10b981; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .btn-submit { background: #10b981; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; box-sizing: border-box; }
     .btn-submit:hover { background: #059669; }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 600px) {
+        .evaluar-container { margin: 20px 15px; padding: 25px 20px; }
+        .evaluar-header h1 { font-size: 1.5rem; }
+        .evaluar-header p { font-size: 0.95rem; }
+        .stars-container { gap: 5px; }
+        .stars-container label { font-size: 2.4rem; } /* Reduce estrellas un poco en móviles */
+        .form-control { font-size: 1rem; } /* Evita zoom automático en iPhone */
+        .btn-upload { width: 100%; } /* Botón ancho completo */
+        .file-item { font-size: 0.85rem; word-break: break-word; text-align: center; } /* Para que nombres de archivo largos no rompan el diseño */
+    }
 </style>
 {% endblock %}
 
