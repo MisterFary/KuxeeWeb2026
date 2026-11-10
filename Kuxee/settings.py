@@ -143,6 +143,10 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_URL = 'acceso_denegado'
 
+# Configuración para producción en Railway
 CSRF_TRUSTED_ORIGINS = [
     'https://tu-dominio-de-railway.up.railway.app',
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
