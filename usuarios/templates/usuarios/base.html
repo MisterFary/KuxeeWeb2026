@@ -13,7 +13,8 @@
         :root { --kuxee-blue: #3b82f6; --kuxee-dark: #1e293b; --kuxee-bg: #f8fafc; --footer-blue: #2563eb; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--kuxee-bg); color: #333; display: flex; flex-direction: column; min-height: 100vh; }
         
-        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; }
+        .nav-brand-group { display: flex; align-items: center; gap: 20px; }
         .logo { display: flex; align-items: center; font-weight: bold; font-size: 20px; color: var(--kuxee-dark); text-decoration: none; }
         
         .btn-chat { background: #eff6ff; color: var(--kuxee-blue); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.2rem; transition: background 0.2s; }
@@ -22,9 +23,10 @@
         .search-container { display: flex; flex: 1; max-width: 600px; margin: 0 40px; }
         .search-container input { width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px 0 0 6px; outline: none; }
         .search-container button { background: var(--kuxee-blue); color: white; border: none; padding: 10px 20px; border-radius: 0 6px 6px 0; cursor: pointer; }
+        
         .nav-links { display: flex; align-items: center; gap: 20px; }
         .nav-links a { text-decoration: none; color: #475569; font-weight: 500; }
-        .btn-login { background: var(--kuxee-blue); color: white !important; padding: 8px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; }
+        .btn-login { background: var(--kuxee-blue); color: white !important; padding: 8px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; text-align: center; }
 
         .user-menu { display: flex; align-items: center; gap: 15px; position: relative; }
         .btn-bell { background: #f1f5f9; color: #475569; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.2rem; position: relative; }
@@ -61,19 +63,13 @@
         .btn-flotante:hover { transform: scale(1.1); background-color: #2563eb; }
         main { flex: 1; }
         
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; padding: 15px; }
         .modal-overlay.activo { display: flex; animation: fadeInOverlay 0.3s ease forwards; }
         .modal-box { background: white; border-radius: 12px; max-width: 600px; width: 100%; padding: 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
         .modal-overlay.activo .modal-box { animation: modalPopUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        @keyframes fadeInOverlay {
-            from { background: rgba(15, 23, 42, 0); backdrop-filter: blur(0px); }
-            to { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); }
-        }
-        @keyframes modalPopUp {
-            from { opacity: 0; transform: scale(0.8) translateY(40px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        @keyframes fadeInOverlay { from { background: rgba(15, 23, 42, 0); backdrop-filter: blur(0px); } to { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); } }
+        @keyframes modalPopUp { from { opacity: 0; transform: scale(0.8) translateY(40px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
         .modal-title-blue { text-align: center; color: var(--kuxee-blue); font-size: 1.5rem; font-weight: bold; margin-top: 0; margin-bottom: 25px; }
         .form-group { margin-bottom: 20px; }
@@ -96,8 +92,7 @@
         .btn-cancel { background: #f1f5f9; color: #1e293b; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-cancel:hover { background: #e2e8f0; }
         .btn-publish { background: var(--kuxee-blue); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
-        .btn-publish:hover { background: #2563eb; }
-
+        
         .footer { background: var(--footer-blue); color: white; padding: 50px 40px 20px 40px; margin-top: 60px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
         .footer-col h4 { margin-top: 0; font-size: 1.1rem; margin-bottom: 20px; text-align: center; }
@@ -105,6 +100,33 @@
         .footer-bottom { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.9rem; }
         .swal2-custom-popup { border-radius: 16px !important; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; }
         .btn-cancelar-swal { color: #475569 !important; font-weight: bold !important; } 
+
+        /* BOTÓN HAMBURGUESA OCULTO EN PC */
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.8rem; color: var(--kuxee-dark); cursor: pointer; }
+
+        /* DISEÑO RESPONSIVO PARA CELULARES */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 15px; }
+            .nav-brand-group { width: 100%; justify-content: space-between; margin-bottom: 10px; }
+            .mobile-menu-btn { display: block; }
+            .search-container { order: 3; max-width: 100%; margin: 10px 0; width: 100%; }
+            
+            .nav-links { display: none; flex-direction: column; width: 100%; order: 4; align-items: flex-start; gap: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+            .nav-links.active { display: flex; }
+            .nav-links a { width: 100%; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+            .btn-login { width: 100%; box-sizing: border-box; }
+            
+            .user-menu { width: 100%; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 10px; }
+            
+            /* Ajustes modales para celular */
+            .modal-box, .modal-content-global { padding: 20px; width: 95%; }
+            .category-grid { grid-template-columns: 1fr; }
+            .modal-footer { flex-direction: column; }
+            .btn-cancel, .btn-publish { width: 100%; text-align: center; justify-content: center; }
+            
+            #notificacionesDropdown, #userDropdown { position: fixed; top: 70px; right: 10px; left: 10px; width: auto; max-width: none; }
+            .footer { padding: 30px 20px 15px 20px; }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -155,16 +177,21 @@
     {% endif %}
 
     <nav class="navbar">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <a href="{% url 'inicio' %}" class="logo">
-                <div style="width: 40px; height: 40px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 10px;">K</div> KUXEE
-            </a>
-            
-            {% if user.is_authenticated %}
-                <a href="{% url 'mensajes' %}" class="btn-chat" title="Mensajes">
-                    <i class="fas fa-comments"></i>
+        <div class="nav-brand-group">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <a href="{% url 'inicio' %}" class="logo">
+                    <div style="width: 40px; height: 40px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 10px;">K</div> KUXEE
                 </a>
-            {% endif %}
+                {% if user.is_authenticated %}
+                    <a href="{% url 'mensajes' %}" class="btn-chat" title="Mensajes">
+                        <i class="fas fa-comments"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <!-- Botón Menú Hamburguesa para Móviles -->
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
 
         <form class="search-container" method="GET" action="{% url 'maestros' %}">
@@ -172,7 +199,7 @@
             <button type="submit"><i class="fas fa-search"></i></button>
         </form>
         
-        <div class="nav-links">
+        <div class="nav-links" id="navLinks">
             <a href="{% url 'inicio' %}">Inicio</a>
             <a href="{% url 'lista_maestros' %}">Maestros</a>
             <a href="{% url 'solicitudes' %}">Solicitudes</a>
@@ -190,7 +217,7 @@
                             {% endif %}
                         </a>
                         
-                        <div id="notificacionesDropdown" class="dropdown-menu" style="right: 0; padding: 0;">
+                        <div id="notificacionesDropdown" class="dropdown-menu">
                             <div class="dropdown-header" style="justify-content: space-between;">
                                 <strong>Notificaciones</strong>
                             </div>
@@ -339,9 +366,8 @@
         </div>
         <div class="footer-bottom">© 2026 Kuxee — Conectando clientes con maestros de confianza.</div>
     </footer>
-<!-- ========================================== -->
+
 <!-- BOTÓN FLOTANTE Y MODAL GLOBAL PARA CLIENTES -->
-<!-- ========================================== -->
 {% if user.is_authenticated and user.es_cliente and user.perfil_cliente.plan_actual == 'premium' %}
 <style>
     .btn-flotante-global {
@@ -352,11 +378,16 @@
     }
     .btn-flotante-global:hover { background: #2563eb; transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
 
-    .modal-overlay-global { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; justify-content: center; align-items: center; }
-    .modal-content-global { background: white; width: 90%; max-width: 600px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-overlay-global { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; }
+    .modal-content-global { background: white; width: 100%; max-width: 600px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative; }
     .modal-close-global { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: #64748b; cursor: pointer; border: none; background: none; }
     .form-control-global, .form-select-global { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
     .btn-submit-modal { width: 100%; background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+    
+    @media (max-width: 768px) {
+        .btn-flotante-global { width: 55px; height: 55px; font-size: 1.5rem; bottom: 20px; right: 20px; }
+        .modal-content-global { padding: 20px; }
+    }
 </style>
 
 <button class="btn-flotante-global" onclick="abrirModalGlobal()"><i class="fas fa-plus"></i></button>
@@ -406,6 +437,11 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        /* FUNCIÓN NUEVA: Toggle para el menú en celulares */
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
         function abrirModalPublicarServicio() { document.getElementById('modalPublicarServicio').classList.add('activo'); }
         function cerrarModalPublicarServicio() { document.getElementById('modalPublicarServicio').classList.remove('activo'); }
         
@@ -479,11 +515,9 @@
         {% if user.is_authenticated %}
         setInterval(function() {
             if (!document.getElementById("caja-mensajes")) {
-                // Generamos una URL con un "sello de tiempo" para que el navegador NUNCA use la caché
                 var urlFresca = new URL(window.location.href, window.location.origin);
                 urlFresca.searchParams.set('_t', new Date().getTime());
                 
-                // cache: 'no-store' obliga al navegador a ir siempre al servidor
                 fetch(urlFresca.toString(), { cache: 'no-store' })
                 .then(response => response.text())
                 .then(html => {

@@ -19,7 +19,7 @@
     .img-principal i { font-size: 5rem; color: #334155; }
     
     .miniaturas { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-    .miniatura { width: 80px; height: 60px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; object-fit: cover; }
+    .miniatura { width: 80px; height: 60px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; object-fit: cover; flex-shrink: 0; }
     .miniatura.activa { border-color: #3b82f6; }
 
     /* Info del Servicio (Derecha) */
@@ -28,7 +28,7 @@
     .titulo-solicitud { color: #0f172a; font-size: 2.2rem; font-weight: 900; margin: 0 0 20px 0; text-transform: uppercase; }
     
     .perfil-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; background: #f8fafc; margin-bottom: 30px; }
-    .avatar-cliente { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid #cbd5e1; font-size: 1.5rem; color: #64748b; }
+    .avatar-cliente { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid #cbd5e1; font-size: 1.5rem; color: #64748b; flex-shrink: 0; }
     .datos-cliente h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; }
     .datos-cliente p { margin: 0; color: #64748b; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
 
@@ -38,6 +38,18 @@
     .acciones-btn { display: flex; gap: 15px; margin-top: 40px; }
     .btn-contactar { background: #4f46e5; color: white; padding: 12px 30px; border-radius: 6px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 10px; border: none; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
     .btn-contactar:hover { background: #4338ca; }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 768px) {
+        .detalle-container { margin: 20px auto; padding: 0 15px; }
+        .detalle-layout { gap: 25px; flex-direction: column; }
+        .galeria-section { max-width: 100%; min-width: 100%; }
+        .img-principal { height: 260px; } /* Se achica la foto principal en celulares */
+        .info-section { min-width: 100%; }
+        .titulo-solicitud { font-size: 1.6rem; }
+        .acciones-btn { margin-top: 25px; width: 100%; }
+        .btn-contactar { width: 100%; justify-content: center; box-sizing: border-box; }
+    }
 </style>
 {% endblock %}
 

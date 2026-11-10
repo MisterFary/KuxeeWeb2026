@@ -97,6 +97,19 @@
     .otro-info { padding: 10px 12px; }
     .otro-titulo { font-weight: bold; color: #1e293b; font-size: 0.9rem; margin-bottom: 6px; }
     .otro-precio { color: #d97706; font-weight: bold; font-size: 0.85rem; }
+
+    /* DISEÑO RESPONSIVO (CELULARES) */
+    @media (max-width: 768px) {
+        .detalle-container { padding: 0 15px; margin: 15px auto; }
+        .detalle-grid { grid-template-columns: 1fr; gap: 25px; margin-bottom: 30px; }
+        .main-image-box { height: 280px; } /* Reduce altura de foto en celular */
+        .servicio-titulo { font-size: 1.4rem; }
+        .acciones-row { flex-direction: column; width: 100%; gap: 10px; }
+        .btn-contactar, .btn-like { width: 100%; justify-content: center; box-sizing: border-box; }
+        .comentario-form-main textarea { font-size: 1rem; } /* Evita zoom automático en iPhone */
+        .btn-publicar-main { width: 100%; box-sizing: border-box; }
+        .seccion-subtitulo { font-size: 1.3rem; }
+    }
 </style>
 {% endblock %}
 

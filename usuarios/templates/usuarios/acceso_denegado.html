@@ -3,23 +3,103 @@
 {% block title %}Acceso Denegado - Kuxee{% endblock %}
 
 {% block contenido %}
-<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 20px;">
+<style>
+    /* Estilos base (Computadora / Tablet) */
+    .denegado-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        text-align: center;
+        padding: 20px;
+    }
+    .denegado-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        background-color: #fee2e2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+    .denegado-icon-wrapper i {
+        font-size: 3rem;
+        color: #ef4444;
+    }
+    .denegado-title {
+        color: #0f172a;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    .denegado-text {
+        color: #64748b;
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .denegado-buttons {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        max-width: 400px;
+        justify-content: center;
+    }
+    .btn-denegado {
+        padding: 12px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.2s;
+        text-align: center;
+        flex: 1; /* Hace que los botones tengan el mismo tamaño */
+    }
+    .btn-blue {
+        background: var(--kuxee-blue);
+        color: white;
+    }
+    .btn-gray {
+        background: #f1f5f9;
+        color: #475569;
+    }
     
-    <div style="width: 100px; height: 100px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-        <i class="fas fa-lock" style="font-size: 3rem; color: #ef4444;"></i>
+    /* Diseño Responsivo (Celulares) */
+    @media (max-width: 600px) {
+        .denegado-title {
+            font-size: 2rem; /* Achica un poco el título */
+        }
+        .denegado-text {
+            font-size: 1rem;
+        }
+        .denegado-buttons {
+            flex-direction: column; /* Apila los botones verticalmente */
+            gap: 10px;
+        }
+        .btn-denegado {
+            width: 100%; /* Botones ocupan todo el ancho de la pantalla */
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+<div class="denegado-container">
+    <div class="denegado-icon-wrapper">
+        <i class="fas fa-lock"></i>
     </div>
     
-    <h1 style="color: #0f172a; font-size: 2.5rem; margin-bottom: 15px;">Acceso Denegado</h1>
+    <h1 class="denegado-title">Acceso Denegado</h1>
     
-    <p style="color: #64748b; font-size: 1.1rem; max-width: 500px; margin-bottom: 30px; line-height: 1.6;">
+    <p class="denegado-text">
         Lo sentimos, no tienes permisos para ver esta página. Debes iniciar sesión con tu cuenta para acceder a la mensajería y a las herramientas privadas.
     </p>
     
-    <div style="display: flex; gap: 15px;">
-        <a href="{% url 'login' %}" style="background: var(--kuxee-blue); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+    <div class="denegado-buttons">
+        <a href="{% url 'login' %}" class="btn-denegado btn-blue">
             Iniciar Sesión
         </a>
-        <a href="{% url 'inicio' %}" style="background: #f1f5f9; color: #475569; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+        <a href="{% url 'inicio' %}" class="btn-denegado btn-gray">
             Volver al inicio
         </a>
     </div>
