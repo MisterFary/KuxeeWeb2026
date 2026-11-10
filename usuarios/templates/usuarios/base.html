@@ -109,7 +109,7 @@
         .desktop-links a { color: #475569; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
         .desktop-links a:hover { color: var(--kuxee-blue); }
         
-        /* ENLACES OCULTOS EN ESCRITORIO (SE MUESTRAN EN EL DROPDOWN DE CELULAR) */
+        /* ENLACES OCULTOS EN ESCRITORIO */
         .mobile-only-links { display: none; }
         
         .btn-login { 
@@ -119,6 +119,18 @@
             border-radius: 8px; 
             font-weight: bold; 
             text-decoration: none; 
+        }
+
+        /* MENÚ HAMBURGUESA PARA INVITADOS (OCULTO EN PC) */
+        .guest-menu-container { position: relative; display: flex; align-items: center; }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: var(--kuxee-dark);
+            cursor: pointer;
+            padding: 5px;
         }
 
         /* PERFIL Y NOTIFICACIONES */
@@ -179,11 +191,15 @@
            ========================================= */
         @media (max-width: 900px) {
             .navbar { padding: 10px 12px; gap: 8px; flex-wrap: nowrap; }
-            .logo { font-size: 0; /* Oculta la palabra Kuxee en móvil */ gap: 0; }
+            .logo { font-size: 0; gap: 0; }
             
             /* Ocultamos los links del PC y mostramos los del menú móvil */
             .desktop-links { display: none; }
             .mobile-only-links { display: block; }
+            
+            /* Ocultamos el botón "Ingresar" en móvil, mostramos el menú hamburguesa */
+            .btn-login.desktop-only { display: none; }
+            .mobile-menu-btn { display: block; }
             
             .nav-left, .nav-right { gap: 6px; }
             .btn-icon-circle, .profile-pic, .logo img { width: 38px; height: 38px; font-size: 1rem; }
@@ -193,11 +209,18 @@
             .search-container input { padding: 0 12px; font-size: 0.9rem; border-radius: 20px 0 0 20px; }
             .search-container button { padding: 0 12px; border-radius: 0 20px 20px 0; }
             
-            .btn-login { padding: 8px 12px; font-size: 0.85rem; border-radius: 20px; }
-            
-            /* Ajuste de los dropdowns para que no se salgan de la pantalla */
-            #userDropdown, #notificacionesDropdown { 
-                position: fixed; top: 60px; right: 10px; width: 280px; max-width: 90vw; 
+            /* Ajuste de todos los dropdowns para que tomen todo el ancho en móvil */
+            #userDropdown, #notificacionesDropdown, #guestDropdown { 
+                position: fixed; top: 58px; right: 0; left: 0; width: 100%; max-width: 100%; 
+                border-radius: 0 0 12px 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
+                border-left: none; border-right: none;
+            }
+
+            /* Letras un poco más grandes y negritas en los menús de celular */
+            .dropdown-menu a, .dropdown-item-btn {
+                font-size: 1.05rem; 
+                padding: 15px 20px;
+                font-weight: 600;
             }
         }
 
@@ -306,14 +329,14 @@
         </script>
     {% endif %}
 
-    <!-- NAVBAR -->
+    <!-- NAVBAR EN LÍNEA IDÉNTICO A IMAGEN 1 Y 2 -->
     <nav class="navbar">
         <!-- 1. LADO IZQUIERDO: LOGO Y CHAT -->
         <div class="nav-left">
             <a href="{% url 'inicio' %}" class="logo">
                 <img src="{% static 'images/logo_kuxee.png' %}" alt="Kuxee" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div style="display:none; width: 42px; height: 42px; background: black; border-radius: 50%; align-items: center; justify-content: center; color: white; font-weight:bold; font-size:18px;">K</div>
-                <span class="logo-text">KUXEE</span> <!-- Se oculta en móvil vía CSS -->
+                <span class="logo-text">KUXEE</span>
             </a>
 
             {% if user.is_authenticated %}
@@ -329,7 +352,7 @@
             <button type="submit"><i class="fas fa-search"></i></button>
         </form>
 
-        <!-- 3. LADO DERECHO: LINKS (PC), CAMPANA Y PERFIL -->
+        <!-- 3. LADO DERECHO: LINKS (PC), CAMPANA Y PERFILES -->
         <div class="nav-right">
             
             <!-- ENLACES VISIBLES SOLO EN ESCRITORIO -->
@@ -342,6 +365,7 @@
             </div>
 
             {% if user.is_authenticated %}
+                <!-- === USUARIO LOGUEADO === -->
                 <!-- CAMPANA NOTIFICACIONES -->
                 <div id="campana-wrapper">
                     <a href="#" class="btn-icon-circle" onclick="toggleNotificaciones(event)">
@@ -423,8 +447,31 @@
                         </form>
                     </div>
                 </div>
+
             {% else %}
-                <a href="{% url 'login' %}" class="btn-login">Ingresar</a>
+                <!-- === USUARIO INVITADO (NO LOGUEADO) === -->
+                
+                <!-- Botón visible en PC -->
+                <a href="{% url 'login' %}" class="btn-login desktop-only">Ingresar</a>
+                
+                <!-- Menú Hamburguesa visible en Celular -->
+                <div class="guest-menu-container">
+                    <button class="mobile-menu-btn" onclick="toggleGuestMenu(event)">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div id="guestDropdown" class="dropdown-menu">
+                        <a href="{% url 'inicio' %}"><i class="fas fa-home" style="width: 25px; color: var(--kuxee-blue);"></i> Inicio</a>
+                        <a href="{% url 'lista_maestros' %}"><i class="fas fa-user-tie" style="width: 25px; color: var(--kuxee-blue);"></i> Maestros</a>
+                        <a href="{% url 'solicitudes' %}"><i class="fas fa-list-ul" style="width: 25px; color: var(--kuxee-blue);"></i> Solicitudes</a>
+                        <a href="{% url 'planes' %}"><i class="fas fa-crown" style="width: 25px; color: var(--kuxee-blue);"></i> Planes</a>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt" style="width: 25px; color: var(--kuxee-blue);"></i> Iniciar sesión</a>
+                        <a href="{% url 'registro' %}"><i class="fas fa-user-plus" style="width: 25px; color: var(--kuxee-blue);"></i> Crear cuenta</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </nav>
@@ -583,6 +630,12 @@
             if(userDrop) userDrop.classList.remove('active');
         }
         
+        // CONTROL DROPDOWN INVITADOS
+        function toggleGuestMenu(e) {
+            e.preventDefault();
+            document.getElementById('guestDropdown').classList.toggle('active');
+        }
+
         // CERRAR MODALES/DROPDOWNS AL HACER CLICK AFUERA
         window.addEventListener('click', function(e) {
             const userDrop = document.getElementById('userDropdown');
@@ -590,9 +643,15 @@
             const notiDrop = document.getElementById('notificacionesDropdown');
             const notiTrig = document.querySelector('.btn-icon-circle .fa-bell') ? document.querySelector('.btn-icon-circle .fa-bell').parentNode : null;
             
+            const guestDrop = document.getElementById('guestDropdown');
+            const guestTrig = document.querySelector('.mobile-menu-btn');
+            
             if (userDrop && userTrig && !userTrig.contains(e.target) && !userDrop.contains(e.target)) userDrop.classList.remove('active');
             if (notiDrop && notiTrig && !notiTrig.contains(e.target) && !notiDrop.contains(e.target)) notiDrop.classList.remove('active');
             
+            // Cerrar menú de invitados si se clickea afuera
+            if (guestDrop && guestTrig && !guestTrig.contains(e.target) && !guestDrop.contains(e.target)) guestDrop.classList.remove('active');
+
             const modalServicio = document.getElementById('modalPublicarServicio');
             if (e.target === modalServicio) cerrarModalPublicarServicio();
             
