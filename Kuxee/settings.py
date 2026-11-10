@@ -69,21 +69,28 @@ WSGI_APPLICATION = 'Kuxee.wsgi.application'
 
 # Database
 # DATABASES MODIFICADO: Funcionará con Postgres local en tu PC y con Postgres en Railway automáticamente
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kuxee_db',       
-        'USER': 'postgres',       
-        'PASSWORD': 'misterfary', 
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'kuxee_db',       
+#        'USER': 'postgres',       
+#        'PASSWORD': 'misterfary', 
+#        'HOST': 'localhost',
+#        'PORT': '5432',
+#    }
+#}
 
 # Si detecta que está en la nube de Railway, usa la base de datos de allá
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+#if 'DATABASE_URL' in os.environ:
+    #DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
