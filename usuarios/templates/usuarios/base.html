@@ -360,7 +360,9 @@
                 <a href="{% url 'inicio' %}">Inicio</a>
                 <a href="{% url 'lista_maestros' %}">Maestros</a>
                 <a href="{% url 'solicitudes' %}">Solicitudes</a>
-                {% if user.is_authenticated %}<a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>{% endif %}
+                {% if user.is_authenticated and user.es_maestro %}
+                    <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
+                {% endif %}
                 <a href="{% url 'planes' %}">Planes</a>
             </div>
 
@@ -435,7 +437,9 @@
                             <a href="{% url 'inicio' %}">Inicio</a>
                             <a href="{% url 'lista_maestros' %}">Maestros</a>
                             <a href="{% url 'solicitudes' %}">Solicitudes</a>
-                            <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
+                            {% if user.es_maestro %}
+                                <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
+                            {% endif %}
                             <a href="{% url 'planes' %}">Planes</a>
                         </div>
                         
