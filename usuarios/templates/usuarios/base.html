@@ -413,8 +413,9 @@
                 </div>
 
                 <!-- PERFIL DE USUARIO Y MENÚ -->
-                <div class="profile-trigger" onclick="toggleUserDropdown(event)">
-                    <div class="profile-pic">
+                <div class="profile-trigger">
+                    <!-- EL EVENTO ONCLICK AHORA ESTÁ SOLO EN LA FOTO DE PERFIL, NO EN EL CONTENEDOR COMPLETO -->
+                    <div class="profile-pic" onclick="toggleUserDropdown(event)">
                         {% if user.foto_perfil %}<img src="{{ user.foto_perfil.url }}">{% else %}<i class="fas fa-user"></i>{% endif %}
                     </div>
                     
