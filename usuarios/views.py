@@ -16,6 +16,9 @@ from .models import Trato
 from .models import SolicitudCliente
 from django.db.models import Avg
 from .models import Resena
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Trato
 
 
 from .models import (
@@ -1270,3 +1273,21 @@ def eliminar_chat(request, contacto_username, servicio_id):
     ).delete()
 
     return redirect('mensajes')
+
+@login_required
+def mis_compras(request):
+    # Si es cliente, vemos los tratos donde él es el cliente
+    if request.user.es_cliente:
+        compras = Trato.objects.filter(cliente=request.user).order_by('-id')
+    # Si es maestro, vemos los tratos hechos sobre sus servicios
+    elif request.user.es_maestro:
+        compras = Trato.objects.filter(servicio__maestro__usuario=request.user).order_by('-id')
+    else:
+        compras = []
+
+    return render(request, 'usuarios/mis_compras.html', {'compras': compras})
+
+@login_required
+def ajustes(request):
+    # Vista temporal para que el botón "Ajustes" no genere error
+    return render(request, 'usuarios/ajustes.html')

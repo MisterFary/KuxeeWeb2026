@@ -87,4 +87,6 @@ urlpatterns = [
     # RUTA CORREGIDA: Eliminar chat
     # ==========================================
     path('eliminar-chat/<str:contacto_username>/<int:servicio_id>/', views.eliminar_chat, name='eliminar_chat'),
+    path('mis-compras/', views.mis_compras, name='mis_compras'),
+    path('ajustes/', views.ajustes, name='ajustes'),
 ]

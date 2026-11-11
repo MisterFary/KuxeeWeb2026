@@ -1,0 +1,56 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Mis Compras - Kuxee{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 900px; margin: 40px auto; padding: 0 20px; min-height: 60vh;">
+    <h2 style="color: var(--kuxee-blue); margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-shopping-bag"></i> Mis Compras y Tratos
+    </h2>
+
+    <div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+        
+        {% if compras %}
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for trato in compras %}
+                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: #eff6ff; color: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 5px 0; color: #1e293b;">{{ trato.servicio.titulo|default:"Servicio Kuxee" }}</h4>
+                            <p style="margin: 0; color: #64748b; font-size: 0.85rem;">
+                                {% if user.es_cliente %}
+                                    Maestro: {{ trato.servicio.maestro.usuario.first_name|default:trato.servicio.maestro.usuario.username }}
+                                {% else %}
+                                    Cliente: {{ trato.cliente.first_name|default:trato.cliente.username }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid #bbf7d0;">
+                            <i class="fas fa-check-circle"></i> Trato Pagado
+                        </span>
+                        
+                        <a href="{% url 'mensajes' %}?contacto={% if user.es_cliente %}{{ trato.servicio.maestro.usuario.username }}{% else %}{{ trato.cliente.username }}{% endif %}&servicio={{ trato.servicio.id }}" 
+                           style="background: #f1f5f9; color: #475569; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: 0.2s;">
+                           Ver Chat
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 40px 20px;">
+                <i class="fas fa-box-open" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                <h3 style="color: #475569; margin: 0 0 10px 0;">No tienes compras registradas</h3>
+                <p style="color: #94a3b8; margin: 0;">Los tratos que pagues o realices aparecerán en esta sección.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
