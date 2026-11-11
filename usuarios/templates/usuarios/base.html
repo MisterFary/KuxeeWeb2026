@@ -360,7 +360,7 @@
                 <a href="{% url 'inicio' %}">Inicio</a>
                 <a href="{% url 'lista_maestros' %}">Maestros</a>
                 <a href="{% url 'solicitudes' %}">Solicitudes</a>
-                {% if user.is_authenticated and user.es_maestro %}
+                {% if user.is_authenticated %}
                     <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
                 {% endif %}
                 <a href="{% url 'planes' %}">Planes</a>
@@ -428,8 +428,8 @@
                         </div>
                         
                         <a href="{% url 'mi_perfil' %}"><i class="fas fa-user-circle" style="width: 20px;"></i> Mi Perfil</a>
-                        <a href="#"><i class="fas fa-shopping-bag" style="width: 20px;"></i> Mis Compras</a>
-                        <a href="#"><i class="fas fa-cog" style="width: 20px;"></i> Ajustes</a>
+                        <a href="{% url 'mis_compras' %}"><i class="fas fa-shopping-bag" style="width: 20px;"></i> Mis Compras</a>
+                        <a href="{% url 'ajustes' %}"><i class="fas fa-cog" style="width: 20px;"></i> Ajustes</a>
                         
                         <!-- ESTOS ENLACES SOLO APARECEN CUANDO ESTÁS EN EL CELULAR -->
                         <div class="mobile-only-links">
@@ -437,9 +437,7 @@
                             <a href="{% url 'inicio' %}">Inicio</a>
                             <a href="{% url 'lista_maestros' %}">Maestros</a>
                             <a href="{% url 'solicitudes' %}">Solicitudes</a>
-                            {% if user.es_maestro %}
-                                <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
-                            {% endif %}
+                            <a href="{% url 'mis_trabajos' %}">Mis Trabajos</a>
                             <a href="{% url 'planes' %}">Planes</a>
                         </div>
                         
