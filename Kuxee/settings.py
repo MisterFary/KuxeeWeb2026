@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'usuarios',
 ]
 
@@ -153,3 +155,20 @@ CSRF_TRUSTED_ORIGINS = [
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+# ==========================================
+# CONFIGURACIÓN DE CLOUDINARY PARA IMÁGENES
+# ==========================================
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'pega_aqui_tu_cloud_name',
+    'API_KEY': 'pega_aqui_tu_api_key',
+    'API_SECRET': 'pega_aqui_tu_api_secret',
+}
+
+# Le decimos a Django que guarde los archivos multimedia en Cloudinary
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Mantén estas rutas que ya tenías
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
