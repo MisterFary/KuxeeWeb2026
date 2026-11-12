@@ -11,27 +11,27 @@
 
     /* Pestañas de Filtro */
     .tabs-container { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-    .tab-pill { background: #e2e8f0; color: #475569; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: all 0.2s; }
+    .tab-pill { background: #e2e8f0; color: #475569; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: all 0.2s; white-space: nowrap; }
     .tab-pill:hover { background: #cbd5e1; }
     .tab-pill.active { background: #4f46e5; color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
 
     /* Tarjeta de Trato */
     .trato-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); flex-wrap: wrap; gap: 20px;}
-    .trato-info { display: flex; flex-direction: column; gap: 10px; }
+    .trato-info { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 250px;}
     .trato-title { font-size: 1.4rem; font-weight: bold; color: #0f172a; margin: 0; }
-    .trato-meta { color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; }
+    .trato-meta { color: #64748b; font-size: 0.9rem; display: flex; align-items: center; flex-wrap: wrap; gap: 15px; }
     .trato-meta i { color: #94a3b8; }
     
     /* Badges de Estado */
-    .badge-estado { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; width: max-content; }
+    .badge-estado { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; width: max-content; }
     .estado-proceso { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
     .estado-pospuesto { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
     .estado-finalizado { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
     .estado-cancelado { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
     /* Botones de Acción */
-    .trato-actions { display: flex; gap: 10px; align-items: center; }
-    .btn-action { padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none; }
+    .trato-actions { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+    .btn-action { padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; text-decoration: none; text-align: center; }
     .btn-finalizar { background: #10b981; color: white; }
     .btn-finalizar:hover { background: #059669; }
     .btn-posponer { background: #f59e0b; color: white; }
@@ -40,7 +40,7 @@
     .btn-reanudar:hover { background: #2563eb; }
     .btn-evaluar { background: #eab308; color: white; }
     .btn-evaluar:hover { background: #ca8a04; }
-    .btn-chat { background: white; color: #4f46e5; border: 1px solid #c7d2fe; display: flex; flex-direction: column; align-items: center; padding: 6px 12px; line-height: 1.2; font-size: 0.85rem; }
+    .btn-chat { background: white; color: #4f46e5; border: 1px solid #c7d2fe; flex-direction: row; padding: 10px 18px; line-height: normal; font-size: 0.95rem; }
     .btn-chat:hover { background: #f5f3ff; border-color: #a5b4fc; }
 
     /* Estado Vacío */
@@ -48,8 +48,34 @@
     .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 20px; }
     .empty-state h3 { color: #334155; margin-bottom: 10px; font-size: 1.3rem; }
     .empty-state p { color: #64748b; margin-bottom: 25px; }
-    .btn-explorar { background: #6d28d9; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+    .btn-explorar { background: #6d28d9; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
     .btn-explorar:hover { background: #5b21b6; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO PARA CELULARES
+       ========================================= */
+    @media (max-width: 768px) {
+        .trabajos-container { margin: 20px auto; padding: 0 15px; }
+        .page-header h1 { font-size: 1.8rem; }
+        .page-header p { font-size: 0.95rem; }
+        
+        .tabs-container { gap: 10px; flex-wrap: wrap; }
+        .tab-pill { padding: 8px 15px; font-size: 0.85rem; flex-grow: 1; text-align: center; }
+
+        .trato-card { flex-direction: column; align-items: stretch; padding: 20px 15px; gap: 15px; }
+        .trato-info { min-width: 0; }
+        .trato-title { font-size: 1.2rem; text-align: center; }
+        .trato-meta { flex-direction: column; align-items: center; gap: 5px; text-align: center; }
+        
+        .badge-estado { width: 100%; margin-top: 10px; padding: 8px 12px; }
+
+        .trato-actions { flex-direction: column; width: 100%; gap: 10px; }
+        .trato-actions form { width: 100%; margin: 0; }
+        .btn-action { width: 100%; padding: 12px; font-size: 1rem; }
+        
+        .empty-state { padding: 40px 15px; }
+        .btn-explorar { width: 100%; }
+    }
 </style>
 {% endblock %}
 
@@ -95,7 +121,7 @@
                 <!-- ACCIONES EXCLUSIVAS DEL CLIENTE -->
                 {% if request.user == trato.cliente %}
                     {% if trato.estado == 'en_proceso' or trato.estado == 'pagado' %}
-                        <form method="POST" style="margin: 0;">
+                        <form method="POST" style="margin: 0; width: 100%;">
                             {% csrf_token %}
                             <input type="hidden" name="trato_id" value="{{ trato.id }}">
                             <input type="hidden" name="nuevo_estado" value="pospuesto">
@@ -103,7 +129,7 @@
                                 <i class="fas fa-pause-circle"></i> Posponer
                             </button>
                         </form>
-                        <form method="POST" style="margin: 0;">
+                        <form method="POST" style="margin: 0; width: 100%;">
                             {% csrf_token %}
                             <input type="hidden" name="trato_id" value="{{ trato.id }}">
                             <input type="hidden" name="nuevo_estado" value="finalizado">
@@ -112,7 +138,7 @@
                             </button>
                         </form>
                     {% elif trato.estado == 'pospuesto' %}
-                        <form method="POST" style="margin: 0;">
+                        <form method="POST" style="margin: 0; width: 100%;">
                             {% csrf_token %}
                             <input type="hidden" name="trato_id" value="{{ trato.id }}">
                             <input type="hidden" name="nuevo_estado" value="en_proceso">
@@ -137,11 +163,11 @@
                 <!-- BOTÓN CHAT (Visible para ambos) -->
                 {% if request.user == trato.cliente %}
                     <a href="{% url 'mensajes' %}?contacto={{ trato.maestro.username }}&servicio={{ trato.servicio.id }}" class="btn-action btn-chat">
-                        <i class="fas fa-comments"></i> <span>Ver<br>Chat</span>
+                        <i class="fas fa-comments"></i> <span>Ver Chat</span>
                     </a>
                 {% else %}
                     <a href="{% url 'mensajes' %}?contacto={{ trato.cliente.username }}&servicio={{ trato.servicio.id }}" class="btn-action btn-chat">
-                        <i class="fas fa-comments"></i> <span>Ver<br>Chat</span>
+                        <i class="fas fa-comments"></i> <span>Ver Chat</span>
                     </a>
                 {% endif %}
             </div>

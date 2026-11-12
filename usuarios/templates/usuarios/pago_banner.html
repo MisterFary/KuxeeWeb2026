@@ -137,6 +137,49 @@
     .btn-pagar:hover {
         background: #2563eb;
     }
+
+    /* =========================================
+       DISEÑO RESPONSIVO PARA CELULARES
+       ========================================= */
+    @media (max-width: 576px) {
+        .payment-container {
+            padding: 15px;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .payment-header {
+            padding: 50px 15px 25px; /* Más espacio arriba para que no choque con el botón Volver */
+        }
+        .btn-volver {
+            top: 15px;
+            left: 15px;
+        }
+        .payment-header h2 {
+            font-size: 1.5rem;
+            margin-top: 5px;
+        }
+        .payment-header p {
+            font-size: 0.85rem;
+        }
+        .payment-amount {
+            font-size: 2.2rem;
+        }
+        .payment-body {
+            padding: 20px 15px;
+        }
+        .payment-body h3 {
+            font-size: 1.1rem;
+        }
+        .grid-2-col {
+            grid-template-columns: 1fr; /* Apila los campos de fecha y CVV en vertical para facilitar la escritura en móvil */
+            gap: 20px;
+        }
+        .btn-pagar {
+            padding: 14px;
+            font-size: 1.05rem;
+            margin-top: 15px;
+        }
+    }
 </style>
 {% endblock %}
 
