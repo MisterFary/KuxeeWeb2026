@@ -127,6 +127,9 @@ STATICFILES_DIRS = [
 # Ruta donde Django juntará todos los estáticos cuando subas la web a producción en Railway
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
