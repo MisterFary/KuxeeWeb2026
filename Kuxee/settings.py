@@ -161,9 +161,9 @@ USE_X_FORWARDED_HOST = True
 # ==========================================
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'pega_aqui_tu_cloud_name',
-    'API_KEY': 'pega_aqui_tu_api_key',
-    'API_SECRET': 'pega_aqui_tu_api_secret',
+    'CLOUD_NAME': 'knpcdf9a',
+    'API_KEY': '346244195235633',
+    'API_SECRET': 'kisEMeJBk9sYiG6mY8DPhOjUvG8',
 }
 
 # Le decimos a Django que guarde los archivos multimedia en Cloudinary
