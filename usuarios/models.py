@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 
+
 # ==========================================
 # USUARIO PERSONALIZADO
 # ==========================================
@@ -230,3 +231,26 @@ class Resena(models.Model):
 
     def __str__(self):
         return f"Reseña de {self.cliente.username} a {self.maestro.username} ({self.calificacion} estrellas)"
+
+
+class ReporteProblema(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Usuario (si estaba logueado)"
+    )
+    descripcion = models.TextField(verbose_name="Descripción del problema")
+    url_origen = models.CharField(max_length=255, blank=True, verbose_name="Página desde donde se envió")
+    resuelto = models.BooleanField(default=False, verbose_name="¿Resuelto?")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de envío")
+
+    class Meta:
+        verbose_name = "Reporte de problema"
+        verbose_name_plural = "Reportes de problemas"
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        autor = self.usuario.username if self.usuario else "Visitante anónimo"
+        return f"[{self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}] {autor}: {self.descripcion[:45]}"

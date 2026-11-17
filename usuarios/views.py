@@ -19,6 +19,7 @@ from .models import Resena
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Trato
+from .models import ReporteProblema
 
 
 from .models import (
@@ -1291,3 +1292,21 @@ def mis_compras(request):
 def ajustes(request):
     # Vista temporal para que el botón "Ajustes" no genere error
     return render(request, 'usuarios/ajustes.html')
+
+
+def notificar_problema(request):
+    if request.method == 'POST':
+        descripcion = request.POST.get('descripcion', '').strip()
+        url_origen = request.POST.get('url_origen', '/')
+        
+        if descripcion:
+            ReporteProblema.objects.create(
+                usuario=request.user if request.user.is_authenticated else None,
+                descripcion=descripcion,
+                url_origen=url_origen
+            )
+            messages.success(request, '¡Gracias! Tu reporte fue enviado al equipo de Kuxee.')
+        else:
+            messages.error(request, 'Por favor describe el problema antes de enviar.')
+            
+    return redirect(request.META.get('HTTP_REFERER', 'inicio'))

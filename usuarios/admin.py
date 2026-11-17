@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import BannerDestacado
+from .models import BannerDestacado, ReporteProblema
 from .models import (
     Usuario, 
     PerfilCliente, 
@@ -79,3 +79,15 @@ class BannerDestacadoAdmin(admin.ModelAdmin):
     list_filter = ('estado',)
     list_editable = ('estado',)
     readonly_fields = ('fecha_activacion', 'fecha_expiracion')
+
+@admin.register(ReporteProblema)
+class ReporteProblemaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'usuario', 'resumen_problema', 'url_origen', 'resuelto', 'fecha_creacion')
+    list_filter = ('resuelto', 'fecha_creacion')
+    search_fields = ('descripcion', 'usuario__username', 'usuario__email', 'url_origen')
+    list_editable = ('resuelto',)
+    readonly_fields = ('usuario', 'descripcion', 'url_origen', 'fecha_creacion')
+
+    def resumen_problema(self, obj):
+        return obj.descripcion[:70] + ('...' if len(obj.descripcion) > 70 else '')
+    resumen_problema.short_description = "Problema reportado"

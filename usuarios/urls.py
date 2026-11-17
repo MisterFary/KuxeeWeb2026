@@ -82,6 +82,7 @@ urlpatterns = [
     path('trato/<int:trato_id>/evaluar/', views.evaluar_trato, name='evaluar_trato'),
     path('resenas/', views.ver_resenas, name='ver_resenas'),    
     path('resenas/<str:username>/', views.ver_resenas, name='ver_resenas_publico'),
+    path('notificar-problema/', views.notificar_problema, name='notificar_problema'),
     
     # ==========================================
     # RUTA CORREGIDA: Eliminar chat
