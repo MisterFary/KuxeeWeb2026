@@ -69,7 +69,7 @@
             justify-content: center; 
             text-decoration: none; 
             font-size: 1.2rem; 
-            flex-shrink: 0;
+            flex-shrink: 0; 
             position: relative;
             cursor: pointer;
             transition: background 0.2s;
@@ -99,9 +99,9 @@
             padding: 0 20px; 
             border-radius: 0 8px 8px 0; 
             cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
         }
 
         /* ENLACES VISIBLES SOLO EN ESCRITORIO */
@@ -193,30 +193,25 @@
             .navbar { padding: 10px 12px; gap: 8px; flex-wrap: nowrap; }
             .logo { font-size: 0; gap: 0; }
             
-            /* Ocultamos los links del PC y mostramos los del menú móvil */
             .desktop-links { display: none; }
             .mobile-only-links { display: block; }
             
-            /* Ocultamos el botón "Ingresar" en móvil, mostramos el menú hamburguesa */
             .btn-login.desktop-only { display: none; }
             .mobile-menu-btn { display: block; }
             
             .nav-left, .nav-right { gap: 6px; }
             .btn-icon-circle, .profile-pic, .logo img { width: 38px; height: 38px; font-size: 1rem; }
             
-            /* Buscador redondo en móvil */
             .search-container { max-width: none; margin: 0; min-width: 100px; height: 38px; }
             .search-container input { padding: 0 12px; font-size: 0.9rem; border-radius: 20px 0 0 20px; }
             .search-container button { padding: 0 12px; border-radius: 0 20px 20px 0; }
             
-            /* Ajuste de todos los dropdowns para que tomen todo el ancho en móvil */
             #userDropdown, #notificacionesDropdown, #guestDropdown { 
                 position: fixed; top: 58px; right: 0; left: 0; width: 100%; max-width: 100%; 
                 border-radius: 0 0 12px 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
                 border-left: none; border-right: none;
             }
 
-            /* Letras un poco más grandes y negritas en los menús de celular */
             .dropdown-menu a, .dropdown-item-btn {
                 font-size: 1.05rem; 
                 padding: 15px 20px;
@@ -262,24 +257,344 @@
         .btn-publish, .btn-submit-modal { background: var(--kuxee-blue); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; }
         .btn-submit-modal { width: 100%; padding: 14px; margin-top: 10px; }
 
-        /* 5. FOOTER */
-        .footer { background: var(--footer-blue); color: white; padding: 50px 40px 20px 40px; margin-top: 60px; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
-        .footer-col h4 { margin-top: 0; font-size: 1.1rem; margin-bottom: 20px; text-align: center; }
-        .social-btn { display: block; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px; color: white; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); text-align: center; }
-        .footer-bottom { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.9rem; }
+        /* =========================================
+           5. FOOTER ESTILO KUXEE (4 COLUMNAS + DEGRADADO)
+           ========================================= */
+        .footer {
+            background: linear-gradient(90deg, #4338ca 0%, #2563eb 50%, #0284c7 100%);
+            color: white;
+            padding: 35px 40px 20px 40px;
+            margin-top: 60px;
+        }
+        .footer-top-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding-bottom: 18px;
+            margin: 0 auto 30px auto;
+            max-width: 1350px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 28px;
+            max-width: 1350px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        .footer-col h4 {
+            margin-top: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            text-align: center;
+            color: white;
+        }
+
+        /* Columna 1: Redes Sociales */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.14);
+            padding: 11px 16px;
+            border-radius: 25px;
+            margin-bottom: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: translateY(-2px);
+        }
+        .social-btn i { width: 18px; text-align: center; font-size: 1rem; }
+
+        /* Columna 2: Pagos */
+        .pago-box {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .pago-box-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .pago-box-cards {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .pago-box-check {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #a7f3d0;
+        }
+
+        /* Columna 3: Reglas y Contacto */
+        .footer-reglas-box {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .footer-terms-trigger {
+            background: none;
+            border: none;
+            color: white;
+            font: inherit;
+            font-size: 0.92rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+            transition: opacity 0.2s;
+        }
+        .footer-terms-trigger:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .footer-email-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .footer-email-link:hover { text-decoration: underline; }
+        .footer-o-divider {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin: 6px 0;
+        }
+        .footer-problem-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin: 8px 0 10px 0;
+        }
+        .footer-problem-textarea {
+            width: 100%;
+            min-height: 75px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .footer-problem-textarea::placeholder { color: rgba(255, 255, 255, 0.75); }
+        .footer-problem-textarea:focus {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .btn-footer-enviar {
+            margin-top: 10px;
+            background: white;
+            color: #2563eb;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-footer-enviar:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        /* Columna 4: Seguridad */
+        .footer-seguridad-text {
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .footer-seguridad-text p { margin: 0 0 12px 0; }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        /* =========================================
+           MODAL GLOBAL DE TÉRMINOS Y CONDICIONES
+           ========================================= */
+        .terms-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(2px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .terms-modal-overlay.open {
+            display: flex;
+            animation: fadeInTerms 0.2s ease-out;
+        }
+        @keyframes fadeInTerms { from { opacity: 0; } to { opacity: 1; } }
+        .terms-modal-box {
+            background: white;
+            width: 100%;
+            max-width: 700px;
+            max-height: 86vh;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.22);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUpTerms 0.25s ease-out;
+        }
+        @keyframes slideUpTerms { from { transform: translateY(15px); opacity: 0.8; } to { transform: translateY(0); opacity: 1; } }
+        .terms-modal-header {
+            padding: 18px 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .terms-modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terms-modal-close {
+            background: #e2e8f0;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            color: #475569;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .terms-modal-close:hover { background: #cbd5e1; color: #0f172a; }
+        .terms-modal-body {
+            padding: 22px 26px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            color: #334155;
+            font-size: 0.93rem;
+            line-height: 1.65;
+            text-align: left;
+        }
+        .terms-meta-box {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.88rem;
+            color: #1e293b;
+        }
+        .terms-meta-box p { margin: 2px 0; }
+        .terms-warning-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 12px 0;
+            color: #78350f;
+            font-size: 0.9rem;
+        }
+        .terms-modal-body h4 { color: #0f172a; margin: 20px 0 8px 0; font-size: 1.02rem; font-weight: 700; }
+        .terms-modal-body p { margin: 0 0 10px 0; }
+        .terms-modal-body ul { margin: 0 0 12px 0; padding-left: 20px; }
+        .terms-modal-body li { margin-bottom: 6px; }
+        .terms-modal-body a { color: #3b82f6; font-weight: 600; text-decoration: none; }
+        .terms-modal-body a:hover { text-decoration: underline; }
+        .terms-modal-footer {
+            padding: 14px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn-terms-cancel {
+            background: white;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.92rem;
+        }
+        .btn-terms-cancel:hover { background: #f1f5f9; }
+        .btn-terms-accept {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.92rem;
+        }
+        .btn-terms-accept:hover { background: #2563eb; }
         
         .swal2-custom-popup { border-radius: 16px !important; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; }
         .btn-cancelar-swal { color: #475569 !important; font-weight: bold !important; } 
 
-        /* AJUSTES EXTRA MÓVIL (Modales y Footer) */
+        /* AJUSTES EXTRA MÓVIL Y TABLET (Modales y Footer) */
+        @media (max-width: 1024px) {
+            .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+        }
+
         @media (max-width: 768px) {
             .modal-box, .modal-content-global { padding: 20px; width: 95%; }
             .category-grid { grid-template-columns: 1fr; }
             .modal-footer { flex-direction: column; }
             .btn-cancel, .btn-publish { width: 100%; text-align: center; justify-content: center; }
             .btn-flotante, .btn-flotante-global { width: 55px; height: 55px; font-size: 1.5rem; bottom: 20px; right: 20px; }
-            .footer { padding: 30px 20px 15px 20px; }
+            
+            .footer { padding: 30px 18px 18px 18px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 26px; }
+            .btn-footer-enviar { width: 100%; justify-content: center; padding: 11px; }
+
+            .terms-modal-header { padding: 15px 18px; }
+            .terms-modal-header h3 { font-size: 1.05rem; }
+            .terms-modal-body { padding: 16px 18px; font-size: 0.88rem; }
+            .terms-modal-footer { padding: 12px 18px; flex-direction: column-reverse; }
+            .btn-terms-cancel, .btn-terms-accept { width: 100%; padding: 12px; text-align: center; }
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -329,7 +644,7 @@
         </script>
     {% endif %}
 
-    <!-- NAVBAR EN LÍNEA IDÉNTICO A IMAGEN 1 Y 2 -->
+    <!-- NAVBAR -->
     <nav class="navbar">
         <!-- 1. LADO IZQUIERDO: LOGO Y CHAT -->
         <div class="nav-left">
@@ -367,7 +682,6 @@
             </div>
 
             {% if user.is_authenticated %}
-                <!-- === USUARIO LOGUEADO === -->
                 <!-- CAMPANA NOTIFICACIONES -->
                 <div id="campana-wrapper">
                     <a href="#" class="btn-icon-circle" onclick="toggleNotificaciones(event)">
@@ -414,7 +728,6 @@
 
                 <!-- PERFIL DE USUARIO Y MENÚ -->
                 <div class="profile-trigger">
-                    <!-- EL EVENTO ONCLICK AHORA ESTÁ SOLO EN LA FOTO DE PERFIL, NO EN EL CONTENEDOR COMPLETO -->
                     <div class="profile-pic" onclick="toggleUserDropdown(event)">
                         {% if user.foto_perfil %}<img src="{{ user.foto_perfil.url }}">{% else %}<i class="fas fa-user"></i>{% endif %}
                     </div>
@@ -432,7 +745,7 @@
                         <a href="{% url 'mis_compras' %}"><i class="fas fa-shopping-bag" style="width: 20px;"></i> Mis Compras</a>
                         <a href="{% url 'ajustes' %}"><i class="fas fa-cog" style="width: 20px;"></i> Ajustes</a>
                         
-                        <!-- ESTOS ENLACES SOLO APARECEN CUANDO ESTÁS EN EL CELULAR -->
+                        <!-- ENLACES CELULAR -->
                         <div class="mobile-only-links">
                             <div class="dropdown-divider"></div>
                             <a href="{% url 'inicio' %}">Inicio</a>
@@ -452,12 +765,9 @@
                 </div>
 
             {% else %}
-                <!-- === USUARIO INVITADO (NO LOGUEADO) === -->
-                
-                <!-- Botón visible en PC -->
+                <!-- USUARIO INVITADO -->
                 <a href="{% url 'login' %}" class="btn-login desktop-only">Ingresar</a>
                 
-                <!-- Menú Hamburguesa visible en Celular -->
                 <div class="guest-menu-container">
                     <button class="mobile-menu-btn" onclick="toggleGuestMenu(event)">
                         <i class="fas fa-bars"></i>
@@ -574,21 +884,170 @@
         </script>
     {% endif %}
 
+    <!-- FOOTER DE 4 COLUMNAS IGUAL A LA IMAGEN -->
     <footer class="footer">
-        <div class="footer-title" style="text-align: center; margin-bottom: 20px; font-weight: bold;">Sobre kuxee.cl</div>
+        <div class="footer-top-title">Sobre kuxee.cl</div>
+        
         <div class="footer-grid">
+            <!-- COLUMNA 1: REDES SOCIALES -->
             <div class="footer-col">
                 <h4>Redes sociales</h4>
                 <a href="#" class="social-btn"><i class="fab fa-tiktok"></i> Tiktok</a>
                 <a href="#" class="social-btn"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i> Facebook</a>
             </div>
+
+            <!-- COLUMNA 2: PAGOS -->
             <div class="footer-col">
                 <h4>Pagos</h4>
-                <p style="text-align: center; color: #cbd5e1; font-size: 0.9rem;">Procesamos pagos 100% seguros mediante Webpay y tarjetas de crédito/débito.</p>
+                <div class="pago-box">
+                    <div class="pago-box-title"><i class="far fa-credit-card"></i> Tarjeta de crédito</div>
+                    <div class="pago-box-cards">Visa · Mastercard · American Express · Magna · Presto</div>
+                    <div class="pago-box-check">✓ Aprobación inmediata</div>
+                </div>
+                <div class="pago-box">
+                    <div class="pago-box-title"><i class="far fa-credit-card"></i> Tarjeta de débito o prepago</div>
+                    <div class="pago-box-cards">Visa · Mastercard · RedCompra</div>
+                    <div class="pago-box-check">✓ Aprobación inmediata</div>
+                </div>
+            </div>
+
+            <!-- COLUMNA 3: REGLAS Y CONTACTO -->
+            <div class="footer-col">
+                <h4>Reglas y contacto</h4>
+                <div class="footer-reglas-box">
+                    <button type="button" class="footer-terms-trigger" onclick="abrirTerminos()">
+                        Términos y condiciones
+                    </button>
+                    <a href="mailto:soporte@kuxee.cl" class="footer-email-link">soporte@kuxee.cl</a>
+                    <div class="footer-o-divider">o</div>
+                    <div class="footer-problem-title">Notificar problema</div>
+                    
+                    <form method="POST" action="{% url 'notificar_problema' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="url_origen" value="{{ request.path }}">
+                        <textarea name="descripcion" class="footer-problem-textarea" placeholder="Describe el problema..." maxlength="1500" required></textarea>
+                        <button type="submit" class="btn-footer-enviar">
+                            <i class="fas fa-paper-plane"></i> Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- COLUMNA 4: SEGURIDAD -->
+            <div class="footer-col">
+                <h4>Seguridad</h4>
+                <div class="footer-seguridad-text">
+                    <p>Tu conexión está protegida con <strong>certificado SSL</strong>. Tus datos viajan cifrados.</p>
+                    <p><i class="fas fa-shield-alt"></i> Los pagos se procesan a través de una <strong>pasarela de pago online</strong> segura. <strong>No necesitas registrarte ni crear ninguna cuenta en la pasarela:</strong> solo ingresas los datos de tu tarjeta y listo. Kuxee nunca almacena los datos de tu tarjeta.</p>
+                </div>
             </div>
         </div>
+
         <div class="footer-bottom">© 2026 Kuxee — Conectando clientes con maestros de confianza.</div>
     </footer>
+
+    <!-- MODAL DESPLEGABLE GLOBAL DE TÉRMINOS Y CONDICIONES -->
+    <div class="terms-modal-overlay" id="modalTerminos" onclick="cerrarTerminosAfuera(event)">
+        <div class="terms-modal-box">
+            <div class="terms-modal-header">
+                <h3><i class="fas fa-file-contract" style="color: #3b82f6;"></i> Términos y Condiciones de Kuxee</h3>
+                <button type="button" class="terms-modal-close" onclick="cerrarTerminos()" aria-label="Cerrar">&times;</button>
+            </div>
+            
+            <div class="terms-modal-body">
+                <div class="terms-meta-box">
+                    <p><strong>Última actualización:</strong> 17/11/2026</p>
+                    <p><strong>Identidad del prestador:</strong> Kuxee SpA</p>
+                    <p><strong>Correo:</strong> <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a></p>
+                    <p><strong>Sitio:</strong> <a href="https://kuxee.cl" target="_blank" rel="noopener">https://kuxee.cl</a></p>
+                </div>
+
+                <p>Al acceder o utilizar Kuxee, aceptas cumplir estos Términos y Condiciones. Si no estás de acuerdo, no uses la plataforma. Estos términos se rigen por las leyes de la República de Chile, en particular la <strong>Ley 19.496</strong> de protección al consumidor y la <strong>Ley 19.628</strong> sobre protección de la vida privada.</p>
+
+                <h4>1. Objeto y rol de Kuxee</h4>
+                <p>Kuxee es un intermediario digital que facilita el contacto entre clientes y maestros de oficios o profesionales independientes. <strong>Kuxee NO es proveedora de los servicios publicados, ni parte en los contratos celebrados entre clientes y maestros.</strong> La relación contractual del trabajo se establece exclusivamente entre cliente y maestro.</p>
+
+                <h4>2. Registro y cuentas</h4>
+                <ul>
+                    <li>La navegación pública del catálogo no requiere cuenta.</li>
+                    <li>Para contactar a un maestro, publicar servicios o pagar una comisión, debes registrarte con datos veraces (Ley 19.496).</li>
+                    <li>Los maestros deben aportar teléfono, oficio, ubicación, correo válido y RUT chileno para la emisión de boleta.</li>
+                    <li>Eres responsable de la confidencialidad de tus credenciales y de toda actividad realizada con tu cuenta.</li>
+                    <li>Kuxee puede suspender cuentas que infrinjan estos términos o la legislación vigente.</li>
+                </ul>
+
+                <h4>3. Planes de suscripción</h4>
+                <p>Los precios y beneficios actualizados de cada plan están disponibles en la página de Planes. Todos los precios incluyen IVA (19%). Suscripción de duración mensual con renovación manual desde la app. Comisión por trato mínima con plan activo: <strong>$5.990</strong>.</p>
+
+                <h4>4. Hacer un trato y comisión Kuxee</h4>
+                <p>Cuando un cliente decide contratar un servicio, debe usar el botón <strong>"Hacer trato"</strong> dentro del chat. Al confirmarlo paga una comisión a Kuxee con tarjeta vía pasarela segura (Mercado Pago). Comisión estándar: <strong>$6.990</strong> (IVA incluido). Con plan activo: <strong>$5.990</strong>.</p>
+                <p>Una vez aprobada la comisión, se habilitan los datos de contacto del maestro (teléfono, email, WhatsApp) en el chat y el cliente los recibe por correo. A partir de ese momento Kuxee deja de participar en la coordinación, ejecución o pago del servicio principal — ese acuerdo es 100% entre cliente y maestro.</p>
+
+                <h4>5. Prohibición de compartir contactos antes del trato</h4>
+                <p>Está estrictamente prohibido compartir teléfonos, correos o direcciones en el chat antes de confirmar y pagar el trato. La plataforma filtra estos contenidos. Eludir esta restricción puede provocar la suspensión de la cuenta.</p>
+
+                <h4>6. Responsabilidad post-trato</h4>
+                <p>Una vez entregados los datos de contacto, Kuxee no se hace responsable por:</p>
+                <ul>
+                    <li>La calidad, oportunidad o resultados del servicio prestado por el maestro.</li>
+                    <li>Acuerdos económicos o disputas entre cliente y maestro.</li>
+                    <li>Cumplimiento de plazos, garantías legales del trabajo, devoluciones o reparaciones.</li>
+                </ul>
+                <p>El maestro es responsable del cumplimiento de las obligaciones tributarias y laborales relativas al servicio que presta.</p>
+
+                <h4>7. Boleta electrónica y obligaciones tributarias</h4>
+                <p>Kuxee emite la respectiva boleta electrónica afecta (DTE tipo 39) al cliente por cada comisión, plan, banner o imagen destacada pagada, conforme a la normativa del Servicio de Impuestos Internos (SII) de Chile. Los precios mostrados al público incluyen IVA (19%) ya desglosado en cada boleta. Para emitir la boleta es obligatorio tener un RUT chileno válido registrado en el perfil al momento del pago.</p>
+
+                <h4>8. Garantía de reembolso (30 días) — solo comisión de trato</h4>
+                <p>Si el trabajo no se concretó (el maestro no se presentó, no respondió o canceló sin justificación), el cliente dispone de <strong>30 días</strong> desde el pago de la comisión para solicitar el reembolso desde <em>"Mis Compras" &rarr; "Solicitar reembolso"</em>. El reembolso se realiza al mismo medio de pago utilizado, en un plazo de hasta 15 días hábiles tras la aprobación (según los tiempos del banco emisor).</p>
+                <p><strong>Importante:</strong> el reembolso cubre solo la comisión pagada a Kuxee. El precio del trabajo en sí (lo que el cliente y el maestro acuerden) no pasa por Kuxee, por lo que cualquier diferencia o reclamo sobre el trabajo realizado debe resolverse directamente entre cliente y maestro (Sección 6).</p>
+                <div class="terms-warning-box">
+                    <strong>⚠️ NO reembolsable desde Mis Compras:</strong> las compras de planes de suscripción, banners publicitarios, imagen destacada y sección personal en home corresponden a servicios de publicidad/membresía de uso inmediato y NO son reembolsables automáticamente una vez efectuado el pago. Si Kuxee no pudo prestar el servicio comprado por una falla técnica imputable a la plataforma (ej. el banner contratado nunca se publicó, el plan no se activó), escríbenos a <a href="mailto:compras@kuxee.cl">compras@kuxee.cl</a> con el folio y revisaremos el caso, sin perjuicio de los derechos del consumidor establecidos en el Art. 3° letra e) de la Ley 19.496.
+                </div>
+
+                <h4>9. Reseñas</h4>
+                <p>Solo los clientes con al menos un trato finalizado pueden dejar una reseña al maestro correspondiente. Las reseñas deben ser honestas, no contener insultos, datos personales de terceros ni infringir el honor o la imagen del maestro. Kuxee se reserva el derecho de eliminar reseñas que infrinjan estos criterios.</p>
+
+                <h4>10. Protección de datos personales (Ley 19.628)</h4>
+                <p>Kuxee recolecta los datos mínimos necesarios para operar la plataforma: nombre, email, teléfono, RUT (solo para boleta), ubicación a nivel de comuna, oficio (maestros) y los mensajes intercambiados en el chat.</p>
+                <ul>
+                    <li><strong>Finalidad:</strong> permitir el contacto entre cliente y maestro, emitir boletas, prevenir fraude.</li>
+                    <li><strong>Conservación:</strong> los datos se mantienen mientras tu cuenta esté activa; al eliminarla se borran o anonimizan, salvo aquellos que la ley obliga a conservar (boletas, libro de ingresos: 6 años por norma SII).</li>
+                    <li><strong>Derechos:</strong> puedes acceder, rectificar, cancelar u oponerte al tratamiento de tus datos escribiendo a <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a>.</li>
+                    <li><strong>Transferencia:</strong> no vendemos datos a terceros. Compartimos con Mercado Pago (procesador de pagos) y proveedores SII (emisión de boletas) solo lo estrictamente necesario.</li>
+                </ul>
+
+                <h4>11. Pagos y seguridad</h4>
+                <p>Las transacciones se procesan a través de Mercado Pago Chile, certificado PCI-DSS. Kuxee no almacena datos de tarjetas en sus servidores. Cada cobro genera un identificador único trazable a la boleta correspondiente. Los métodos aceptados son: tarjetas de crédito (Visa, Mastercard, American Express, Magna, Presto), tarjetas de débito (Visa, Mastercard, RedCompra) y saldo Mercado Pago.</p>
+
+                <h4>12. Conducta esperada</h4>
+                <ul>
+                    <li>No publicar servicios ilegales, fraudulentos o que infrinjan derechos de terceros.</li>
+                    <li>No publicar contenido ofensivo, discriminatorio o que vulnere la privacidad.</li>
+                    <li>No realizar spam, suplantar identidades ni intentar vulnerar la seguridad del sitio.</li>
+                    <li>No usar la plataforma para evadir impuestos u obligaciones legales.</li>
+                </ul>
+
+                <h4>13. Eliminación de cuenta</h4>
+                <p>Puedes solicitar la eliminación de tu cuenta desde <em>Ajustes &rarr; "Eliminar cuenta"</em>. Se borrarán tus datos personales y contenido generado (mensajes, servicios, comentarios, likes). Las boletas emitidas y entradas del libro de ingresos se conservarán anonimizadas por 6 años, conforme a la normativa tributaria chilena.</p>
+
+                <h4>14. Modificaciones</h4>
+                <p>Kuxee puede actualizar estos Términos. Las modificaciones entran en vigor al publicarse en esta página. Cambios sustanciales se notificarán por correo y aviso en el inicio. El uso continuado tras la publicación implica aceptación.</p>
+
+                <h4>15. Ley aplicable y jurisdicción</h4>
+                <p>Estos Términos se rigen por las leyes de la República de Chile. Cualquier disputa será resuelta por los tribunales ordinarios de justicia de la ciudad de Santiago. Sin perjuicio de lo anterior, el consumidor puede acudir al SERNAC conforme a la Ley 19.496.</p>
+
+                <h4>16. Contacto</h4>
+                <p>Para consultas, ejercicio de derechos sobre datos personales o reclamos: <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a>.</p>
+            </div>
+
+            <div class="terms-modal-footer">
+                <button type="button" class="btn-terms-cancel" onclick="cerrarTerminos()">Cerrar</button>
+                <button type="button" class="btn-terms-accept" id="btn-aceptar-terminos-modal" onclick="aceptarYCerrarTerminos()">He leído y acepto</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -596,6 +1055,47 @@
         function abrirModalPublicarServicio() { document.getElementById('modalPublicarServicio').classList.add('activo'); }
         function cerrarModalPublicarServicio() { document.getElementById('modalPublicarServicio').classList.remove('activo'); }
         
+        // CONTROL MODAL GLOBAL DE TÉRMINOS Y CONDICIONES
+        function abrirTerminos() {
+            const modal = document.getElementById('modalTerminos');
+            const btnAceptar = document.getElementById('btn-aceptar-terminos-modal');
+            const checkRegistro = document.getElementById('check-terminos');
+
+            if (btnAceptar) {
+                btnAceptar.style.display = checkRegistro ? 'inline-block' : 'none';
+            }
+            if (modal) {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function cerrarTerminos() {
+            const modal = document.getElementById('modalTerminos');
+            if (modal) {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function cerrarTerminosAfuera(e) {
+            if (e.target && e.target.id === 'modalTerminos') {
+                cerrarTerminos();
+            }
+        }
+
+        function aceptarYCerrarTerminos() {
+            const checkRegistro = document.getElementById('check-terminos');
+            const termsContainer = document.getElementById('terms-container');
+            if (checkRegistro) checkRegistro.checked = true;
+            if (termsContainer) termsContainer.classList.remove('terms-error');
+            cerrarTerminos();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarTerminos();
+        });
+
         function filtrarCategorias() {
             const texto = document.getElementById('cat-search').value.toLowerCase();
             const items = document.querySelectorAll('.category-item');
@@ -633,13 +1133,11 @@
             if(userDrop) userDrop.classList.remove('active');
         }
         
-        // CONTROL DROPDOWN INVITADOS
         function toggleGuestMenu(e) {
             e.preventDefault();
             document.getElementById('guestDropdown').classList.toggle('active');
         }
 
-        // CERRAR MODALES/DROPDOWNS AL HACER CLICK AFUERA
         window.addEventListener('click', function(e) {
             const userDrop = document.getElementById('userDropdown');
             const userTrig = document.querySelector('.profile-trigger');
@@ -651,8 +1149,6 @@
             
             if (userDrop && userTrig && !userTrig.contains(e.target) && !userDrop.contains(e.target)) userDrop.classList.remove('active');
             if (notiDrop && notiTrig && !notiTrig.contains(e.target) && !notiDrop.contains(e.target)) notiDrop.classList.remove('active');
-            
-            // Cerrar menú de invitados si se clickea afuera
             if (guestDrop && guestTrig && !guestTrig.contains(e.target) && !guestDrop.contains(e.target)) guestDrop.classList.remove('active');
 
             const modalServicio = document.getElementById('modalPublicarServicio');
