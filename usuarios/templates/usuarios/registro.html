@@ -32,7 +32,13 @@
     .role-option.active .role-title { color: var(--kuxee-blue); }
     .role-desc { font-size: 0.82rem; color: #64748b; }
     
-    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 20px; box-sizing: border-box; }
+    /* Checkbox Términos y Condiciones */
+    .terms-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; margin-bottom: 5px; font-size: 0.9rem; color: #475569; line-height: 1.45; }
+    .terms-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--kuxee-blue); cursor: pointer; flex-shrink: 0; }
+    .terms-link { color: var(--kuxee-blue); font-weight: bold; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font: inherit; }
+    .terms-link:hover { color: #1d4ed8; }
+
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 18px; box-sizing: border-box; }
     .btn-submit:hover { background: #2563eb; }
 
     /* Custom Dropdown Comunas y Oficios */
@@ -57,6 +63,150 @@
     .comuna-item.selected .check-icon { display: block; }
 
     /* =========================================
+       MODAL DE TÉRMINOS Y CONDICIONES
+       ========================================= */
+    .terms-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(2px);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+        box-sizing: border-box;
+    }
+    .terms-modal-overlay.open {
+        display: flex;
+        animation: fadeInModal 0.2s ease-out;
+    }
+    @keyframes fadeInModal {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .terms-modal-box {
+        background: white;
+        width: 100%;
+        max-width: 700px;
+        max-height: 86vh;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.22);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUpModal 0.25s ease-out;
+    }
+    @keyframes slideUpModal {
+        from { transform: translateY(15px); opacity: 0.8; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .terms-modal-header {
+        padding: 18px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+    .terms-modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .terms-modal-close {
+        background: #e2e8f0;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        color: #475569;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+    .terms-modal-close:hover { background: #cbd5e1; color: #0f172a; }
+
+    .terms-modal-body {
+        padding: 22px 26px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        color: #334155;
+        font-size: 0.93rem;
+        line-height: 1.65;
+    }
+    .terms-meta-box {
+        background: #f1f5f9;
+        border-left: 4px solid var(--kuxee-blue);
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 0.88rem;
+        color: #1e293b;
+    }
+    .terms-meta-box p { margin: 2px 0; }
+    .terms-warning-box {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 15px;
+        border-radius: 6px;
+        margin: 12px 0;
+        color: #78350f;
+        font-size: 0.9rem;
+    }
+    .terms-modal-body h4 {
+        color: #0f172a;
+        margin: 20px 0 8px 0;
+        font-size: 1.02rem;
+        font-weight: 700;
+    }
+    .terms-modal-body p { margin: 0 0 10px 0; }
+    .terms-modal-body ul { margin: 0 0 12px 0; padding-left: 20px; }
+    .terms-modal-body li { margin-bottom: 6px; }
+    .terms-modal-body a { color: var(--kuxee-blue); font-weight: 600; text-decoration: none; }
+    .terms-modal-body a:hover { text-decoration: underline; }
+
+    .terms-modal-footer {
+        padding: 14px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    .btn-terms-cancel {
+        background: white;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.92rem;
+    }
+    .btn-terms-cancel:hover { background: #f1f5f9; }
+    .btn-terms-accept {
+        background: var(--kuxee-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.92rem;
+    }
+    .btn-terms-accept:hover { background: #2563eb; }
+
+    /* =========================================
        DISEÑO RESPONSIVO (TABLETS Y CELULARES)
        ========================================= */
     @media (max-width: 768px) {
@@ -72,12 +222,17 @@
         .custom-select-trigger { padding: 11px 12px; font-size: 0.95rem; }
         .custom-select-menu { max-height: 270px; }
 
-        /* En móvil el botón de marcar región se adapta limpiamente sin apretar el título */
         .region-header { padding: 10px 12px; }
         .btn-region { font-size: 0.72rem; padding: 5px 10px; }
         .comuna-item { padding: 12px 14px; font-size: 0.92rem; }
         
         .btn-submit { padding: 14px; font-size: 1rem; }
+
+        .terms-modal-header { padding: 15px 18px; }
+        .terms-modal-header h3 { font-size: 1.05rem; }
+        .terms-modal-body { padding: 16px 18px; font-size: 0.88rem; }
+        .terms-modal-footer { padding: 12px 18px; flex-direction: column-reverse; }
+        .btn-terms-cancel, .btn-terms-accept { width: 100%; padding: 12px; text-align: center; }
     }
 
     @media (max-width: 360px) {
@@ -193,8 +348,118 @@
                 {{ form.oficios }}
             </div>
 
+            <!-- Aceptación de Términos y Condiciones -->
+            <div class="terms-group">
+                <input type="checkbox" id="check-terminos" name="acepta_terminos" required>
+                <label for="check-terminos" style="cursor: pointer;">
+                    He leído y acepto los <button type="button" class="terms-link" onclick="abrirTerminos()">Términos y Condiciones</button> de uso de Kuxee.
+                </label>
+            </div>
+
             <button type="submit" class="btn-submit">Crear cuenta</button>
         </form>
+    </div>
+</div>
+
+<!-- Despliegue / Modal de Términos y Condiciones -->
+<div class="terms-modal-overlay" id="modalTerminos" onclick="cerrarTerminosAfuera(event)">
+    <div class="terms-modal-box">
+        <div class="terms-modal-header">
+            <h3><i class="fas fa-file-contract" style="color: var(--kuxee-blue);"></i> Términos y Condiciones de Kuxee</h3>
+            <button type="button" class="terms-modal-close" onclick="cerrarTerminos()" aria-label="Cerrar">&times;</button>
+        </div>
+        
+        <div class="terms-modal-body">
+            <div class="terms-meta-box">
+                <p><strong>Última actualización:</strong> 17/11/2026</p>
+                <p><strong>Identidad del prestador:</strong> Kuxee SpA</p>
+                <p><strong>Correo:</strong> <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a></p>
+                <p><strong>Sitio:</strong> <a href="https://kuxee.cl" target="_blank" rel="noopener">https://kuxee.cl</a></p>
+            </div>
+
+            <p>Al acceder o utilizar Kuxee, aceptas cumplir estos Términos y Condiciones. Si no estás de acuerdo, no uses la plataforma. Estos términos se rigen por las leyes de la República de Chile, en particular la <strong>Ley 19.496</strong> de protección al consumidor y la <strong>Ley 19.628</strong> sobre protección de la vida privada.</p>
+
+            <h4>1. Objeto y rol de Kuxee</h4>
+            <p>Kuxee es un intermediario digital que facilita el contacto entre clientes y maestros de oficios o profesionales independientes. <strong>Kuxee NO es proveedora de los servicios publicados, ni parte en los contratos celebrados entre clientes y maestros.</strong> La relación contractual del trabajo se establece exclusivamente entre cliente y maestro.</p>
+
+            <h4>2. Registro y cuentas</h4>
+            <ul>
+                <li>La navegación pública del catálogo no requiere cuenta.</li>
+                <li>Para contactar a un maestro, publicar servicios o pagar una comisión, debes registrarte con datos veraces (Ley 19.496).</li>
+                <li>Los maestros deben aportar teléfono, oficio, ubicación, correo válido y RUT chileno para la emisión de boleta.</li>
+                <li>Eres responsable de la confidencialidad de tus credenciales y de toda actividad realizada con tu cuenta.</li>
+                <li>Kuxee puede suspender cuentas que infrinjan estos términos o la legislación vigente.</li>
+            </ul>
+
+            <h4>3. Planes de suscripción</h4>
+            <p>Los precios y beneficios actualizados de cada plan están disponibles en la página de Planes. Todos los precios incluyen IVA (19%). Suscripción de duración mensual con renovación manual desde la app. Comisión por trato mínima con plan activo: <strong>$5.990</strong>.</p>
+
+            <h4>4. Hacer un trato y comisión Kuxee</h4>
+            <p>Cuando un cliente decide contratar un servicio, debe usar el botón <strong>"Hacer trato"</strong> dentro del chat. Al confirmarlo paga una comisión a Kuxee con tarjeta vía pasarela segura (Mercado Pago). Comisión estándar: <strong>$6.990</strong> (IVA incluido). Con plan activo: <strong>$5.990</strong>.</p>
+            <p>Una vez aprobada la comisión, se habilitan los datos de contacto del maestro (teléfono, email, WhatsApp) en el chat y el cliente los recibe por correo. A partir de ese momento Kuxee deja de participar en la coordinación, ejecución o pago del servicio principal — ese acuerdo es 100% entre cliente y maestro.</p>
+
+            <h4>5. Prohibición de compartir contactos antes del trato</h4>
+            <p>Está estrictamente prohibido compartir teléfonos, correos o direcciones en el chat antes de confirmar y pagar el trato. La plataforma filtra estos contenidos. Eludir esta restricción puede provocar la suspensión de la cuenta.</p>
+
+            <h4>6. Responsabilidad post-trato</h4>
+            <p>Una vez entregados los datos de contacto, Kuxee no se hace responsable por:</p>
+            <ul>
+                <li>La calidad, oportunidad o resultados del servicio prestado por el maestro.</li>
+                <li>Acuerdos económicos o disputas entre cliente y maestro.</li>
+                <li>Cumplimiento de plazos, garantías legales del trabajo, devoluciones o reparaciones.</li>
+            </ul>
+            <p>El maestro es responsable del cumplimiento de las obligaciones tributarias y laborales relativas al servicio que presta.</p>
+
+            <h4>7. Boleta electrónica y obligaciones tributarias</h4>
+            <p>Kuxee emite la respectiva boleta electrónica afecta (DTE tipo 39) al cliente por cada comisión, plan, banner o imagen destacada pagada, conforme a la normativa del Servicio de Impuestos Internos (SII) de Chile. Los precios mostrados al público incluyen IVA (19%) ya desglosado en cada boleta. Para emitir la boleta es obligatorio tener un RUT chileno válido registrado en el perfil al momento del pago.</p>
+
+            <h4>8. Garantía de reembolso (30 días) — solo comisión de trato</h4>
+            <p>Si el trabajo no se concretó (el maestro no se presentó, no respondió o canceló sin justificación), el cliente dispone de <strong>30 días</strong> desde el pago de la comisión para solicitar el reembolso desde <em>"Mis Compras" &rarr; "Solicitar reembolso"</em>. El reembolso se realiza al mismo medio de pago utilizado, en un plazo de hasta 15 días hábiles tras la aprobación (según los tiempos del banco emisor).</p>
+            <p><strong>Importante:</strong> el reembolso cubre solo la comisión pagada a Kuxee. El precio del trabajo en sí (lo que el cliente y el maestro acuerden) no pasa por Kuxee, por lo que cualquier diferencia o reclamo sobre el trabajo realizado debe resolverse directamente entre cliente y maestro (Sección 6).</p>
+            <div class="terms-warning-box">
+                <strong>⚠️ NO reembolsable desde Mis Compras:</strong> las compras de planes de suscripción, banners publicitarios, imagen destacada y sección personal en home corresponden a servicios de publicidad/membresía de uso inmediato y NO son reembolsables automáticamente una vez efectuado el pago. Si Kuxee no pudo prestar el servicio comprado por una falla técnica imputable a la plataforma (ej. el banner contratado nunca se publicó, el plan no se activó), escríbenos a <a href="mailto:compras@kuxee.cl">compras@kuxee.cl</a> con el folio y revisaremos el caso, sin perjuicio de los derechos del consumidor establecidos en el Art. 3° letra e) de la Ley 19.496.
+            </div>
+
+            <h4>9. Reseñas</h4>
+            <p>Solo los clientes con al menos un trato finalizado pueden dejar una reseña al maestro correspondiente. Las reseñas deben ser honestas, no contener insultos, datos personales de terceros ni infringir el honor o la imagen del maestro. Kuxee se reserva el derecho de eliminar reseñas que infrinjan estos criterios.</p>
+
+            <h4>10. Protección de datos personales (Ley 19.628)</h4>
+            <p>Kuxee recolecta los datos mínimos necesarios para operar la plataforma: nombre, email, teléfono, RUT (solo para boleta), ubicación a nivel de comuna, oficio (maestros) y los mensajes intercambiados en el chat.</p>
+            <ul>
+                <li><strong>Finalidad:</strong> permitir el contacto entre cliente y maestro, emitir boletas, prevenir fraude.</li>
+                <li><strong>Conservación:</strong> los datos se mantienen mientras tu cuenta esté activa; al eliminarla se borran o anonimizan, salvo aquellos que la ley obliga a conservar (boletas, libro de ingresos: 6 años por norma SII).</li>
+                <li><strong>Derechos:</strong> puedes acceder, rectificar, cancelar u oponerte al tratamiento de tus datos escribiendo a <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a>.</li>
+                <li><strong>Transferencia:</strong> no vendemos datos a terceros. Compartimos con Mercado Pago (procesador de pagos) y proveedores SII (emisión de boletas) solo lo estrictamente necesario.</li>
+            </ul>
+
+            <h4>11. Pagos y seguridad</h4>
+            <p>Las transacciones se procesan a través de Mercado Pago Chile, certificado PCI-DSS. Kuxee no almacena datos de tarjetas en sus servidores. Cada cobro genera un identificador único trazable a la boleta correspondiente. Los métodos aceptados son: tarjetas de crédito (Visa, Mastercard, American Express, Magna, Presto), tarjetas de débito (Visa, Mastercard, RedCompra) y saldo Mercado Pago.</p>
+
+            <h4>12. Conducta esperada</h4>
+            <ul>
+                <li>No publicar servicios ilegales, fraudulentos o que infrinjan derechos de terceros.</li>
+                <li>No publicar contenido ofensivo, discriminatorio o que vulnere la privacidad.</li>
+                <li>No realizar spam, suplantar identidades ni intentar vulnerar la seguridad del sitio.</li>
+                <li>No usar la plataforma para evadir impuestos u obligaciones legales.</li>
+            </ul>
+
+            <h4>13. Eliminación de cuenta</h4>
+            <p>Puedes solicitar la eliminación de tu cuenta desde <em>Ajustes &rarr; "Eliminar cuenta"</em>. Se borrarán tus datos personales y contenido generado (mensajes, servicios, comentarios, likes). Las boletas emitidas y entradas del libro de ingresos se conservarán anonimizadas por 6 años, conforme a la normativa tributaria chilena.</p>
+
+            <h4>14. Modificaciones</h4>
+            <p>Kuxee puede actualizar estos Términos. Las modificaciones entran en vigor al publicarse en esta página. Cambios sustanciales se notificarán por correo y aviso en el inicio. El uso continuado tras la publicación implica aceptación.</p>
+
+            <h4>15. Ley aplicable y jurisdicción</h4>
+            <p>Estos Términos se rigen por las leyes de la República de Chile. Cualquier disputa será resuelta por los tribunales ordinarios de justicia de la ciudad de Santiago. Sin perjuicio de lo anterior, el consumidor puede acudir al SERNAC conforme a la Ley 19.496.</p>
+
+            <h4>16. Contacto</h4>
+            <p>Para consultas, ejercicio de derechos sobre datos personales o reclamos: <a href="mailto:soporte@kuxee.cl">soporte@kuxee.cl</a>.</p>
+        </div>
+
+        <div class="terms-modal-footer">
+            <button type="button" class="btn-terms-cancel" onclick="cerrarTerminos()">Cerrar</button>
+            <button type="button" class="btn-terms-accept" onclick="aceptarYCerrarTerminos()">He leído y acepto</button>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -214,6 +479,34 @@
     $(document).ready(function() {
         if (document.getElementById('input-rol').value === 'maestro') {
             seleccionarRol('maestro');
+        }
+    });
+
+    // Funciones del Modal de Términos y Condiciones
+    function abrirTerminos() {
+        document.getElementById('modalTerminos').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarTerminos() {
+        document.getElementById('modalTerminos').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function cerrarTerminosAfuera(e) {
+        if (e.target.id === 'modalTerminos') {
+            cerrarTerminos();
+        }
+    }
+
+    function aceptarYCerrarTerminos() {
+        document.getElementById('check-terminos').checked = true;
+        cerrarTerminos();
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarTerminos();
         }
     });
 
