@@ -33,7 +33,8 @@
     .role-desc { font-size: 0.82rem; color: #64748b; }
     
     /* Checkbox Términos y Condiciones */
-    .terms-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; margin-bottom: 5px; font-size: 0.9rem; color: #475569; line-height: 1.45; }
+    .terms-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; margin-bottom: 5px; font-size: 0.9rem; color: #475569; line-height: 1.45; padding: 10px; border-radius: 8px; border: 1px solid transparent; transition: all 0.2s; }
+    .terms-group.terms-error { background: #fef2f2; border-color: #fca5a5; }
     .terms-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--kuxee-blue); cursor: pointer; flex-shrink: 0; }
     .terms-link { color: var(--kuxee-blue); font-weight: bold; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font: inherit; }
     .terms-link:hover { color: #1d4ed8; }
@@ -246,7 +247,7 @@
     <div class="register-card">
         <h2 class="register-title">Crea tu cuenta</h2>
 
-        <form method="POST">
+        <form method="POST" id="form-registro">
             {% csrf_token %}
             <div class="form-group">{{ form.first_name }}</div>
             <div class="form-group">{{ form.username }}</div>
@@ -349,8 +350,8 @@
             </div>
 
             <!-- Aceptación de Términos y Condiciones -->
-            <div class="terms-group">
-                <input type="checkbox" id="check-terminos" name="acepta_terminos" required>
+            <div class="terms-group" id="terms-container">
+                <input type="checkbox" id="check-terminos" name="acepta_terminos">
                 <label for="check-terminos" style="cursor: pointer;">
                     He leído y acepto los <button type="button" class="terms-link" onclick="abrirTerminos()">Términos y Condiciones</button> de uso de Kuxee.
                 </label>
@@ -482,6 +483,36 @@
         }
     });
 
+    // Validación con Alerta Personalizada de la página antes de enviar el registro
+    document.getElementById('form-registro').addEventListener('submit', function(e) {
+        const checkTerminos = document.getElementById('check-terminos');
+        const termsContainer = document.getElementById('terms-container');
+
+        if (!checkTerminos.checked) {
+            e.preventDefault();
+            termsContainer.classList.add('terms-error');
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Términos y Condiciones',
+                text: 'Debes leer y aceptar los Términos y Condiciones de Kuxee para crear tu cuenta.',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3b82f6',
+                customClass: { popup: 'swal2-custom-popup' }
+            }).then(() => {
+                termsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                checkTerminos.focus();
+            });
+        }
+    });
+
+    // Quitar el resaltado rojo apenas el usuario marque la casilla
+    document.getElementById('check-terminos').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('terms-container').classList.remove('terms-error');
+        }
+    });
+
     // Funciones del Modal de Términos y Condiciones
     function abrirTerminos() {
         document.getElementById('modalTerminos').classList.add('open');
@@ -501,6 +532,7 @@
 
     function aceptarYCerrarTerminos() {
         document.getElementById('check-terminos').checked = true;
+        document.getElementById('terms-container').classList.remove('terms-error');
         cerrarTerminos();
     }
 
