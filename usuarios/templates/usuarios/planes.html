@@ -3,20 +3,27 @@
 
 {% block extra_css %}
 <style>
-    .planes-container { max-width: 900px; margin: 40px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    /* Seguridad global contra desbordamientos */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    .planes-container { max-width: 900px; margin: 40px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; }
+
+    .planes-header { text-align: center; margin-bottom: 30px; }
+    .planes-header h1 { color: #0f172a; margin: 0 0 10px 0; font-size: 2.2rem; }
+    .planes-header p { color: #64748b; margin: 0; font-size: 1rem; line-height: 1.5; }
 
     /* Switch Cliente / Maestro */
-    .toggle-wrapper { display: flex; justify-content: center; margin-bottom: 50px; }
-    .toggle-box { background: #f1f5f9; border-radius: 30px; display: flex; padding: 5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-    .toggle-btn { padding: 10px 30px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .toggle-wrapper { display: flex; justify-content: center; margin-bottom: 45px; }
+    .toggle-box { background: #f1f5f9; border-radius: 30px; display: inline-flex; padding: 5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); max-width: 100%; box-sizing: border-box; }
+    .toggle-btn { padding: 10px 30px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .toggle-btn.active { background: #4f46e5; color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
     .toggle-btn.inactive { background: transparent; color: #64748b; }
 
     /* Contenedor de Tarjetas */
-    .cards-wrapper { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+    .cards-wrapper { display: flex; justify-content: center; gap: 35px; flex-wrap: wrap; align-items: stretch; }
     
-    /* Diseño Base de Tarjeta */
-    .plan-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px 30px; width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
+    /* Diseño Base de Tarjeta (ancho fluido hasta 380px) */
+    .plan-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px 30px; width: 100%; max-width: 380px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; display: flex; flex-direction: column; transition: transform 0.2s; box-sizing: border-box; }
     .plan-card:hover { transform: translateY(-5px); }
 
     /* Tarjeta Destacada (Plus/Premium) */
@@ -25,7 +32,7 @@
 
     /* Textos de la Tarjeta */
     .plan-subtitle { color: #4f46e5; font-weight: bold; font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
-    .plan-price { color: #4f46e5; font-size: 3.2rem; font-weight: 800; text-align: center; margin-bottom: 20px; display: flex; justify-content: center; align-items: baseline; }
+    .plan-price { color: #4f46e5; font-size: 3.2rem; font-weight: 800; text-align: center; margin-bottom: 20px; display: flex; justify-content: center; align-items: baseline; flex-wrap: wrap; }
     .plan-price.free { font-size: 2.8rem; }
     .plan-price span { font-size: 1rem; font-weight: normal; color: #64748b; margin-left: 5px; }
     .plan-desc { color: #475569; font-size: 0.9rem; text-align: center; line-height: 1.5; margin-bottom: 30px; min-height: 70px; }
@@ -33,23 +40,52 @@
     /* Lista de Beneficios */
     .plan-features { list-style: none; padding: 0; margin: 0 0 30px 0; flex-grow: 1; }
     .plan-features li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; font-size: 0.9rem; color: #334155; line-height: 1.4; }
-    .plan-features li i.fa-check { color: #10b981; margin-top: 3px; font-size: 1rem; }
+    .plan-features li i.fa-check { color: #10b981; margin-top: 3px; font-size: 1rem; flex-shrink: 0; }
     .icon-emoji { margin-right: 4px; font-style: normal; }
 
     /* Botones de Acción */
-    .btn-plan { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: background 0.2s; }
+    .btn-plan { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: background 0.2s; box-sizing: border-box; }
     .btn-blue { background: #3b82f6; color: white; }
     .btn-blue:hover { background: #2563eb; color: white; }
     .btn-current { background: #f1f5f9; color: #64748b; cursor: default; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
+    @media (max-width: 850px) {
+        .cards-wrapper { gap: 30px; }
+        .plan-card { max-width: 450px; }
+        /* Cuando las tarjetas están apiladas verticalmente, quitamos el alto mínimo forzado */
+        .plan-desc { min-height: auto; margin-bottom: 24px; }
+    }
+
+    @media (max-width: 768px) {
+        .planes-container { margin: 25px auto; padding: 0 15px; }
+        .planes-header h1 { font-size: 1.75rem; }
+        .planes-header p { font-size: 0.95rem; }
+
+        .toggle-wrapper { margin-bottom: 35px; }
+        .toggle-box { width: 100%; max-width: 340px; }
+        .toggle-btn { flex: 1; padding: 10px 15px; font-size: 0.9rem; }
+
+        .plan-card { padding: 32px 20px; }
+        .badge-recomendado { right: 50%; transform: translateX(50%); white-space: nowrap; }
+        
+        .plan-price { font-size: 2.6rem; margin-bottom: 15px; }
+        .plan-price.free { font-size: 2.3rem; }
+        
+        .plan-features { margin-bottom: 25px; }
+        .plan-features li { margin-bottom: 14px; font-size: 0.88rem; }
+    }
 </style>
 {% endblock %}
 
 {% block contenido %}
 <div class="planes-container">
     
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #0f172a;">Planes Kuxee</h1>
-        <p style="color: #64748b;">Elige el plan que mejor se adapta a ti. Puedes cambiar de plan cuando quieras.</p>
+    <div class="planes-header">
+        <h1>Planes Kuxee</h1>
+        <p>Elige el plan que mejor se adapta a ti. Puedes cambiar de plan cuando quieras.</p>
     </div>
 
     <!-- Switch de Tipo de Cuenta -->
@@ -75,10 +111,10 @@
             </div>
             
             <ul class="plan-features">
-                <li><i class="fas fa-check"></i> Hasta 3 servicios publicados</li>
-                <li><i class="fas fa-check"></i> Hasta 7 imágenes por servicio</li>
-                <li><i class="fas fa-check"></i> Hasta 3 oficios donde ofreces tu servicio</li>
-                <li><i class="fas fa-check"></i> <span class="icon-emoji">🎓</span> Subir 1 certificado profesional</li>
+                <li><i class="fas fa-check"></i> <span>Hasta 3 servicios publicados</span></li>
+                <li><i class="fas fa-check"></i> <span>Hasta 7 imágenes por servicio</span></li>
+                <li><i class="fas fa-check"></i> <span>Hasta 3 oficios donde ofreces tu servicio</span></li>
+                <li><i class="fas fa-check"></i> <span><span class="icon-emoji">🎓</span> Subir 1 certificado profesional</span></li>
             </ul>
 
             {% if user.is_authenticated %}
@@ -106,14 +142,14 @@
             </div>
             
             <ul class="plan-features">
-                <li><i class="fas fa-check"></i> Hasta 6 servicios publicados</li>
-                <li><i class="fas fa-check"></i> Hasta 14 imágenes por servicio</li>
-                <li><i class="fas fa-check"></i> Hasta 6 oficios donde ofreces tu servicio</li>
-                <li><i class="fas fa-check"></i> Publicar solicitudes con hasta 5 archivos (videos e imágenes)</li>
-                <li><i class="fas fa-check"></i> <span style="font-weight: bold; color: #0f172a;">Maestro verificado</span></li>
-                <li><i class="fas fa-check"></i> <span class="icon-emoji">🚀</span> Mejor posicionamiento en búsquedas</li>
-                <li><i class="fas fa-check"></i> <span class="icon-emoji">🎓</span> Subir hasta 3 certificados profesionales</li>
-                <li><i class="fas fa-check"></i> <span class="icon-emoji">⭐</span> Comprar una sección exclusiva en el inicio (tu franja con tus servicios, activa 1 semana por compra)</li>
+                <li><i class="fas fa-check"></i> <span>Hasta 6 servicios publicados</span></li>
+                <li><i class="fas fa-check"></i> <span>Hasta 14 imágenes por servicio</span></li>
+                <li><i class="fas fa-check"></i> <span>Hasta 6 oficios donde ofreces tu servicio</span></li>
+                <li><i class="fas fa-check"></i> <span>Publicar solicitudes con hasta 5 archivos (videos e imágenes)</span></li>
+                <li><i class="fas fa-check"></i> <span><strong style="color: #0f172a;">Maestro verificado</strong></span></li>
+                <li><i class="fas fa-check"></i> <span><span class="icon-emoji">🚀</span> Mejor posicionamiento en búsquedas</span></li>
+                <li><i class="fas fa-check"></i> <span><span class="icon-emoji">🎓</span> Subir hasta 3 certificados profesionales</span></li>
+                <li><i class="fas fa-check"></i> <span><span class="icon-emoji">⭐</span> Comprar una sección exclusiva en el inicio (tu franja con tus servicios, activa 1 semana por compra)</span></li>
             </ul>
 
             {% if user.is_authenticated %}
@@ -143,8 +179,8 @@
             </div>
             
             <ul class="plan-features">
-                <li><i class="fas fa-check"></i> Busca y contacta maestros</li>
-                <li><i class="fas fa-check"></i> Califica los servicios finalizados</li>
+                <li><i class="fas fa-check"></i> <span>Busca y contacta maestros</span></li>
+                <li><i class="fas fa-check"></i> <span>Califica los servicios finalizados</span></li>
             </ul>
 
             {% if user.is_authenticated %}
@@ -172,8 +208,8 @@
             </div>
             
             <ul class="plan-features">
-                <li><i class="fas fa-check"></i> Publicar solicitudes con hasta 10 archivos (videos e imágenes)</li>
-                <li><i class="fas fa-check"></i> Ahorra en comisiones en todos tus tratos</li>
+                <li><i class="fas fa-check"></i> <span>Publicar solicitudes con hasta 10 archivos (videos e imágenes)</span></li>
+                <li><i class="fas fa-check"></i> <span>Ahorra en comisiones en todos tus tratos</span></li>
             </ul>
 
             {% if user.is_authenticated %}

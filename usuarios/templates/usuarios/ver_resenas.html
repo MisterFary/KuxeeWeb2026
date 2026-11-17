@@ -4,33 +4,78 @@
 
 {% block extra_css %}
 <style>
-    .resenas-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-    .header-resenas { text-align: center; margin-bottom: 40px; }
-    .header-resenas h1 { color: #0f172a; font-size: 2.2rem; margin-bottom: 10px; }
+    /* Seguridad global contra scroll lateral */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    .resenas-container { max-width: 900px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; }
+    .header-resenas { text-align: center; margin-bottom: 35px; }
+    .header-resenas h1 { color: #0f172a; font-size: 2.2rem; margin: 0 0 12px 0; line-height: 1.25; word-break: break-word; }
     
-    .promedio-caja { background: white; border-radius: 12px; padding: 30px; text-align: center; border: 1px solid #e2e8f0; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .btn-volver-perfil { color: var(--kuxee-blue); text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; padding: 6px 12px; border-radius: 8px; transition: background 0.2s; }
+    .btn-volver-perfil:hover { background: #eff6ff; }
+
+    .promedio-caja { background: white; border-radius: 12px; padding: 30px 20px; text-align: center; border: 1px solid #e2e8f0; margin-bottom: 35px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); box-sizing: border-box; }
     .promedio-numero { font-size: 4rem; font-weight: 900; color: #facc15; display: flex; align-items: center; justify-content: center; gap: 10px; line-height: 1; }
-    .promedio-texto { color: #64748b; font-size: 1.1rem; margin-top: 10px; font-weight: bold; }
+    .promedio-texto { color: #64748b; font-size: 1.05rem; margin-top: 12px; font-weight: bold; }
 
     .lista-resenas { display: flex; flex-direction: column; gap: 20px; }
-    .resena-card { background: white; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .resena-card { background: white; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; }
     .resena-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
-    .cliente-info { display: flex; align-items: center; gap: 10px; }
-    .cliente-avatar { width: 45px; height: 45px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #94a3b8; font-size: 1.2rem; }
-    .cliente-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .cliente-nombre { font-weight: bold; color: #0f172a; font-size: 1.1rem; }
-    .resena-fecha { color: #94a3b8; font-size: 0.85rem; }
     
-    .estrellas { color: #e2e8f0; font-size: 1.2rem; margin-bottom: 15px; }
+    .cliente-info { display: flex; align-items: center; gap: 12px; min-width: 0; width: 100%; }
+    .cliente-avatar { width: 46px; height: 46px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #94a3b8; font-size: 1.2rem; flex-shrink: 0; }
+    .cliente-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .cliente-datos { min-width: 0; flex-grow: 1; }
+    .cliente-nombre { font-weight: bold; color: #0f172a; font-size: 1.05rem; word-break: break-word; }
+    .resena-fecha { color: #94a3b8; font-size: 0.85rem; margin-top: 2px; }
+    
+    .estrellas { color: #e2e8f0; font-size: 1.2rem; margin-bottom: 14px; display: flex; gap: 4px; }
     .estrellas .activa { color: #facc15; }
     
-    .resena-comentario { color: #334155; line-height: 1.6; font-size: 1rem; margin-bottom: 20px; white-space: pre-line; }
+    .resena-comentario { color: #334155; line-height: 1.6; font-size: 1rem; margin-bottom: 18px; white-space: pre-line; word-wrap: break-word; overflow-wrap: break-word; }
     
-    .resena-imagenes { display: flex; gap: 15px; flex-wrap: wrap; }
-    .img-miniatura { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s; }
+    .resena-imagenes { display: flex; gap: 12px; flex-wrap: wrap; }
+    .resena-imagenes a { display: block; border-radius: 8px; overflow: hidden; }
+    .img-miniatura { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s; display: block; }
     .img-miniatura:hover { transform: scale(1.05); }
+
+    .trabajo-evaluado { margin-top: 15px; font-size: 0.85rem; color: #64748b; border-top: 1px dashed #e2e8f0; padding-top: 12px; display: flex; align-items: center; gap: 8px; word-break: break-word; }
+    .trabajo-evaluado i { color: #94a3b8; flex-shrink: 0; }
     
     .empty-state { text-align: center; padding: 50px 20px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
+    @media (max-width: 768px) {
+        .resenas-container { margin: 22px auto; padding: 0 14px; }
+        
+        .header-resenas { margin-bottom: 24px; }
+        .header-resenas h1 { font-size: 1.6rem; }
+
+        .promedio-caja { padding: 22px 16px; margin-bottom: 25px; }
+        .promedio-numero { font-size: 3.1rem; gap: 8px; }
+        .promedio-texto { font-size: 0.95rem; margin-top: 8px; }
+
+        .lista-resenas { gap: 16px; }
+        .resena-card { padding: 18px 16px; }
+        .resena-header { padding-bottom: 12px; margin-bottom: 12px; }
+        
+        .cliente-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
+        .cliente-nombre { font-size: 1rem; }
+        .resena-fecha { font-size: 0.8rem; }
+
+        .estrellas { font-size: 1.1rem; margin-bottom: 12px; }
+        .resena-comentario { font-size: 0.94rem; margin-bottom: 15px; }
+
+        /* En móvil las 3 fotos caben en una sola fila proporcional */
+        .resena-imagenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .resena-imagenes a { width: 100%; aspect-ratio: 1 / 1; }
+        .img-miniatura { width: 100%; height: 100%; }
+
+        .trabajo-evaluado { font-size: 0.82rem; }
+        .empty-state { padding: 35px 16px; }
+    }
 </style>
 {% endblock %}
 
@@ -40,9 +85,9 @@
         <h1>Reseñas de {{ maestro_user.first_name|title|default:maestro_user.username|title }}</h1>
         
         {% if request.user == maestro_user %}
-            <a href="{% url 'mi_perfil' %}" style="color: var(--kuxee-blue); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Volver a mi perfil</a>
+            <a href="{% url 'mi_perfil' %}" class="btn-volver-perfil"><i class="fas fa-arrow-left"></i> Volver a mi perfil</a>
         {% else %}
-            <a href="{% url 'perfil_publico' maestro_user.username %}" style="color: var(--kuxee-blue); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Volver al perfil</a>
+            <a href="{% url 'perfil_publico' maestro_user.username %}" class="btn-volver-perfil"><i class="fas fa-arrow-left"></i> Volver al perfil</a>
         {% endif %}
     </div>
 
@@ -66,7 +111,7 @@
                                 <i class="fas fa-user"></i>
                             {% endif %}
                         </div>
-                        <div>
+                        <div class="cliente-datos">
                             <div class="cliente-nombre">{{ resena.cliente.first_name|title|default:resena.cliente.username|title }}</div>
                             <div class="resena-fecha">{{ resena.fecha_creacion|date:"d de F, Y" }}</div>
                         </div>
@@ -85,33 +130,35 @@
                     <div class="resena-comentario">{{ resena.comentario }}</div>
                 {% endif %}
                 
+                {% if resena.imagen_1 or resena.imagen_2 or resena.imagen_3 %}
                 <div class="resena-imagenes">
                     {% if resena.imagen_1 %}
                         <a href="{{ resena.imagen_1.url }}" target="_blank">
-                            <img src="{{ resena.imagen_1.url }}" class="img-miniatura">
+                            <img src="{{ resena.imagen_1.url }}" class="img-miniatura" alt="Evidencia 1">
                         </a>
                     {% endif %}
                     
                     {% if resena.imagen_2 %}
                         <a href="{{ resena.imagen_2.url }}" target="_blank">
-                            <img src="{{ resena.imagen_2.url }}" class="img-miniatura">
+                            <img src="{{ resena.imagen_2.url }}" class="img-miniatura" alt="Evidencia 2">
                         </a>
                     {% endif %}
                     
                     {% if resena.imagen_3 %}
                         <a href="{{ resena.imagen_3.url }}" target="_blank">
-                            <img src="{{ resena.imagen_3.url }}" class="img-miniatura">
+                            <img src="{{ resena.imagen_3.url }}" class="img-miniatura" alt="Evidencia 3">
                         </a>
                     {% endif %}
                 </div>
+                {% endif %}
                 
-                <div style="margin-top: 15px; font-size: 0.85rem; color: #94a3b8; border-top: 1px dashed #e2e8f0; padding-top: 10px;">
-                    <i class="fas fa-tools"></i> Trabajo evaluado: {{ resena.trato.servicio.titulo }}
+                <div class="trabajo-evaluado">
+                    <i class="fas fa-tools"></i> <span>Trabajo evaluado: {{ resena.trato.servicio.titulo }}</span>
                 </div>
             </div>
         {% empty %}
             <div class="empty-state">
-                <i class="fas fa-star-half-alt" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                <i class="fas fa-star-half-alt" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
                 <h3>Este maestro aún no tiene reseñas</h3>
                 <p>Las evaluaciones aparecerán aquí cuando los clientes finalicen sus tratos.</p>
             </div>

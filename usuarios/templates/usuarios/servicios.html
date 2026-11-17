@@ -4,61 +4,105 @@
 
 {% block extra_css %}
 <style>
-    .main-container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
+    /* Seguridad global contra scroll lateral */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    .main-container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; box-sizing: border-box; }
     
-    .page-header { text-align: center; margin-bottom: 40px; margin-top: 20px; }
-    .page-header h1 { font-size: 2.2rem; font-weight: bold; color: #1e293b; margin-bottom: 10px; }
-    .page-header p { color: #64748b; font-size: 1.05rem; }
+    .page-header { text-align: center; margin-bottom: 35px; margin-top: 15px; }
+    .page-header h1 { font-size: 2.2rem; font-weight: bold; color: #1e293b; margin: 0 0 10px 0; }
+    .page-header p { color: #64748b; font-size: 1.05rem; margin: 0; }
 
     /* CONTENEDOR DE FILTROS */
-    .filtros-container { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 25px; margin-bottom: 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .filtros-container { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 25px; margin-bottom: 35px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; }
     .filtros-form { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
     
-    .filtro-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 280px; position: relative; }
+    .filtro-group { display: flex; flex-direction: column; flex: 1 1 260px; min-width: 0; position: relative; }
     .filtro-label { font-size: 0.9rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
     
     .filtros-botones { display: flex; gap: 10px; align-items: flex-end; }
-    .btn-filtrar { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 45px;}
+    .btn-filtrar { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 45px; box-sizing: border-box; }
     .btn-filtrar:hover { background: #2563eb; }
-    .btn-limpiar { background: #f1f5f9; color: #64748b; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: all 0.2s; font-size: 0.95rem; border: 1px solid #e2e8f0; height: 45px; display: inline-flex; align-items: center;}
+    .btn-limpiar { background: #f1f5f9; color: #64748b; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; transition: all 0.2s; font-size: 0.95rem; border: 1px solid #e2e8f0; height: 45px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
     .btn-limpiar:hover { background: #e2e8f0; color: #334155; }
 
     /* DISEÑO PERSONALIZADO TIPO "KUXEE" PARA LOS DROPDOWNS */
-    .kuxee-dropdown { width: 100%; position: relative; user-select: none; }
-    .kuxee-dropdown-header { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #475569; font-size: 0.95rem; transition: border-color 0.2s; height: 45px; box-sizing: border-box; }
+    .kuxee-dropdown { width: 100%; position: relative; user-select: none; box-sizing: border-box; }
+    .kuxee-dropdown-header { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #475569; font-size: 0.95rem; transition: border-color 0.2s; height: 45px; box-sizing: border-box; }
+    .kuxee-dropdown-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .kuxee-dropdown.open .kuxee-dropdown-header { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     
-    .kuxee-dropdown-menu { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; max-height: 350px; overflow-y: auto; display: none; }
+    .kuxee-dropdown-menu { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 100; max-height: 340px; overflow-y: auto; display: none; -webkit-overflow-scrolling: touch; }
     .kuxee-dropdown.open .kuxee-dropdown-menu { display: block; }
     
     /* Grupos y Botón "Marcar región completa" */
-    .kuxee-dropdown-group-header { padding: 10px 15px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 2; }
-    .kuxee-group-title { color: #5b21b6; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; }
-    .kuxee-select-all { background: #f3e8ff; color: #7e22ce; border: none; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 5px; }
+    .kuxee-dropdown-group-header { padding: 10px 15px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 2; }
+    .kuxee-group-title { color: #5b21b6; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; line-height: 1.3; }
+    .kuxee-select-all { background: #f3e8ff; color: #7e22ce; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .kuxee-select-all:hover { background: #e9d5ff; }
     
     /* Opciones individuales */
-    .kuxee-option { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.2s; margin: 0; }
+    .kuxee-option { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.2s; margin: 0; }
     .kuxee-option:hover { background: #f8fafc; }
     .kuxee-option input[type="checkbox"] { display: none; }
     .kuxee-option-text { color: #2563eb; font-weight: bold; font-size: 0.95rem; }
-    .kuxee-check-icon { color: #4f46e5; opacity: 0; transition: opacity 0.2s; font-size: 1.1rem; }
+    .kuxee-check-icon { color: #4f46e5; opacity: 0; transition: opacity 0.2s; font-size: 1.1rem; flex-shrink: 0; }
     .kuxee-option input[type="checkbox"]:checked ~ .kuxee-check-icon { opacity: 1; }
 
     /* Grilla de Servicios */
-    .servicios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
-    .servicio-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .servicios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; margin-bottom: 40px; }
+    .servicio-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; min-width: 0; }
     .servicio-card:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(0,0,0,0.1); }
-    .servicio-img { width: 100%; height: 160px; object-fit: cover; border-bottom: 1px solid #e2e8f0; }
-    .servicio-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+    .servicio-img { width: 100%; height: 170px; object-fit: cover; border-bottom: 1px solid #e2e8f0; }
+    .servicio-content { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
     
-    .servicio-title { font-weight: bold; color: var(--kuxee-dark); font-size: 1.1rem; margin: 0 0 8px 0; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px; text-transform: capitalize; }
-    .servicio-desc { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; }
+    .servicio-title { font-weight: bold; color: var(--kuxee-dark); font-size: 1.1rem; margin: 0 0 8px 0; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 44px; text-transform: capitalize; }
+    .servicio-desc { font-size: 0.85rem; color: #64748b; margin: 0 0 15px 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; }
     
     .servicio-price-pill { border: 1px solid #fcd34d; background: #fffbeb; border-radius: 20px; padding: 6px 12px; font-size: 0.9rem; font-weight: bold; color: #d97706; display: inline-block; text-align: center; margin-bottom: 15px; margin-right: auto; }
     
-    .servicio-footer-row { font-size: 0.8rem; color: var(--kuxee-blue); display: flex; align-items: center; gap: 8px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;}
-    .servicio-footer-row i { width: 14px; text-align: center; }
+    .servicio-footer-row { font-size: 0.82rem; color: var(--kuxee-blue); display: flex; align-items: center; gap: 8px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .servicio-footer-row i { width: 14px; text-align: center; flex-shrink: 0; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
+    @media (max-width: 900px) {
+        .main-container { padding: 25px 20px; }
+    }
+
+    @media (max-width: 768px) {
+        .main-container { padding: 20px 14px; }
+        
+        .page-header { margin-bottom: 24px; margin-top: 10px; }
+        .page-header h1 { font-size: 1.65rem; }
+        .page-header p { font-size: 0.92rem; }
+
+        .filtros-container { padding: 16px; margin-bottom: 25px; }
+        .filtros-form { flex-direction: column; align-items: stretch; gap: 15px; }
+        .filtro-group { flex: 1 1 auto; width: 100%; }
+
+        .filtros-botones { width: 100%; margin-top: 4px; }
+        .btn-filtrar { flex: 2; }
+        .btn-limpiar { flex: 1; }
+
+        .kuxee-dropdown-menu { max-height: 280px; }
+        .kuxee-dropdown-group-header { padding: 10px 12px; }
+        .kuxee-select-all { font-size: 0.72rem; padding: 4px 9px; }
+
+        .servicios-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .servicio-img { height: 140px; }
+        .servicio-content { padding: 12px; }
+        .servicio-title { font-size: 0.98rem; height: 40px; }
+        .servicio-price-pill { font-size: 0.82rem; padding: 5px 10px; margin-bottom: 10px; }
+    }
+
+    @media (max-width: 480px) {
+        .servicios-grid { grid-template-columns: 1fr; gap: 16px; }
+        .servicio-img { height: 175px; }
+        .servicio-content { padding: 15px; }
+        .servicio-title { font-size: 1.05rem; height: auto; max-height: 44px; }
+    }
 </style>
 {% endblock %}
 
@@ -187,7 +231,7 @@
             
         </div>
         {% empty %}
-        <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 60px; background: white; border-radius: 12px; border: 1px dashed #cbd5e1;">
+        <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 40px 20px; background: white; border-radius: 12px; border: 1px dashed #cbd5e1;">
             <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
             <h3>No se encontraron servicios</h3>
             <p>Prueba cambiando los filtros de búsqueda o limpia los filtros para ver todos.</p>
@@ -225,7 +269,6 @@
             const isOficio = dropdown.id === 'dropdown-oficios';
             const defaultText = isOficio ? "Todos los oficios" : "Todas las comunas";
 
-            // Función para actualizar el texto del encabezado
             function updateHeaderText() {
                 const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
                 const isOpen = dropdown.classList.contains('open');
@@ -241,10 +284,8 @@
                 }
             }
 
-            // Abrir/Cerrar el menú
             header.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Cerrar otros dropdowns
                 dropdowns.forEach(d => {
                     if (d !== dropdown) {
                         d.classList.remove('open');
@@ -258,23 +299,19 @@
                 updateHeaderText();
             });
 
-            // Al hacer clic en una opción (checkbox)
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', updateHeaderText);
             });
 
-            // Botón "Marcar región completa" o "Marcar grupo completo"
             selectAllBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Evitar que se cierre el menú
+                    e.stopPropagation();
                     const groupId = btn.getAttribute('data-group');
                     const groupContainer = dropdown.querySelector(`.kuxee-dropdown-options[data-group-id="${groupId}"]`);
                     const groupCheckboxes = groupContainer.querySelectorAll('input[type="checkbox"]');
                     
-                    // Verificar si todos están marcados
                     const allChecked = Array.from(groupCheckboxes).every(cb => cb.checked);
                     
-                    // Si todos están marcados, los desmarcamos. Si no, marcamos todos.
                     groupCheckboxes.forEach(cb => {
                         cb.checked = !allChecked;
                     });
@@ -283,11 +320,9 @@
                 });
             });
 
-            // Actualización inicial
             updateHeaderText();
         });
 
-        // Cerrar dropdowns si se hace clic fuera de ellos
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.kuxee-dropdown')) {
                 dropdowns.forEach(d => {

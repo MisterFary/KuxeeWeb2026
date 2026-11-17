@@ -4,44 +4,85 @@
 
 {% block extra_css %}
 <style>
-    .register-wrapper { display: flex; justify-content: center; padding: 40px 20px; }
-    .register-card { background: white; width: 100%; max-width: 550px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    /* Seguridad global contra scroll lateral */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    .register-wrapper { display: flex; justify-content: center; padding: 40px 20px; box-sizing: border-box; }
+    .register-card { background: white; width: 100%; max-width: 550px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; box-sizing: border-box; }
     .register-title { text-align: center; color: var(--kuxee-blue); font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; font-weight: bold; }
     
-    .form-group { margin-bottom: 15px; }
-    .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; }
+    /* Blindaje para todos los inputs generados por Django */
+    .form-group { margin-bottom: 16px; }
+    .register-card input[type="text"],
+    .register-card input[type="email"],
+    .register-card input[type="password"],
+    .register-card input[type="tel"],
+    .register-card input[type="number"],
+    .form-control { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s; }
+    
+    .register-card input:focus,
     .form-control:focus { border-color: var(--kuxee-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     
-    .role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; margin-top: 10px; }
-    .role-option { border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    /* Selector de Rol (Cliente / Maestro) */
+    .role-selector { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin-bottom: 20px; margin-top: 10px; }
+    .role-option { border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px 12px; text-align: center; cursor: pointer; transition: all 0.2s; box-sizing: border-box; }
     .role-option:hover { border-color: #cbd5e1; background: #f8fafc; }
     .role-option.active { border-color: var(--kuxee-blue); background: #eff6ff; }
     .role-title { font-weight: bold; color: var(--kuxee-dark); font-size: 1.1rem; margin-bottom: 5px; }
     .role-option.active .role-title { color: var(--kuxee-blue); }
-    .role-desc { font-size: 0.8rem; color: #64748b; }
+    .role-desc { font-size: 0.82rem; color: #64748b; }
     
-    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 20px; }
+    .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 20px; box-sizing: border-box; }
     .btn-submit:hover { background: #2563eb; }
 
     /* Custom Dropdown Comunas y Oficios */
-    .custom-select-wrapper { position: relative; width: 100%; user-select: none; font-family: inherit; }
-    .custom-select-trigger { border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 8px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; color: #1e293b; }
-    .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; max-height: 350px; overflow-y: auto; display: none; }
+    .custom-select-wrapper { position: relative; width: 100%; user-select: none; font-family: inherit; box-sizing: border-box; }
+    .custom-select-trigger { border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 8px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 1rem; color: #1e293b; box-sizing: border-box; }
+    .custom-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .custom-select-menu { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 100; max-height: 320px; overflow-y: auto; display: none; -webkit-overflow-scrolling: touch; }
     .custom-select-menu.open { display: block; }
     
     .region-group { border-bottom: 1px solid #e2e8f0; }
-    .region-header { background: #f8fafc; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #e2e8f0; }
-    .region-name { font-weight: bold; color: #6d28d9; font-size: 0.85rem; text-transform: uppercase; }
-    .btn-region { background: #eff6ff; color: #4f46e5; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .region-header { background: #f8fafc; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #e2e8f0; }
+    .region-name { font-weight: bold; color: #6d28d9; font-size: 0.82rem; text-transform: uppercase; line-height: 1.3; }
+    .btn-region { background: #eff6ff; color: #4f46e5; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; white-space: nowrap; }
     .btn-region:hover { background: #e0e7ff; }
     .btn-region.active { background: #10b981; color: white; }
     
-    .comunas-list { padding: 5px 0; background: white; }
-    .comuna-item { padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: #1e293b; transition: background 0.2s; }
+    .comunas-list { padding: 4px 0; background: white; }
+    .comuna-item { padding: 11px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: #1e293b; transition: background 0.2s; }
     .comuna-item:hover { background: #f1f5f9; }
-    .comuna-item .check-icon { display: none; color: #4f46e5; }
+    .comuna-item .check-icon { display: none; color: #4f46e5; flex-shrink: 0; }
     .comuna-item.selected { background: #eff6ff; color: #4f46e5; font-weight: bold; }
     .comuna-item.selected .check-icon { display: block; }
+
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
+    @media (max-width: 768px) {
+        .register-wrapper { padding: 20px 12px; }
+        .register-card { padding: 25px 18px; border-radius: 10px; }
+        .register-title { font-size: 1.55rem; margin-bottom: 22px; }
+        
+        .role-selector { gap: 10px; }
+        .role-option { padding: 12px 8px; }
+        .role-title { font-size: 1rem; }
+        .role-desc { font-size: 0.75rem; }
+
+        .custom-select-trigger { padding: 11px 12px; font-size: 0.95rem; }
+        .custom-select-menu { max-height: 270px; }
+
+        /* En móvil el botón de marcar región se adapta limpiamente sin apretar el título */
+        .region-header { padding: 10px 12px; }
+        .btn-region { font-size: 0.72rem; padding: 5px 10px; }
+        .comuna-item { padding: 12px 14px; font-size: 0.92rem; }
+        
+        .btn-submit { padding: 14px; font-size: 1rem; }
+    }
+
+    @media (max-width: 360px) {
+        .role-selector { grid-template-columns: 1fr; }
+    }
 </style>
 {% endblock %}
 
@@ -78,7 +119,7 @@
             
             <!-- Selector de Comunas -->
             <div class="form-group" style="position: relative;">
-                <label style="font-weight: bold; font-size: 0.9rem; color: #475569; display: block; margin-bottom: 5px;">
+                <label style="font-weight: bold; font-size: 0.9rem; color: #475569; display: block; margin-bottom: 5px; line-height: 1.4;">
                     Comunas * <small style="font-weight: normal; color: #94a3b8;">(hasta 10 individuales o una región completa)</small>
                 </label>
                 
@@ -119,7 +160,7 @@
 
             <!-- Selector de Oficios -->
             <div class="form-group" id="campo-oficios" style="display: none; position: relative;">
-                <label style="font-weight: bold; font-size: 0.9rem; color: #475569; display: block; margin-bottom: 5px;">
+                <label style="font-weight: bold; font-size: 0.9rem; color: #475569; display: block; margin-bottom: 5px; line-height: 1.4;">
                     Oficios * <small style="font-weight: normal; color: #94a3b8;">(máximo 3 al registrarte; con plan Plus 6)</small>
                 </label>
                 
@@ -218,7 +259,7 @@
                 document.querySelectorAll('.comuna-opcion').forEach(item => item.classList.remove('selected'));
             }
             btn.classList.add('active');
-            btn.innerHTML = '✓ Región completa activa (click para quitar)';
+            btn.innerHTML = '✓ Región completa activa';
             selectedComunas.add(val);
             isRegionActive = true;
         }
@@ -269,9 +310,9 @@
         
         const triggerText = document.getElementById(type + '-trigger-text');
         if (forceCount) {
-            triggerText.innerText = forceCount + ' seleccionados · toca aquí para cerrar';
+            triggerText.innerText = forceCount + ' seleccionados · toca para cerrar';
         } else if (selectedSet.size > 0) {
-            triggerText.innerText = selectedSet.size + ' seleccionados · toca aquí para cerrar';
+            triggerText.innerText = selectedSet.size + ' seleccionados · toca para cerrar';
         } else {
             triggerText.innerText = type === 'comunas' ? 'Selecciona comuna(s)' : 'Selecciona oficio(s)';
         }
