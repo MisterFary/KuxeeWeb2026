@@ -39,11 +39,35 @@ class PerfilMaestro(models.Model):
     comuna = models.CharField(max_length=100, blank=True)
     descripcion = models.TextField(blank=True)
     oficio_principal = models.CharField(max_length=100, blank=True)
+    papel_antecedentes = models.FileField(
+        upload_to='antecedentes/',
+        blank=True,
+        null=True,
+        verbose_name="Papel de antecedentes"
+    )
+    fecha_antecedentes = models.DateTimeField(blank=True, null=True)
     plan_actual = models.CharField(
         max_length=20, 
         choices=[('gratis', 'Gratis'), ('plus', 'Plus')], 
         default='gratis'
     )
+
+    @property
+    def max_certificados(self):
+        """Plan Plus: hasta 3 certificados. Plan Gratis: máximo 1 certificado."""
+        return 3 if self.plan_actual == 'plus' else 1
+
+    @property
+    def perfil_completo(self):
+        """Es obligatorio tener datos básicos Y el papel de antecedentes subido."""
+        return bool(
+            self.usuario.foto_perfil
+            and self.telefono
+            and self.comuna
+            and self.descripcion
+            and self.oficio_principal
+            and self.papel_antecedentes
+        )
 
     def __str__(self):
         return self.usuario.username

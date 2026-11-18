@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-    .form-container { max-width: 700px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .form-container { max-width: 720px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
     .page-title { color: var(--kuxee-dark); margin-bottom: 10px; font-size: 2rem; }
     .page-subtitle { color: #64748b; margin-bottom: 30px; font-size: 1rem; }
     
@@ -20,15 +20,56 @@
     .btn-submit { background: var(--kuxee-blue); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; cursor: pointer; width: 70%; transition: background 0.3s; box-sizing: border-box; }
     .btn-submit:hover { background: #2563eb; }
 
+    /* SECCIÓN DOCUMENTACIÓN Y CERTIFICADOS DEL MAESTRO */
+    .docs-section { margin-top: 30px; padding-top: 25px; border-top: 2px solid #f1f5f9; }
+    .docs-section-title { font-size: 1.25rem; color: #0f172a; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px; }
+    .docs-section-desc { color: #64748b; font-size: 0.9rem; margin: 0 0 20px 0; line-height: 1.45; }
+
+    .doc-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .doc-card.obligatorio-pendiente { background: #fffbeb; border-color: #fde68a; }
+    .doc-card.obligatorio-ok { background: #f0fdf4; border-color: #bbf7d0; }
+
+    .doc-card-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .doc-card-title { font-weight: 700; color: #1e293b; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+
+    .badge-doc { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+    .badge-doc.pendiente { background: #fef3c7; color: #b45309; }
+    .badge-doc.ok { background: #dcfce7; color: #15803d; }
+    .badge-doc.plan { background: #ede9fe; color: #6d28d9; }
+
+    .doc-archivo-actual { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: white; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px; flex-wrap: wrap; }
+    .doc-link { color: #2563eb; font-weight: 600; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+    .doc-link:hover { text-decoration: underline; }
+
+    .cert-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .cert-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: white; padding: 12px 14px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .cert-info { min-width: 0; }
+    .cert-titulo { font-weight: 700; color: #0f172a; font-size: 0.95rem; word-break: break-word; }
+    .cert-fecha { font-size: 0.8rem; color: #64748b; }
+    .cert-acciones { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .btn-ver-doc { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.83rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-ver-doc:hover { background: #dbeafe; }
+    .btn-eliminar-doc { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.83rem; font-weight: 600; }
+    .btn-eliminar-doc:hover { background: #dc2626; color: white; }
+
+    .nuevo-cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+    .file-hint { font-size: 0.8rem; color: #64748b; margin-top: 6px; }
+
+    .upgrade-box { background: #f5f3ff; border: 1px dashed #c4b5fd; border-radius: 8px; padding: 14px; font-size: 0.9rem; color: #5b21b6; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-upgrade-mini { background: #7c3aed; color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
+    .btn-upgrade-mini:hover { background: #6d28d9; }
+
     /* DISEÑO RESPONSIVO (CELULARES) */
     @media (max-width: 600px) {
         .form-container { margin: 20px 15px; padding: 25px 20px; }
         .page-title { font-size: 1.6rem; }
-        .name-grid { grid-template-columns: 1fr; gap: 0; }
+        .name-grid, .nuevo-cert-grid { grid-template-columns: 1fr; gap: 10px; }
         .btn-row { flex-direction: column-reverse; gap: 10px; }
         .btn-cancel { width: 100%; }
         .btn-submit { width: 100%; }
-        .form-control { font-size: 1rem; } /* Evita zoom automático en iPhone */
+        .form-control { font-size: 1rem; }
+        .cert-item { flex-direction: column; align-items: flex-start; }
     }
 </style>
 {% endblock %}
@@ -36,9 +77,9 @@
 {% block contenido %}
 <div class="form-container">
     <h1 class="page-title"><i class="fas fa-user-edit"></i> Editar mi perfil</h1>
-    <p class="page-subtitle">Actualiza tu información personal y de contacto.</p>
+    <p class="page-subtitle">Actualiza tu información personal, de contacto y documentación.</p>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="name-grid">
@@ -76,10 +117,110 @@
             </select>
         </div>
 
-        {% if user.es_maestro %}
+        {% if user.es_maestro and perfil_maestro %}
         <div class="form-group">
             <label>Descripción sobre ti (Biografía)</label>
-            <textarea name="descripcion" class="form-control" placeholder="Cuéntale a tus clientes sobre tu experiencia y forma de trabajar...">{{ user.perfil_maestro.descripcion }}</textarea>
+            <textarea name="descripcion" class="form-control" placeholder="Cuéntale a tus clientes sobre tu experiencia y forma de trabajar...">{{ perfil_maestro.descripcion }}</textarea>
+        </div>
+
+        <!-- DOCUMENTACIÓN Y CERTIFICADOS DEL MAESTRO -->
+        <div class="docs-section">
+            <h2 class="docs-section-title"><i class="fas fa-shield-alt" style="color: var(--kuxee-blue);"></i> Verificación y Certificados</h2>
+            <p class="docs-section-desc">
+                Estos documentos serán visibles en tu perfil público para generar mayor confianza en los clientes que visiten Kuxee.
+            </p>
+
+            <!-- 1. PAPEL DE ANTECEDENTES (OBLIGATORIO) -->
+            <div class="doc-card {% if perfil_maestro.papel_antecedentes %}obligatorio-ok{% else %}obligatorio-pendiente{% endif %}">
+                <div class="doc-card-header">
+                    <span class="doc-card-title">
+                        <i class="fas fa-file-contract" style="color: {% if perfil_maestro.papel_antecedentes %}#16a34a{% else %}#d97706{% endif %};"></i>
+                        Papel de Antecedentes <span style="color: #dc2626;">*</span>
+                    </span>
+                    {% if perfil_maestro.papel_antecedentes %}
+                        <span class="badge-doc ok"><i class="fas fa-check-circle"></i> Subido</span>
+                    {% else %}
+                        <span class="badge-doc pendiente"><i class="fas fa-exclamation-circle"></i> Obligatorio pendiente</span>
+                    {% endif %}
+                </div>
+
+                {% if perfil_maestro.papel_antecedentes %}
+                    <div class="doc-archivo-actual">
+                        <span style="font-size: 0.88rem; color: #334155;">
+                            Documento cargado {% if perfil_maestro.fecha_antecedentes %}el {{ perfil_maestro.fecha_antecedentes|date:"d/m/Y" }}{% endif %}
+                        </span>
+                        <a href="{{ perfil_maestro.papel_antecedentes.url }}" target="_blank" class="btn-ver-doc">
+                            <i class="fas fa-external-link-alt"></i> Ver documento actual
+                        </a>
+                    </div>
+                {% endif %}
+
+                <label style="font-size: 0.9rem; margin-bottom: 6px;">
+                    {% if perfil_maestro.papel_antecedentes %}Reemplazar papel de antecedentes (opcional):{% else %}Subir papel de antecedentes (obligatorio):{% endif %}
+                </label>
+                <input type="file" name="papel_antecedentes" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" {% if not perfil_maestro.papel_antecedentes %}required{% endif %}>
+                <div class="file-hint">Formatos permitidos: PDF, JPG, PNG o WEBP.</div>
+            </div>
+
+            <!-- 2. CERTIFICADOS PROFESIONALES (1 GRATIS / 3 PLUS) -->
+            <div class="doc-card">
+                <div class="doc-card-header">
+                    <span class="doc-card-title">
+                        <i class="fas fa-award" style="color: #8b5cf6;"></i>
+                        Certificados Profesionales ({{ certificados|length }}/{{ max_certificados }})
+                    </span>
+                    <span class="badge-doc plan">
+                        {% if perfil_maestro.plan_actual == 'plus' %}
+                            Plan Plus ⭐ (hasta 3)
+                        {% else %}
+                            Plan Gratis (máx. 1)
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if certificados %}
+                    <div class="cert-list">
+                        {% for cert in certificados %}
+                        <div class="cert-item">
+                            <div class="cert-info">
+                                <div class="cert-titulo"><i class="fas fa-certificate" style="color: #f59e0b;"></i> {{ cert.titulo }}</div>
+                                <div class="cert-fecha">Subido el {{ cert.fecha_subida|date:"d/m/Y" }}</div>
+                            </div>
+                            <div class="cert-acciones">
+                                <a href="{{ cert.archivo.url }}" target="_blank" class="btn-ver-doc">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <button type="button" class="btn-eliminar-doc" title="Eliminar certificado" onclick="confirmarEliminarCertificado({{ cert.id }}, '{{ cert.titulo|escapejs }}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if puede_subir_certificado %}
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 0.9rem; margin-bottom: 6px;">Agregar nuevo certificado (opcional):</label>
+                        <div class="nuevo-cert-grid">
+                            <input type="text" name="titulo_certificado" class="form-control" placeholder="Ej: Certificación SEC Clase A" maxlength="100">
+                            <input type="file" name="archivo_certificado" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp">
+                        </div>
+                        <div class="file-hint">Escribe el nombre del título o curso y adjunta el archivo (PDF, JPG, PNG o WEBP).</div>
+                    </div>
+                {% else %}
+                    {% if perfil_maestro.plan_actual == 'gratis' %}
+                        <div class="upgrade-box">
+                            <span>Ya usaste tu <strong>1 certificado</strong> incluido en el Plan Gratis. Con <strong>Maestro Plus</strong> puedes subir hasta <strong>3 certificados</strong>.</span>
+                            <a href="{% url 'planes' %}" class="btn-upgrade-mini">Subir a Plus ⭐</a>
+                        </div>
+                    {% else %}
+                        <p style="margin: 0; font-size: 0.88rem; color: #64748b;">
+                            Ya alcanzaste el máximo de 3 certificados profesionales. Si deseas reemplazar uno, elimina primero uno de los anteriores.
+                        </p>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
         {% endif %}
 
@@ -87,6 +228,12 @@
             <a href="{% url 'mi_perfil' %}" class="btn-cancel">Cancelar</a>
             <button type="submit" class="btn-submit">Guardar Cambios</button>
         </div>
+    </form>
+
+    <!-- Formulario oculto para eliminar certificados individuales sin anidar forms -->
+    <form method="POST" id="form-eliminar-certificado" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="eliminar_certificado_id" id="input-eliminar-certificado-id" value="">
     </form>
 </div>
 {% endblock %}
@@ -98,5 +245,24 @@
             width: '100%'
         });
     });
+
+    function confirmarEliminarCertificado(certId, titulo) {
+        Swal.fire({
+            title: '¿Eliminar certificado?',
+            text: 'Se eliminará "' + titulo + '" de tu perfil.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('input-eliminar-certificado-id').value = certId;
+                document.getElementById('form-eliminar-certificado').submit();
+            }
+        });
+    }
 </script>
 {% endblock %}
