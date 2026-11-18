@@ -969,6 +969,23 @@ def panel_admin(request):
             messages.success(request, f'¡Banner activado y publicado para {banner.usuario.username}!')
             return redirect('panel_admin')
 
+        # --- GESTIONAR REPORTES DE PROBLEMAS (FOOTER) ---
+        elif 'toggle_reporte' in request.POST:
+            reporte_id = request.POST.get('reporte_id')
+            reporte = get_object_or_404(ReporteProblema, id=reporte_id)
+            reporte.resuelto = not reporte.resuelto
+            reporte.save()
+            estado_txt = "resuelto" if reporte.resuelto else "pendiente"
+            messages.success(request, f'Reporte #{reporte.id} marcado como {estado_txt}.')
+            return redirect('panel_admin')
+
+        elif 'eliminar_reporte' in request.POST:
+            reporte_id = request.POST.get('reporte_id')
+            reporte = get_object_or_404(ReporteProblema, id=reporte_id)
+            reporte.delete()
+            messages.success(request, 'Reporte eliminado correctamente.')
+            return redirect('panel_admin')
+
     # =========================================================
     # 1. ESTADÍSTICAS GENERALES Y CÁLCULO DINÁMICO DE TRATOS
     # =========================================================
@@ -989,17 +1006,14 @@ def panel_admin(request):
         
         ingresos_tratos += precio
         
-        # Verificar si es trato de este mes
         if trato.fecha_creacion.year == now.year and trato.fecha_creacion.month == now.month:
             ingresos_tratos_mes += precio
             tratos_mes += 1
             
-        # Verificar si es trato de HOY (Día actual)
         if trato.fecha_creacion.date() == now.date():
             ingresos_tratos_hoy += precio
             tratos_hoy_count += 1
             
-        # Agrupar para el gráfico de 6 meses
         mes_key = (trato.fecha_creacion.year, trato.fecha_creacion.month)
         ganancias_tratos_dict[mes_key] = ganancias_tratos_dict.get(mes_key, 0) + precio
 
@@ -1019,9 +1033,7 @@ def panel_admin(request):
     clientes_premium_mes = PerfilCliente.objects.filter(plan_actual='premium', usuario__date_joined__year=now.year, usuario__date_joined__month=now.month).count()
     ingresos_premium_mes = clientes_premium_mes * 6990
 
-    # =========================================================
-    # NUEVOS KPIs: Planes SOLO de HOY
-    # =========================================================
+    # Planes SOLO de HOY
     maestros_plus_hoy = PerfilMaestro.objects.filter(
         plan_actual='plus', 
         usuario__date_joined__year=now.year, 
@@ -1042,11 +1054,9 @@ def panel_admin(request):
     suma_banners = BannerDestacado.objects.aggregate(total=Sum('monto_pagado'))['total']
     ingresos_banners = suma_banners if suma_banners else 0
     
-    # Banners SOLO de este mes
     banners_mes_obj = BannerDestacado.objects.exclude(estado='pendiente_pago').filter(fecha_pago__year=now.year, fecha_pago__month=now.month).aggregate(total=Sum('monto_pagado'))['total']
     ingresos_banners_mes = banners_mes_obj if banners_mes_obj else 0
 
-    # Totales sumados
     ingresos_totales = ingresos_tratos + ingresos_plus + ingresos_premium + ingresos_banners
     ingresos_mes_total = ingresos_tratos_mes + ingresos_plus_mes + ingresos_premium_mes + ingresos_banners_mes 
 
@@ -1070,22 +1080,18 @@ def panel_admin(request):
     meses_clientes = [item['mes'].strftime('%m/%Y') for item in clientes_mensuales if item['mes']]
     cantidades_clientes_linea = [item['total'] for item in clientes_mensuales if item['mes']]
 
-    # Ganancias mensuales (Últimos 6 meses asegurados)
+    # Ganancias mensuales
     banners_por_mes = BannerDestacado.objects.exclude(estado='pendiente_pago').annotate(mes=TruncMonth('fecha_pago')).values('mes').annotate(total=Sum('monto_pagado'))
     maestros_plus_historial = PerfilMaestro.objects.filter(plan_actual='plus').annotate(mes=TruncMonth('usuario__date_joined')).values('mes').annotate(total=Count('id'))
     clientes_premium_historial = PerfilCliente.objects.filter(plan_actual='premium').annotate(mes=TruncMonth('usuario__date_joined')).values('mes').annotate(total=Count('id'))
 
     ganancias_dict = {}
-    
     for key, val in ganancias_tratos_dict.items():
         ganancias_dict[key] = ganancias_dict.get(key, 0) + val
-            
     for b in banners_por_mes:
         if b['mes']: ganancias_dict[(b['mes'].year, b['mes'].month)] = ganancias_dict.get((b['mes'].year, b['mes'].month), 0) + (b['total'] or 0)
-
     for m in maestros_plus_historial:
         if m['mes']: ganancias_dict[(m['mes'].year, m['mes'].month)] = ganancias_dict.get((m['mes'].year, m['mes'].month), 0) + (m['total'] * 9990)
-
     for c in clientes_premium_historial:
         if c['mes']: ganancias_dict[(c['mes'].year, c['mes'].month)] = ganancias_dict.get((c['mes'].year, c['mes'].month), 0) + (c['total'] * 6990)
             
@@ -1110,6 +1116,10 @@ def panel_admin(request):
 
     banners_pendientes = BannerDestacado.objects.filter(estado='en_diseno').order_by('fecha_pago')
     banners_activos = BannerDestacado.objects.filter(estado='activo', fecha_expiracion__gt=now).order_by('posicion')
+
+    # Reportes enviados desde el footer (Pendientes primero)
+    reportes_problemas = ReporteProblema.objects.select_related('usuario').order_by('resuelto', '-fecha_creacion')
+    reportes_pendientes_count = ReporteProblema.objects.filter(resuelto=False).count()
 
     context = {
         'tratos_exitosos': tratos_exitosos.count(),
@@ -1141,6 +1151,8 @@ def panel_admin(request):
         'ingresos_plus_hoy': ingresos_plus_hoy,
         'clientes_premium_hoy': clientes_premium_hoy,
         'ingresos_premium_hoy': ingresos_premium_hoy,
+        'reportes_problemas': reportes_problemas,
+        'reportes_pendientes_count': reportes_pendientes_count,
     }
     return render(request, 'usuarios/panel_admin.html', context)
 

@@ -31,13 +31,13 @@
     .kpi-diario-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
     .kpi-diario-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 0; }
 
-    /* Contenedores Grid (min-width: 0 es vital para que las tablas no rompan el grid) */
+    /* Contenedores Grid */
     .content-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; margin-bottom: 30px; }
     .full-width-section { grid-column: 1 / -1; }
     
     .panel-section { background: white; border-radius: 10px; border: 1px solid #e2e8f0; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; min-width: 0; box-sizing: border-box; }
     .content-grid .panel-section { margin-bottom: 0; }
-    .section-title { font-size: 1.2rem; font-weight: bold; color: #0f172a; margin-top: 0; margin-bottom: 20px; }
+    .section-title { font-size: 1.2rem; font-weight: bold; color: #0f172a; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
     /* Gráficos */
     .chart-container { position: relative; height: 320px; width: 100%; display: flex; justify-content: center; align-items: center; }
@@ -63,6 +63,15 @@
     .btn-guardar-plan { background: #10b981; color: white; border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; flex-shrink: 0; }
     .btn-guardar-plan:hover { background: #059669; }
 
+    /* Botones Reportes de Problemas */
+    .reporte-acciones { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
+    .btn-reporte-toggle { background: #3b82f6; color: white; border: none; padding: 7px 11px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: bold; white-space: nowrap; transition: background 0.2s; }
+    .btn-reporte-toggle:hover { background: #2563eb; }
+    .btn-reporte-toggle.reabrir { background: #64748b; }
+    .btn-reporte-toggle.reabrir:hover { background: #475569; }
+    .btn-reporte-eliminar { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: bold; transition: all 0.2s; }
+    .btn-reporte-eliminar:hover { background: #dc2626; color: white; }
+
     /* Modal Administrar Banner */
     .admin-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
     .admin-modal-box { background: white; width: 100%; max-width: 500px; border-radius: 12px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
@@ -86,7 +95,6 @@
         .dashboard-header h1 { font-size: 1.4rem; }
         .btn-volver { width: 100%; justify-content: center; }
         
-        /* En móvil mostramos 2 tarjetas KPI por fila para aprovechar el espacio, y 1 en pantallas muy chicas */
         .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
         .kpi-card { padding: 16px 14px; }
         .kpi-value { font-size: 1.5rem; }
@@ -96,12 +104,10 @@
         .panel-section { padding: 16px 14px; margin-bottom: 20px; }
         .section-title { font-size: 1.05rem; margin-bottom: 15px; }
         
-        /* Alturas optimizadas para gráficos en móvil */
         .chart-container.chart-lg { height: 260px; }
         .chart-container.chart-sm { height: 220px; }
-        .chart-container.chart-pie { height: 360px; } /* Más alto para acomodar la leyenda abajo */
+        .chart-container.chart-pie { height: 360px; }
 
-        /* Tablas más compactas en móvil */
         th, td { padding: 10px; font-size: 0.85rem; }
         
         .admin-modal-box { padding: 20px 15px; }
@@ -428,6 +434,92 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- PROBLEMAS REPORTADOS DESDE EL FOOTER -->
+    <div class="panel-section full-width-section">
+        <h2 class="section-title" style="color: #ef4444;">
+            <i class="fas fa-exclamation-triangle"></i> Problemas Reportados desde el Footer
+            {% if reportes_pendientes_count > 0 %}
+                <span class="badge badge-incompleto">{{ reportes_pendientes_count }} pendiente{% if reportes_pendientes_count != 1 %}s{% endif %}</span>
+            {% endif %}
+        </h2>
+
+        <div class="table-responsive">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Usuario</th>
+                            <th>Página Origen</th>
+                            <th>Descripción del Problema</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reporte in reportes_problemas %}
+                        <tr {% if reporte.resuelto %}style="background: #f8fafc; opacity: 0.8;"{% endif %}>
+                            <td style="white-space: nowrap; font-size: 0.85rem; color: #64748b;">
+                                {{ reporte.fecha_creacion|date:"d/m/Y H:i" }}
+                            </td>
+                            <td>
+                                {% if reporte.usuario %}
+                                    <strong>{{ reporte.usuario.username }}</strong><br>
+                                    <span style="font-size: 0.8rem; color: #64748b;">{{ reporte.usuario.email }}</span>
+                                {% else %}
+                                    <span style="color: #94a3b8; font-style: italic;">Visitante anónimo</span>
+                                {% endif %}
+                            </td>
+                            <td style="white-space: nowrap;">
+                                <a href="{{ reporte.url_origen }}" target="_blank" style="color: #3b82f6; font-weight: 600; text-decoration: none; font-size: 0.85rem;">
+                                    {{ reporte.url_origen }}
+                                </a>
+                            </td>
+                            <td style="min-width: 240px; max-width: 420px; word-break: break-word; line-height: 1.45;">
+                                {{ reporte.descripcion }}
+                            </td>
+                            <td>
+                                {% if reporte.resuelto %}
+                                    <span class="badge badge-completo">Resuelto ✓</span>
+                                {% else %}
+                                    <span class="badge badge-incompleto">Pendiente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="reporte-acciones">
+                                    <form method="POST" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="toggle_reporte" value="1">
+                                        <input type="hidden" name="reporte_id" value="{{ reporte.id }}">
+                                        <button type="submit" class="btn-reporte-toggle {% if reporte.resuelto %}reabrir{% endif %}">
+                                            {% if reporte.resuelto %}Reabrir{% else %}Marcar resuelto{% endif %}
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" style="margin: 0;" onsubmit="return confirm('¿Eliminar este reporte permanentemente?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="eliminar_reporte" value="1">
+                                        <input type="hidden" name="reporte_id" value="{{ reporte.id }}">
+                                        <button type="submit" class="btn-reporte-eliminar" title="Eliminar reporte">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 25px; color: #64748b;">
+                                No hay problemas reportados desde el footer aún.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -472,7 +564,7 @@
                 plugins: { 
                     legend: { 
                         display: true, 
-                        position: esMovil ? 'bottom' : 'right', // Abajo en móvil, derecha en PC
+                        position: esMovil ? 'bottom' : 'right',
                         labels: { 
                             font: { size: esMovil ? 11 : 12 },
                             boxWidth: esMovil ? 12 : 15,
@@ -483,7 +575,6 @@
             }
         });
 
-        // Reacomoda dinámicamente la leyenda si giran el teléfono o cambian el tamaño de ventana
         window.addEventListener('resize', function() {
             const nuevaPosicion = window.innerWidth < 768 ? 'bottom' : 'right';
             if (chartOficios.options.plugins.legend.position !== nuevaPosicion) {
