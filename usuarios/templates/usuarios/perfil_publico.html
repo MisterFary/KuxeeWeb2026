@@ -1,6 +1,5 @@
 {% extends 'usuarios/base.html' %}
 
-<!-- Se agregó |title para la pestaña del navegador -->
 {% block title %}Perfil de {{ maestro_user.first_name|title|default:maestro_user.username|title }} - Kuxee{% endblock %}
 
 {% block extra_css %}
@@ -110,7 +109,6 @@
         
         .profile-description-box { text-align: left; border-left: none; border-top: 4px solid var(--kuxee-blue); border-radius: 8px; padding: 15px; font-size: 0.9rem; }
         
-        /* Botón de reseñas visible para todos y a tamaño completo en celular */
         .btn-reseñas { width: 100%; justify-content: center; padding: 12px; }
 
         .stats-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
@@ -315,7 +313,6 @@
     
     <div class="services-grid">
         {% for servicio in servicios %}
-            <!-- Tarjeta clickeable -->
             <div class="service-card" onclick="window.location.href='{% url 'detalle_servicio' servicio.id %}';">
                 <div class="service-image">
                     {% if servicio.imagen_portada %}
@@ -372,7 +369,7 @@
         });
     });
 
-    // Visor modal protegido de solo lectura (sin descarga)
+    // Visor modal protegido de solo lectura (compatible con Cloudinary PDF e imágenes)
     function abrirVisorDocumento(url, titulo) {
         const modal = document.getElementById('modalVisorDoc');
         const tituloEl = document.getElementById('visorDocTitulo');
@@ -382,17 +379,19 @@
         contenedor.innerHTML = '';
 
         const urlLimpia = url.split('?')[0].toLowerCase();
-        const esPdf = urlLimpia.endsWith('.pdf');
+        const esImagen = /\.(jpg|jpeg|png|webp|gif)$/i.test(urlLimpia);
 
-        if (esPdf) {
+        if (!esImagen) {
+            // Renderiza PDF de Cloudinary dentro del visor sin barra de descarga
             const iframe = document.createElement('iframe');
-            iframe.src = url + '#toolbar=0&navpanes=0&scrollbar=1';
+            iframe.src = 'https://docs.google.com/gview?url=' + encodeURIComponent(url) + '&embedded=true';
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
-            iframe.setAttribute('controlsList', 'nodownload');
+            iframe.style.background = 'white';
             contenedor.appendChild(iframe);
         } else {
+            // Imagen protegida contra clic derecho y arrastre
             const img = document.createElement('img');
             img.src = url;
             img.alt = titulo;
@@ -410,8 +409,8 @@
         marcaAgua.style.position = 'absolute';
         marcaAgua.style.bottom = '14px';
         marcaAgua.style.right = '18px';
-        marcaAgua.style.background = 'rgba(15, 23, 42, 0.65)';
-        marcaAgua.style.color = 'rgba(255, 255, 255, 0.85)';
+        marcaAgua.style.background = 'rgba(15, 23, 42, 0.75)';
+        marcaAgua.style.color = 'rgba(255, 255, 255, 0.9)';
         marcaAgua.style.fontSize = '0.72rem';
         marcaAgua.style.fontWeight = 'bold';
         marcaAgua.style.padding = '5px 10px';
