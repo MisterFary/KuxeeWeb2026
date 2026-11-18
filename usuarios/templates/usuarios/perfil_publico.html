@@ -59,7 +59,7 @@
     .doc-public-name { font-weight: 700; color: #0f172a; font-size: 1rem; word-break: break-word; line-height: 1.35; }
     .doc-public-meta { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
 
-    .btn-ver-archivo-publico { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 14px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: background 0.2s; box-sizing: border-box; width: 100%; }
+    .btn-ver-archivo-publico { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 14px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: background 0.2s; box-sizing: border-box; width: 100%; border: none; cursor: pointer; }
     .btn-ver-archivo-publico.green { background: #16a34a; color: white; }
     .btn-ver-archivo-publico.green:hover { background: #15803d; }
     .btn-ver-archivo-publico.blue { background: var(--kuxee-blue); color: white; }
@@ -208,14 +208,14 @@
         </div>
     </div>
 
-    <!-- DOCUMENTACIÓN Y CERTIFICADOS VISIBLES PARA TODOS (CLIENTES E INVITADOS) -->
+    <!-- DOCUMENTACIÓN Y CERTIFICADOS VISIBLES PARA TODOS (SOLO LECTURA) -->
     <div class="docs-public-section">
         <div class="docs-public-header">
             <h2 class="docs-public-title">
                 <i class="fas fa-shield-alt" style="color: var(--kuxee-blue);"></i> Documentación y Certificados
             </h2>
             <span style="font-size: 0.85rem; color: #64748b;">
-                Respaldo profesional público en Kuxee
+                <i class="fas fa-lock"></i> Vista protegida de solo lectura
             </span>
         </div>
 
@@ -235,9 +235,11 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ perfil.papel_antecedentes.url }}" target="_blank" rel="noopener" class="btn-ver-archivo-publico green">
+                    <button type="button"
+                            class="btn-ver-archivo-publico green"
+                            onclick="abrirVisorDocumento('{{ perfil.papel_antecedentes.url|escapejs }}', 'Papel de Antecedentes - {{ maestro_user.first_name|default:maestro_user.username|escapejs }}')">
                         <i class="fas fa-eye"></i> Ver Papel de Antecedentes
-                    </a>
+                    </button>
                 </div>
             {% else %}
                 <div class="doc-public-card antecedentes-pendiente">
@@ -267,11 +269,37 @@
                             <div class="doc-public-meta">Subido el {{ cert.fecha_subida|date:"d/m/Y" }}</div>
                         </div>
                     </div>
-                    <a href="{{ cert.archivo.url }}" target="_blank" rel="noopener" class="btn-ver-archivo-publico blue">
-                        <i class="fas fa-external-link-alt"></i> Ver Certificado
-                    </a>
+                    <button type="button"
+                            class="btn-ver-archivo-publico blue"
+                            onclick="abrirVisorDocumento('{{ cert.archivo.url|escapejs }}', '{{ cert.titulo|escapejs }}')">
+                        <i class="fas fa-eye"></i> Ver Certificado
+                    </button>
                 </div>
             {% endfor %}
+        </div>
+    </div>
+
+    <!-- MODAL VISOR SOLO LECTURA (SIN DESCARGA) -->
+    <div id="modalVisorDoc"
+         oncontextmenu="return false;"
+         style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+        <div style="background: white; width: 100%; max-width: 850px; height: 88vh; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+            
+            <!-- Cabecera del visor -->
+            <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                    <i class="fas fa-shield-alt" style="color: var(--kuxee-blue);"></i>
+                    <strong id="visorDocTitulo" style="color: #0f172a; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Documento</strong>
+                    <span style="background: #fef3c7; color: #b45309; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; white-space: nowrap;">Solo lectura</span>
+                </div>
+                <button type="button" onclick="cerrarVisorDocumento()" style="border: none; background: #e2e8f0; color: #334155; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">&times;</button>
+            </div>
+
+            <!-- Área de visualización protegida -->
+            <div id="visorDocContenido"
+                 oncontextmenu="return false;"
+                 style="position: relative; flex: 1; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: auto; user-select: none; -webkit-user-select: none;">
+            </div>
         </div>
     </div>
 
@@ -326,8 +354,8 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- SCRIPT AUTOMÁTICO PARA LIMPIAR GUIONES BAJOS Y CAPITALIZAR COMUNAS Y OFICIOS -->
 <script>
+    // Limpiar guiones bajos y capitalizar comunas y oficios
     document.addEventListener("DOMContentLoaded", function() {
         const formatElements = document.querySelectorAll('.format-text');
         
@@ -342,6 +370,77 @@
                 el.textContent = text;
             }
         });
+    });
+
+    // Visor modal protegido de solo lectura (sin descarga)
+    function abrirVisorDocumento(url, titulo) {
+        const modal = document.getElementById('modalVisorDoc');
+        const tituloEl = document.getElementById('visorDocTitulo');
+        const contenedor = document.getElementById('visorDocContenido');
+
+        tituloEl.textContent = titulo;
+        contenedor.innerHTML = '';
+
+        const urlLimpia = url.split('?')[0].toLowerCase();
+        const esPdf = urlLimpia.endsWith('.pdf');
+
+        if (esPdf) {
+            const iframe = document.createElement('iframe');
+            iframe.src = url + '#toolbar=0&navpanes=0&scrollbar=1';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.setAttribute('controlsList', 'nodownload');
+            contenedor.appendChild(iframe);
+        } else {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = titulo;
+            img.draggable = false;
+            img.style.maxWidth = '95%';
+            img.style.maxHeight = '95%';
+            img.style.objectFit = 'contain';
+            img.style.pointerEvents = 'none';
+            img.style.borderRadius = '6px';
+            contenedor.appendChild(img);
+        }
+
+        const marcaAgua = document.createElement('div');
+        marcaAgua.textContent = 'DOCUMENTO VERIFICADO · SOLO LECTURA KUXEE.CL';
+        marcaAgua.style.position = 'absolute';
+        marcaAgua.style.bottom = '14px';
+        marcaAgua.style.right = '18px';
+        marcaAgua.style.background = 'rgba(15, 23, 42, 0.65)';
+        marcaAgua.style.color = 'rgba(255, 255, 255, 0.85)';
+        marcaAgua.style.fontSize = '0.72rem';
+        marcaAgua.style.fontWeight = 'bold';
+        marcaAgua.style.padding = '5px 10px';
+        marcaAgua.style.borderRadius = '6px';
+        marcaAgua.style.pointerEvents = 'none';
+        contenedor.appendChild(marcaAgua);
+
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarVisorDocumento() {
+        const modal = document.getElementById('modalVisorDoc');
+        const contenedor = document.getElementById('visorDocContenido');
+        modal.style.display = 'none';
+        contenedor.innerHTML = '';
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('modalVisorDoc').addEventListener('click', function(e) {
+        if (e.target === this) {
+            cerrarVisorDocumento();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarVisorDocumento();
+        }
     });
 </script>
 {% endblock %}
