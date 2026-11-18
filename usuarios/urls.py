@@ -83,6 +83,7 @@ urlpatterns = [
     path('resenas/', views.ver_resenas, name='ver_resenas'),    
     path('resenas/<str:username>/', views.ver_resenas, name='ver_resenas_publico'),
     path('notificar-problema/', views.notificar_problema, name='notificar_problema'),
+    path('documento-protegido/<str:tipo>/<int:obj_id>/', views.ver_documento_protegido, name='ver_documento_protegido'),
     
     # ==========================================
     # RUTA CORREGIDA: Eliminar chat

@@ -1,4 +1,5 @@
 import re
+import urllib.request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, get_user_model
 from django.contrib import messages
@@ -7,7 +8,7 @@ from django.db.models import Q, Count, Sum, Avg
 from django.db.models.functions import TruncDay, TruncMonth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.cache import cache
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
@@ -1388,3 +1389,34 @@ def notificar_problema(request):
             messages.error(request, 'Por favor describe el problema antes de enviar.')
 
     return redirect(request.META.get('HTTP_REFERER', 'inicio'))
+
+
+def ver_documento_protegido(request, tipo, obj_id):
+    """
+    Sirve el archivo desde Cloudinary hacia el visor PDF.js/Canvas del frontend
+    sin exponer la URL directa ni forzar descarga.
+    """
+    if tipo == 'antecedentes':
+        perfil = get_object_or_404(PerfilMaestro, id=obj_id)
+        archivo = perfil.papel_antecedentes
+    elif tipo == 'certificado':
+        cert = get_object_or_404(Certificado, id=obj_id)
+        archivo = cert.archivo
+    else:
+        raise Http404("Documento no encontrado")
+
+    if not archivo:
+        raise Http404("Archivo no disponible")
+
+    try:
+        with urllib.request.urlopen(archivo.url) as resp:
+            contenido = resp.read()
+            content_type = resp.headers.get_content_type() or 'application/octet-stream'
+    except Exception:
+        raise Http404("No se pudo cargar el documento")
+
+    response = HttpResponse(contenido, content_type=content_type)
+    response['Content-Disposition'] = 'inline'
+    response['X-Content-Type-Options'] = 'nosniff'
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return response

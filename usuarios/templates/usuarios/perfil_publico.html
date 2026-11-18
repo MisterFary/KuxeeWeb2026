@@ -4,7 +4,6 @@
 
 {% block extra_css %}
 <style>
-    /* Seguridad global contra scroll lateral */
     html, body { max-width: 100%; overflow-x: hidden; }
 
     .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 200px; width: 100%; }
@@ -64,11 +63,18 @@
     .btn-ver-archivo-publico.blue { background: var(--kuxee-blue); color: white; }
     .btn-ver-archivo-publico.blue:hover { background: #2563eb; }
 
+    /* Visor protegido: sin selección, sin arrastre, sin impresión */
+    #visorDocPaginas { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; padding: 20px; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    #visorDocPaginas canvas, #visorDocPaginas img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+    @media print {
+        #modalVisorDoc { display: none !important; }
+    }
+
     /* Servicios Grid */
     .section-title { font-size: 1.8rem; color: var(--kuxee-blue); margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
     .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
     
-    /* Tarjeta tipo botón clickeable */
     .service-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .service-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     
@@ -82,9 +88,6 @@
     .service-price { display: inline-block; background: #fffbeb; color: #d97706; border: 1px solid #fde68a; padding: 6px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-align: center; }
     .service-footer { border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 8px; }
 
-    /* =========================================
-       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
-       ========================================= */
     @media (max-width: 900px) {
         .profile-card { padding: 30px; gap: 25px; }
         .profile-avatar-large { width: 140px; height: 140px; }
@@ -95,32 +98,22 @@
     @media (max-width: 768px) {
         .profile-header-banner { height: 140px; }
         .profile-container { margin-top: -65px; padding: 0 15px; }
-        
         .profile-card { flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 25px 18px; }
-        
         .profile-avatar-large { width: 130px; height: 130px; margin-top: -55px; }
         .profile-avatar-large i { font-size: 55px; }
-        
         .profile-info { width: 100%; }
         .profile-info h1 { justify-content: center; font-size: 1.65rem; }
-        
         .profile-details { justify-content: center; font-size: 0.9rem; flex-direction: column; gap: 8px; align-items: center; }
         .profile-details i { width: auto; margin-right: 5px; }
-        
         .profile-description-box { text-align: left; border-left: none; border-top: 4px solid var(--kuxee-blue); border-radius: 8px; padding: 15px; font-size: 0.9rem; }
-        
         .btn-reseñas { width: 100%; justify-content: center; padding: 12px; }
-
         .stats-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
         .stat-card { padding: 20px 15px; }
         .stat-value { font-size: 2.2rem; }
-
         .docs-public-section { padding: 20px 16px; margin-bottom: 30px; }
         .docs-public-title { font-size: 1.15rem; }
         .docs-public-grid { grid-template-columns: 1fr; }
-
         .section-title { justify-content: center; text-align: center; font-size: 1.4rem; flex-wrap: wrap; }
-        
         .services-grid { grid-template-columns: 1fr; gap: 16px; }
     }
 </style>
@@ -177,7 +170,6 @@
                 {% endif %}
             </div>
 
-            <!-- BOTÓN DE RESEÑAS VISIBLE PARA TODOS (INCLUYENDO INVITADOS) -->
             <a href="{% url 'ver_resenas_publico' maestro_user.username %}" class="btn-reseñas">
                 <i class="fas fa-star" style="color: #475569;"></i> Ver reseñas
             </a>
@@ -206,7 +198,7 @@
         </div>
     </div>
 
-    <!-- DOCUMENTACIÓN Y CERTIFICADOS VISIBLES PARA TODOS (SOLO LECTURA) -->
+    <!-- DOCUMENTACIÓN Y CERTIFICADOS VISIBLES PARA TODOS (SOLO LECTURA EN MODAL) -->
     <div class="docs-public-section">
         <div class="docs-public-header">
             <h2 class="docs-public-title">
@@ -218,7 +210,7 @@
         </div>
 
         <div class="docs-public-grid">
-            <!-- Tarjeta Papel de Antecedentes -->
+            <!-- Papel de Antecedentes -->
             {% if perfil.papel_antecedentes %}
                 <div class="doc-public-card antecedentes-ok">
                     <div class="doc-public-top">
@@ -235,7 +227,7 @@
                     </div>
                     <button type="button"
                             class="btn-ver-archivo-publico green"
-                            onclick="abrirVisorDocumento('{{ perfil.papel_antecedentes.url|escapejs }}', 'Papel de Antecedentes - {{ maestro_user.first_name|default:maestro_user.username|escapejs }}')">
+                            onclick="abrirVisorDocumento('{% url 'ver_documento_protegido' 'antecedentes' perfil.id %}', 'Papel de Antecedentes - {{ maestro_user.first_name|default:maestro_user.username|escapejs }}')">
                         <i class="fas fa-eye"></i> Ver Papel de Antecedentes
                     </button>
                 </div>
@@ -254,7 +246,7 @@
                 </div>
             {% endif %}
 
-            <!-- Tarjetas de Certificados Profesionales -->
+            <!-- Certificados Profesionales -->
             {% for cert in certificados %}
                 <div class="doc-public-card">
                     <div class="doc-public-top">
@@ -269,7 +261,7 @@
                     </div>
                     <button type="button"
                             class="btn-ver-archivo-publico blue"
-                            onclick="abrirVisorDocumento('{{ cert.archivo.url|escapejs }}', '{{ cert.titulo|escapejs }}')">
+                            onclick="abrirVisorDocumento('{% url 'ver_documento_protegido' 'certificado' cert.id %}', '{{ cert.titulo|escapejs }}')">
                         <i class="fas fa-eye"></i> Ver Certificado
                     </button>
                 </div>
@@ -277,13 +269,15 @@
         </div>
     </div>
 
-    <!-- MODAL VISOR SOLO LECTURA (SIN DESCARGA) -->
+    <!-- MODAL VISOR SOLO LECTURA (SIN REDIRECCIÓN, SIN COPIA Y SIN DESCARGA) -->
     <div id="modalVisorDoc"
          oncontextmenu="return false;"
-         style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
-        <div style="background: white; width: 100%; max-width: 850px; height: 88vh; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+         onselectstart="return false;"
+         ondragstart="return false;"
+         style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.88); z-index: 9999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+        <div style="background: white; width: 100%; max-width: 860px; height: 88vh; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
             
-            <!-- Cabecera del visor -->
+            <!-- Cabecera -->
             <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                     <i class="fas fa-shield-alt" style="color: var(--kuxee-blue);"></i>
@@ -293,10 +287,14 @@
                 <button type="button" onclick="cerrarVisorDocumento()" style="border: none; background: #e2e8f0; color: #334155; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">&times;</button>
             </div>
 
-            <!-- Área de visualización protegida -->
+            <!-- Contenido renderizado en lienzo -->
             <div id="visorDocContenido"
                  oncontextmenu="return false;"
-                 style="position: relative; flex: 1; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: auto; user-select: none; -webkit-user-select: none;">
+                 style="position: relative; flex: 1; background: #1e293b; overflow-y: auto; user-select: none; -webkit-user-select: none;">
+                <div id="visorDocPaginas"></div>
+                <div style="position: sticky; bottom: 12px; float: right; margin-right: 16px; background: rgba(15, 23, 42, 0.85); color: rgba(255, 255, 255, 0.9); font-size: 0.72rem; font-weight: bold; padding: 5px 10px; border-radius: 6px; pointer-events: none;">
+                    DOCUMENTO VERIFICADO · SOLO LECTURA KUXEE.CL
+                </div>
             </div>
         </div>
     </div>
@@ -351,11 +349,14 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-    // Limpiar guiones bajos y capitalizar comunas y oficios
+    if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const formatElements = document.querySelectorAll('.format-text');
-        
         formatElements.forEach(el => {
             if (el.textContent) {
                 let text = el.textContent.replace(/_/g, ' ');
@@ -363,70 +364,77 @@
                     if(word.length === 0) return '';
                     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
                 }).join(' ');
-                
                 el.textContent = text;
             }
         });
     });
 
-    // Visor modal protegido de solo lectura (compatible con Cloudinary PDF e imágenes)
-    function abrirVisorDocumento(url, titulo) {
+    async function abrirVisorDocumento(proxyUrl, titulo) {
         const modal = document.getElementById('modalVisorDoc');
         const tituloEl = document.getElementById('visorDocTitulo');
-        const contenedor = document.getElementById('visorDocContenido');
+        const paginasEl = document.getElementById('visorDocPaginas');
 
         tituloEl.textContent = titulo;
-        contenedor.innerHTML = '';
-
-        const urlLimpia = url.split('?')[0].toLowerCase();
-        const esImagen = /\.(jpg|jpeg|png|webp|gif)$/i.test(urlLimpia);
-
-        if (!esImagen) {
-            // Renderiza PDF de Cloudinary dentro del visor sin barra de descarga
-            const iframe = document.createElement('iframe');
-            iframe.src = 'https://docs.google.com/gview?url=' + encodeURIComponent(url) + '&embedded=true';
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.style.background = 'white';
-            contenedor.appendChild(iframe);
-        } else {
-            // Imagen protegida contra clic derecho y arrastre
-            const img = document.createElement('img');
-            img.src = url;
-            img.alt = titulo;
-            img.draggable = false;
-            img.style.maxWidth = '95%';
-            img.style.maxHeight = '95%';
-            img.style.objectFit = 'contain';
-            img.style.pointerEvents = 'none';
-            img.style.borderRadius = '6px';
-            contenedor.appendChild(img);
-        }
-
-        const marcaAgua = document.createElement('div');
-        marcaAgua.textContent = 'DOCUMENTO VERIFICADO · SOLO LECTURA KUXEE.CL';
-        marcaAgua.style.position = 'absolute';
-        marcaAgua.style.bottom = '14px';
-        marcaAgua.style.right = '18px';
-        marcaAgua.style.background = 'rgba(15, 23, 42, 0.75)';
-        marcaAgua.style.color = 'rgba(255, 255, 255, 0.9)';
-        marcaAgua.style.fontSize = '0.72rem';
-        marcaAgua.style.fontWeight = 'bold';
-        marcaAgua.style.padding = '5px 10px';
-        marcaAgua.style.borderRadius = '6px';
-        marcaAgua.style.pointerEvents = 'none';
-        contenedor.appendChild(marcaAgua);
+        paginasEl.innerHTML = '<div style="color: #cbd5e1; padding: 40px; font-size: 0.95rem;"><i class="fas fa-spinner fa-spin"></i> Cargando documento protegido...</div>';
 
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        try {
+            const respuesta = await fetch(proxyUrl);
+            if (!respuesta.ok) throw new Error('Error al obtener archivo');
+
+            const contentType = (respuesta.headers.get('Content-Type') || '').toLowerCase();
+            const buffer = await respuesta.arrayBuffer();
+
+            // Detectar si es PDF por cabecera o magic bytes (%PDF)
+            const bytes = new Uint8Array(buffer.slice(0, 5));
+            const esPdfFirma = (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46);
+
+            if (contentType.includes('pdf') || esPdfFirma) {
+                const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+                paginasEl.innerHTML = '';
+
+                for (let numPagina = 1; numPagina <= pdf.numPages; numPagina++) {
+                    const page = await pdf.getPage(numPagina);
+                    const viewport = page.getViewport({ scale: 1.5 });
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    paginasEl.appendChild(canvas);
+                }
+            } else {
+                // Renderizar imagen en <canvas> para que tampoco puedan arrastrarla ni abrirla en otra pestaña
+                const blob = new Blob([buffer], { type: contentType || 'image/jpeg' });
+                const objectUrl = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = function() {
+                    paginasEl.innerHTML = '';
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(objectUrl);
+                    paginasEl.appendChild(canvas);
+                };
+                img.src = objectUrl;
+            }
+        } catch (error) {
+            console.error(error);
+            paginasEl.innerHTML = '<div style="color: #fca5a5; padding: 30px; text-align: center;">No se pudo cargar la vista previa del documento.</div>';
+        }
     }
 
     function cerrarVisorDocumento() {
         const modal = document.getElementById('modalVisorDoc');
-        const contenedor = document.getElementById('visorDocContenido');
+        const paginasEl = document.getElementById('visorDocPaginas');
         modal.style.display = 'none';
-        contenedor.innerHTML = '';
+        paginasEl.innerHTML = '';
         document.body.style.overflow = '';
     }
 
@@ -436,9 +444,15 @@
         }
     });
 
+    // Bloquear Escape (cierra modal) y atajos Ctrl+S, Ctrl+P, Ctrl+C mientras el visor está abierto
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            cerrarVisorDocumento();
+        const modal = document.getElementById('modalVisorDoc');
+        if (modal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                cerrarVisorDocumento();
+            } else if ((e.ctrlKey || e.metaKey) && ['s', 'p', 'c', 'u'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
         }
     });
 </script>
