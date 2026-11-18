@@ -31,7 +31,7 @@
     .kpi-diario-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
     .kpi-diario-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 0; }
 
-    /* Contenedores Grid */
+    /* Contenedores Grid (min-width: 0 es vital para que las tablas no rompan el grid) */
     .content-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; margin-bottom: 30px; }
     .full-width-section { grid-column: 1 / -1; }
     
@@ -95,6 +95,7 @@
         .dashboard-header h1 { font-size: 1.4rem; }
         .btn-volver { width: 100%; justify-content: center; }
         
+        /* En móvil mostramos 2 tarjetas KPI por fila para aprovechar el espacio, y 1 en pantallas muy chicas */
         .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
         .kpi-card { padding: 16px 14px; }
         .kpi-value { font-size: 1.5rem; }
@@ -104,10 +105,12 @@
         .panel-section { padding: 16px 14px; margin-bottom: 20px; }
         .section-title { font-size: 1.05rem; margin-bottom: 15px; }
         
+        /* Alturas optimizadas para gráficos en móvil */
         .chart-container.chart-lg { height: 260px; }
         .chart-container.chart-sm { height: 220px; }
-        .chart-container.chart-pie { height: 360px; }
+        .chart-container.chart-pie { height: 360px; } /* Más alto para acomodar la leyenda abajo */
 
+        /* Tablas más compactas en móvil */
         th, td { padding: 10px; font-size: 0.85rem; }
         
         .admin-modal-box { padding: 20px 15px; }
@@ -497,11 +500,11 @@
                                         </button>
                                     </form>
 
-                                    <form method="POST" style="margin: 0;" onsubmit="return confirm('¿Eliminar este reporte permanentemente?');">
+                                    <form method="POST" id="form-eliminar-reporte-{{ reporte.id }}" style="margin: 0;">
                                         {% csrf_token %}
                                         <input type="hidden" name="eliminar_reporte" value="1">
                                         <input type="hidden" name="reporte_id" value="{{ reporte.id }}">
-                                        <button type="submit" class="btn-reporte-eliminar" title="Eliminar reporte">
+                                        <button type="button" class="btn-reporte-eliminar" title="Eliminar reporte" onclick="confirmarEliminarReporte({{ reporte.id }})">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
@@ -525,6 +528,25 @@
 
 {% block scripts %}
 <script>
+    // Confirmación personalizada con SweetAlert2 para eliminar reportes
+    function confirmarEliminarReporte(reporteId) {
+        Swal.fire({
+            title: '¿Eliminar este reporte?',
+            text: 'Esta acción eliminará el reporte permanentemente y no se puede deshacer.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('form-eliminar-reporte-' + reporteId).submit();
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const esMovil = window.innerWidth < 768;
         
@@ -564,7 +586,7 @@
                 plugins: { 
                     legend: { 
                         display: true, 
-                        position: esMovil ? 'bottom' : 'right',
+                        position: esMovil ? 'bottom' : 'right', // Abajo en móvil, derecha en PC
                         labels: { 
                             font: { size: esMovil ? 11 : 12 },
                             boxWidth: esMovil ? 12 : 15,
@@ -575,6 +597,7 @@
             }
         });
 
+        // Reacomoda dinámicamente la leyenda si giran el teléfono o cambian el tamaño de ventana
         window.addEventListener('resize', function() {
             const nuevaPosicion = window.innerWidth < 768 ? 'bottom' : 'right';
             if (chartOficios.options.plugins.legend.position !== nuevaPosicion) {
