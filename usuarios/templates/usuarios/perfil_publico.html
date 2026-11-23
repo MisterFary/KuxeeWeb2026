@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <style>
+    /* Seguridad global contra scroll lateral */
     html, body { max-width: 100%; overflow-x: hidden; }
 
     .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 200px; width: 100%; }
@@ -63,18 +64,24 @@
     .btn-ver-archivo-publico.blue { background: var(--kuxee-blue); color: white; }
     .btn-ver-archivo-publico.blue:hover { background: #2563eb; }
 
-    /* Visor protegido: sin selección, sin arrastre, sin impresión */
-    #visorDocPaginas { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; padding: 20px; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-    #visorDocPaginas canvas, #visorDocPaginas img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    /* Visor protegido: limpio para leer, pero borroso ante cualquier intento de captura */
+    #visorDocPaginas { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; padding: 20px; box-sizing: border-box; user-select: none; -webkit-user-select: none; transition: filter 0.08s ease, opacity 0.08s ease; }
+    #visorDocPaginas.protegido-blur { filter: blur(28px) brightness(0.45) !important; opacity: 0.15 !important; }
+    #visorDocPaginas canvas { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+    /* Capa de aviso cuando se activa la protección borrosa */
+    #escudoAntiCaptura { display: none; position: absolute; inset: 0; z-index: 20; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: white; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 12px; }
+    #escudoAntiCaptura.activo { display: flex; }
 
     @media print {
-        #modalVisorDoc { display: none !important; }
+        body * { display: none !important; }
     }
 
     /* Servicios Grid */
     .section-title { font-size: 1.8rem; color: var(--kuxee-blue); margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
     .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
     
+    /* Tarjeta tipo botón clickeable */
     .service-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .service-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     
@@ -88,6 +95,9 @@
     .service-price { display: inline-block; background: #fffbeb; color: #d97706; border: 1px solid #fde68a; padding: 6px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-align: center; }
     .service-footer { border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 8px; }
 
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
     @media (max-width: 900px) {
         .profile-card { padding: 30px; gap: 25px; }
         .profile-avatar-large { width: 140px; height: 140px; }
@@ -98,22 +108,32 @@
     @media (max-width: 768px) {
         .profile-header-banner { height: 140px; }
         .profile-container { margin-top: -65px; padding: 0 15px; }
+        
         .profile-card { flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 25px 18px; }
+        
         .profile-avatar-large { width: 130px; height: 130px; margin-top: -55px; }
         .profile-avatar-large i { font-size: 55px; }
+        
         .profile-info { width: 100%; }
         .profile-info h1 { justify-content: center; font-size: 1.65rem; }
+        
         .profile-details { justify-content: center; font-size: 0.9rem; flex-direction: column; gap: 8px; align-items: center; }
         .profile-details i { width: auto; margin-right: 5px; }
+        
         .profile-description-box { text-align: left; border-left: none; border-top: 4px solid var(--kuxee-blue); border-radius: 8px; padding: 15px; font-size: 0.9rem; }
+        
         .btn-reseñas { width: 100%; justify-content: center; padding: 12px; }
+
         .stats-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
         .stat-card { padding: 20px 15px; }
         .stat-value { font-size: 2.2rem; }
+
         .docs-public-section { padding: 20px 16px; margin-bottom: 30px; }
         .docs-public-title { font-size: 1.15rem; }
         .docs-public-grid { grid-template-columns: 1fr; }
+
         .section-title { justify-content: center; text-align: center; font-size: 1.4rem; flex-wrap: wrap; }
+        
         .services-grid { grid-template-columns: 1fr; gap: 16px; }
     }
 </style>
@@ -269,7 +289,7 @@
         </div>
     </div>
 
-    <!-- MODAL VISOR SOLO LECTURA (SIN REDIRECCIÓN, SIN COPIA Y SIN DESCARGA) -->
+    <!-- MODAL VISOR SOLO LECTURA (CON ESCUDO BORROSO ANTI-CAPTURA Y SIN DESCARGA) -->
     <div id="modalVisorDoc"
          oncontextmenu="return false;"
          onselectstart="return false;"
@@ -292,6 +312,19 @@
                  oncontextmenu="return false;"
                  style="position: relative; flex: 1; background: #1e293b; overflow-y: auto; user-select: none; -webkit-user-select: none;">
                 <div id="visorDocPaginas"></div>
+
+                <!-- Escudo borroso ante intento de captura o cambio de foco -->
+                <div id="escudoAntiCaptura">
+                    <i class="fas fa-eye-slash" style="font-size: 2.4rem; color: #facc15;"></i>
+                    <strong style="font-size: 1.1rem;">Documento oculto por seguridad</strong>
+                    <span style="font-size: 0.88rem; color: #cbd5e1; max-width: 340px;">
+                        Se detectó un cambio de ventana o intento de captura. Este documento es de solo lectura en Kuxee.
+                    </span>
+                    <button type="button" onclick="desactivarEscudoBlur()" style="margin-top: 6px; background: var(--kuxee-blue); color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        Continuar leyendo
+                    </button>
+                </div>
+
                 <div style="position: sticky; bottom: 12px; float: right; margin-right: 16px; background: rgba(15, 23, 42, 0.85); color: rgba(255, 255, 255, 0.9); font-size: 0.72rem; font-weight: bold; padding: 5px 10px; border-radius: 6px; pointer-events: none;">
                     DOCUMENTO VERIFICADO · SOLO LECTURA KUXEE.CL
                 </div>
@@ -355,6 +388,8 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
 
+    const VISITANTE_ACTUAL = "{% if user.is_authenticated %}{{ user.username|escapejs }}{% else %}Invitado{% endif %}";
+
     document.addEventListener("DOMContentLoaded", function() {
         const formatElements = document.querySelectorAll('.format-text');
         formatElements.forEach(el => {
@@ -369,12 +404,43 @@
         });
     });
 
+    // Marca de agua limpia y discreta en el borde inferior (no tapa el texto del documento)
+    function estamparMarcaAguaDiscreta(canvas) {
+        const ctx = canvas.getContext('2d');
+        const ahora = new Date();
+        const fechaHora = ahora.toLocaleDateString('es-CL') + ' ' + ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+        const textoMarca = `Solo lectura en Kuxee.cl · Consultado por ${VISITANTE_ACTUAL} (${fechaHora})`;
+
+        ctx.save();
+        const fontSize = Math.max(11, Math.floor(canvas.width / 62));
+        ctx.font = `600 ${fontSize}px Arial, sans-serif`;
+        ctx.fillStyle = 'rgba(100, 116, 139, 0.55)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(textoMarca, canvas.width - 16, canvas.height - 10);
+        ctx.restore();
+    }
+
+    function activarEscudoBlur() {
+        const modal = document.getElementById('modalVisorDoc');
+        if (modal && modal.style.display === 'flex') {
+            document.getElementById('visorDocPaginas').classList.add('protegido-blur');
+            document.getElementById('escudoAntiCaptura').classList.add('activo');
+        }
+    }
+
+    function desactivarEscudoBlur() {
+        document.getElementById('visorDocPaginas').classList.remove('protegido-blur');
+        document.getElementById('escudoAntiCaptura').classList.remove('activo');
+    }
+
     async function abrirVisorDocumento(proxyUrl, titulo) {
         const modal = document.getElementById('modalVisorDoc');
         const tituloEl = document.getElementById('visorDocTitulo');
         const paginasEl = document.getElementById('visorDocPaginas');
 
         tituloEl.textContent = titulo;
+        desactivarEscudoBlur();
         paginasEl.innerHTML = '<div style="color: #cbd5e1; padding: 40px; font-size: 0.95rem;"><i class="fas fa-spinner fa-spin"></i> Cargando documento protegido...</div>';
 
         modal.style.display = 'flex';
@@ -387,7 +453,6 @@
             const contentType = (respuesta.headers.get('Content-Type') || '').toLowerCase();
             const buffer = await respuesta.arrayBuffer();
 
-            // Detectar si es PDF por cabecera o magic bytes (%PDF)
             const bytes = new Uint8Array(buffer.slice(0, 5));
             const esPdfFirma = (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46);
 
@@ -405,10 +470,10 @@
                     canvas.width = viewport.width;
 
                     await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    estamparMarcaAguaDiscreta(canvas);
                     paginasEl.appendChild(canvas);
                 }
             } else {
-                // Renderizar imagen en <canvas> para que tampoco puedan arrastrarla ni abrirla en otra pestaña
                 const blob = new Blob([buffer], { type: contentType || 'image/jpeg' });
                 const objectUrl = URL.createObjectURL(blob);
                 const img = new Image();
@@ -419,6 +484,7 @@
                     canvas.height = img.naturalHeight;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
+                    estamparMarcaAguaDiscreta(canvas);
                     URL.revokeObjectURL(objectUrl);
                     paginasEl.appendChild(canvas);
                 };
@@ -434,6 +500,7 @@
         const modal = document.getElementById('modalVisorDoc');
         const paginasEl = document.getElementById('visorDocPaginas');
         modal.style.display = 'none';
+        desactivarEscudoBlur();
         paginasEl.innerHTML = '';
         document.body.style.overflow = '';
     }
@@ -444,15 +511,51 @@
         }
     });
 
-    // Bloquear Escape (cierra modal) y atajos Ctrl+S, Ctrl+P, Ctrl+C mientras el visor está abierto
+    // --- DETECTORES DE CAPTURA / RECORTE / PÉRDIDA DE FOCO (PC Y CELULAR) ---
+    window.addEventListener('blur', activarEscudoBlur);
+    window.addEventListener('pagehide', activarEscudoBlur);
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) activarEscudoBlur();
+    });
+
+    // En PC: si el cursor sale del área de la ventana (ej. hacia barra de herramientas o recortes)
+    document.addEventListener('mouseleave', activarEscudoBlur);
+
+    // En Celular: gesto de 3 dedos (usado en Android/Xiaomi/Motorola para screenshot)
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length >= 3) {
+            activarEscudoBlur();
+        }
+    }, { passive: true });
+
+    // Teclado en PC: PrintScreen, Win+Shift+S, Cmd+Shift+3/4/5, F12, Ctrl+S/P/C/U
     document.addEventListener('keydown', function(e) {
         const modal = document.getElementById('modalVisorDoc');
-        if (modal.style.display === 'flex') {
-            if (e.key === 'Escape') {
-                cerrarVisorDocumento();
-            } else if ((e.ctrlKey || e.metaKey) && ['s', 'p', 'c', 'u'].includes(e.key.toLowerCase())) {
-                e.preventDefault();
-            }
+        if (modal.style.display !== 'flex') return;
+
+        const key = e.key.toLowerCase();
+
+        if (e.key === 'Escape') {
+            cerrarVisorDocumento();
+            return;
+        }
+
+        if (
+            e.key === 'PrintScreen' ||
+            e.key === 'F12' ||
+            e.metaKey ||
+            (e.ctrlKey && e.shiftKey && ['s', 'i', 'j', 'c'].includes(key)) ||
+            (e.ctrlKey && ['s', 'p', 'c', 'u', 'a'].includes(key))
+        ) {
+            activarEscudoBlur();
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('keyup', function(e) {
+        if (e.key === 'PrintScreen') {
+            activarEscudoBlur();
         }
     });
 </script>
