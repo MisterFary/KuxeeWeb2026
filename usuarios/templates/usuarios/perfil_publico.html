@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <style>
+    /* Seguridad global contra scroll lateral */
     html, body { max-width: 100%; overflow-x: hidden; }
 
     .profile-header-banner { background: linear-gradient(to right, #4f46e5, #0ea5e9); height: 200px; width: 100%; }
@@ -63,18 +64,20 @@
     .btn-ver-archivo-publico.blue { background: var(--kuxee-blue); color: white; }
     .btn-ver-archivo-publico.blue:hover { background: #2563eb; }
 
-    /* Visor protegido: sin selección, sin arrastre, sin impresión */
-    #visorDocPaginas { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; padding: 20px; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-    #visorDocPaginas canvas, #visorDocPaginas img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    /* Visor protegido: sin selección, sin arrastre, sin impresión y desenfoque al perder foco */
+    #visorDocPaginas { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; padding: 20px; box-sizing: border-box; user-select: none; -webkit-user-select: none; transition: filter 0.15s ease, opacity 0.15s ease; }
+    #visorDocPaginas.protegido-blur { filter: blur(18px); opacity: 0.25; }
+    #visorDocPaginas canvas { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 
     @media print {
-        #modalVisorDoc { display: none !important; }
+        body * { display: none !important; }
     }
 
     /* Servicios Grid */
     .section-title { font-size: 1.8rem; color: var(--kuxee-blue); margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
     .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
     
+    /* Tarjeta tipo botón clickeable */
     .service-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .service-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     
@@ -88,6 +91,9 @@
     .service-price { display: inline-block; background: #fffbeb; color: #d97706; border: 1px solid #fde68a; padding: 6px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-align: center; }
     .service-footer { border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 8px; }
 
+    /* =========================================
+       DISEÑO RESPONSIVO (TABLETS Y CELULARES)
+       ========================================= */
     @media (max-width: 900px) {
         .profile-card { padding: 30px; gap: 25px; }
         .profile-avatar-large { width: 140px; height: 140px; }
@@ -98,22 +104,32 @@
     @media (max-width: 768px) {
         .profile-header-banner { height: 140px; }
         .profile-container { margin-top: -65px; padding: 0 15px; }
+        
         .profile-card { flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 25px 18px; }
+        
         .profile-avatar-large { width: 130px; height: 130px; margin-top: -55px; }
         .profile-avatar-large i { font-size: 55px; }
+        
         .profile-info { width: 100%; }
         .profile-info h1 { justify-content: center; font-size: 1.65rem; }
+        
         .profile-details { justify-content: center; font-size: 0.9rem; flex-direction: column; gap: 8px; align-items: center; }
         .profile-details i { width: auto; margin-right: 5px; }
+        
         .profile-description-box { text-align: left; border-left: none; border-top: 4px solid var(--kuxee-blue); border-radius: 8px; padding: 15px; font-size: 0.9rem; }
+        
         .btn-reseñas { width: 100%; justify-content: center; padding: 12px; }
+
         .stats-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
         .stat-card { padding: 20px 15px; }
         .stat-value { font-size: 2.2rem; }
+
         .docs-public-section { padding: 20px 16px; margin-bottom: 30px; }
         .docs-public-title { font-size: 1.15rem; }
         .docs-public-grid { grid-template-columns: 1fr; }
+
         .section-title { justify-content: center; text-align: center; font-size: 1.4rem; flex-wrap: wrap; }
+        
         .services-grid { grid-template-columns: 1fr; gap: 16px; }
     }
 </style>
@@ -269,7 +285,7 @@
         </div>
     </div>
 
-    <!-- MODAL VISOR SOLO LECTURA (SIN REDIRECCIÓN, SIN COPIA Y SIN DESCARGA) -->
+    <!-- MODAL VISOR SOLO LECTURA (SIN REDIRECCIÓN, CON MARCA DE AGUA INCRUSTADA Y SIN DESCARGA) -->
     <div id="modalVisorDoc"
          oncontextmenu="return false;"
          onselectstart="return false;"
@@ -355,6 +371,9 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
 
+    // Identificador del visitante para estampar en la marca de agua
+    const VISITANTE_ACTUAL = "{% if user.is_authenticated %}{{ user.username|escapejs }}{% else %}Visitante Kuxee{% endif %}";
+
     document.addEventListener("DOMContentLoaded", function() {
         const formatElements = document.querySelectorAll('.format-text');
         formatElements.forEach(el => {
@@ -369,12 +388,41 @@
         });
     });
 
+    // Dibuja marcas de agua diagonales directamente sobre los píxeles del canvas
+    function estamparMarcaAguaEnCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        const ahora = new Date();
+        const fechaHora = ahora.toLocaleDateString('es-CL') + ' ' + ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+        const textoMarca = `SOLO LECTURA · KUXEE.CL · ${VISITANTE_ACTUAL} · ${fechaHora}`;
+
+        ctx.save();
+        const fontSize = Math.max(14, Math.floor(canvas.width / 32));
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        ctx.fillStyle = 'rgba(220, 38, 38, 0.22)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const pasoY = fontSize * 6;
+        const pasoX = fontSize * 18;
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-28 * Math.PI / 180);
+
+        for (let y = -canvas.height; y <= canvas.height; y += pasoY) {
+            for (let x = -canvas.width; x <= canvas.width; x += pasoX) {
+                ctx.fillText(textoMarca, x, y);
+            }
+        }
+        ctx.restore();
+    }
+
     async function abrirVisorDocumento(proxyUrl, titulo) {
         const modal = document.getElementById('modalVisorDoc');
         const tituloEl = document.getElementById('visorDocTitulo');
         const paginasEl = document.getElementById('visorDocPaginas');
 
         tituloEl.textContent = titulo;
+        paginasEl.classList.remove('protegido-blur');
         paginasEl.innerHTML = '<div style="color: #cbd5e1; padding: 40px; font-size: 0.95rem;"><i class="fas fa-spinner fa-spin"></i> Cargando documento protegido...</div>';
 
         modal.style.display = 'flex';
@@ -405,10 +453,11 @@
                     canvas.width = viewport.width;
 
                     await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    estamparMarcaAguaEnCanvas(canvas);
                     paginasEl.appendChild(canvas);
                 }
             } else {
-                // Renderizar imagen en <canvas> para que tampoco puedan arrastrarla ni abrirla en otra pestaña
+                // Renderizar imagen en <canvas> con marca de agua incrustada
                 const blob = new Blob([buffer], { type: contentType || 'image/jpeg' });
                 const objectUrl = URL.createObjectURL(blob);
                 const img = new Image();
@@ -419,6 +468,7 @@
                     canvas.height = img.naturalHeight;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
+                    estamparMarcaAguaEnCanvas(canvas);
                     URL.revokeObjectURL(objectUrl);
                     paginasEl.appendChild(canvas);
                 };
@@ -444,13 +494,37 @@
         }
     });
 
-    // Bloquear Escape (cierra modal) y atajos Ctrl+S, Ctrl+P, Ctrl+C mientras el visor está abierto
+    // Desenfocar documento si la ventana pierde el foco (herramienta de recortes o cambio de pestaña/app)
+    window.addEventListener('blur', function() {
+        const modal = document.getElementById('modalVisorDoc');
+        if (modal.style.display === 'flex') {
+            document.getElementById('visorDocPaginas').classList.add('protegido-blur');
+        }
+    });
+
+    window.addEventListener('focus', function() {
+        document.getElementById('visorDocPaginas').classList.remove('protegido-blur');
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        const paginasEl = document.getElementById('visorDocPaginas');
+        if (document.hidden) {
+            paginasEl.classList.add('protegido-blur');
+        } else {
+            paginasEl.classList.remove('protegido-blur');
+        }
+    });
+
+    // Bloquear teclas de captura, copia, guardado e impresión mientras el visor está abierto
     document.addEventListener('keydown', function(e) {
         const modal = document.getElementById('modalVisorDoc');
         if (modal.style.display === 'flex') {
             if (e.key === 'Escape') {
                 cerrarVisorDocumento();
-            } else if ((e.ctrlKey || e.metaKey) && ['s', 'p', 'c', 'u'].includes(e.key.toLowerCase())) {
+            } else if (e.key === 'PrintScreen') {
+                document.getElementById('visorDocPaginas').classList.add('protegido-blur');
+                e.preventDefault();
+            } else if ((e.ctrlKey || e.metaKey) && ['s', 'p', 'c', 'u', 'a'].includes(e.key.toLowerCase())) {
                 e.preventDefault();
             }
         }
